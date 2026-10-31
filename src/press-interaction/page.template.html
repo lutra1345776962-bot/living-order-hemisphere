@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>平顶受压 · Arduino信号与线圈接力</title>
+<title>平顶受压 · 器件选型与Arduino信号链</title>
 <style>
 
 :root {
@@ -1528,6 +1528,7 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 #press-prototype .press-heading{display:grid;gap:calc(var(--font-size-base)*.5);padding-right:90px;}
 #press-prototype .press-views{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:calc(var(--font-size-base)*1.25);}
 #press-prototype figure{margin:0;min-width:0;display:grid;gap:calc(var(--font-size-base)*.5);align-content:start;}
+#press-prototype figure p{line-height:1.5;}
 #press-prototype canvas{width:100%;height:460px;display:block;touch-action:pan-y;}
 #press-prototype .press-readout{display:flex;flex-wrap:wrap;gap:calc(var(--font-size-base)*1.2);}
 #press-prototype .press-section{display:grid;gap:calc(var(--font-size-base)*.6);min-width:0;}
@@ -1547,7 +1548,7 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 </style>
 <header class="press-heading">
 <h1>平顶柱头的Arduino信号链</h1>
-<p>内藏测力 → HX711 → Arduino → M0与8只端部线圈。模拟输入，未连接实体硬件。</p>
+<p>内藏LLB130 → HX711 → Nano A000005 → 中央与8只端部线圈。三维编号对应下方选型表；模拟输入，未连接实体硬件。</p>
 </header>
 <div class="viz-controls" aria-label="上部加载演示">
 <button type="button" class="btn btn-primary" id="press-tap">短时加载</button><button type="button" class="btn" id="press-hold" aria-pressed="false">持续受压</button><button type="button" class="btn" id="press-release">卸载</button><button type="button" class="btn" id="press-play">暂停动画</button>
@@ -1561,16 +1562,19 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 <p id="press-status" class="press-status" aria-live="polite">正在准备三维示意…</p>
 <div class="press-views">
 <figure><figcaption>整机 · 连续平顶面，无外露测力凸起</figcaption><canvas id="press-whole" role="img" aria-label="平顶板内部隐藏测力元件，中央一只大线圈与8只端部小线圈保持原位；8个放射状弧底薄腔共同响应上部荷载。">测力元件在顶板夹层内，HX711与控制器仍在底部，顶面无凸起。</canvas><p class="text-small text-muted">拖动旋转；Ctrl或Shift＋滚轮缩放。剖开仅供观察。</p></figure>
-<figure><figcaption id="press-detail-caption">接线放大 · HX711、Arduino与两组驱动</figcaption><canvas id="press-detail" role="img" aria-label="底部电子仓三维接线放大，包括HX711、Arduino Nano、74HC244缓冲器、中央线圈驱动、8路端部驱动和5V降压模块。">右侧可选择Arduino接线、内藏测力剖面或铁珠分支。</canvas><p class="text-small text-muted">B采样 · C Arduino · F缓冲 · D0/D1驱动。线路为功能走向示意。</p></figure>
+<figure><figcaption id="press-detail-caption">型号与接线 · B采样 / C控制 / D0与D1驱动</figcaption><canvas id="press-detail" role="img" aria-label="底部电子仓三维接线放大，包括SEN-13879 HX711、Arduino Nano A000005、SN74HC244N、中央与端部DRV8874驱动以及D24V10F5降压。">右侧可选择Arduino接线、内藏测力剖面或铁珠分支。</canvas><p class="text-small text-muted">A内藏测力 · B采样 · C控制 · D0/D1驱动 · E降压 · F缓冲 · P外接12V。完整型号和数量见选型表。</p></figure>
 </div>
 <p id="press-signal-description">持续采样待机：等待上部荷载增量</p>
 <div class="press-readout tabular-nums"><span>荷载增量 <output id="press-pressure">0%</output></span><span id="press-current">M0 关 · S组 关</span><span id="press-active">0 / 8只小线圈</span><span>模型中心上移 <output id="press-rise">0.0 mm</output></span></div>
+<section class="press-section" aria-labelledby="press-parts-title"><h2 id="press-parts-title">三维编号与器件型号</h2><p>按实体小样实施包选型。端部D1表示8块独立DRV8874的组合占位；P是外置适配器的接入端。除A传感器本体外，其余轮廓用于说明布置，不是商品外形或加工图。</p>
+<table class="table table-sm" id="press-parts"><caption class="sr-only">各模块编号、确定型号、数量和布置说明</caption><thead><tr><th scope="col">图中标记与模块</th><th scope="col">选型、数量与布置</th></tr></thead><tbody><tr data-part="A"><th scope="row">A · 内藏测力传感器</th><td><a href="https://www.futek.com/store/load-cells/load-button/subminiature-load-button-llb130/fsh04855">FUTEK LLB130 · FSH04855 · 10lb</a> · 1只<br>44.5N量程；本体Ø9.5×3.3mm。位于中央绕组上方的平顶夹层，HX711在柱底。</td></tr><tr data-part="B"><th scope="row">B · 放大与采样</th><td><a href="https://www.sparkfun.com/sparkfun-load-cell-amplifier-hx711.html">SparkFun SEN-13879 · HX711</a> · 1块<br>底部电子仓；E±激励、A±差分输入，DAT→D3，D2→CLK。VCC与VDD均接逻辑5V。</td></tr><tr data-part="C"><th scope="row">C · 控制器</th><td><a href="https://store.arduino.cc/products/arduino-nano">Arduino Nano A000005</a> · 1块<br>经典5V / ATmega328P；位于底部电子仓，分别输出D9与D10。不是Nano ESP32或Nano 33。</td></tr><tr data-part="D0"><th scope="row">D0 · 中央线圈驱动</th><td><a href="https://www.pololu.com/product/4035">Pololu #4035 · DRV8874</a> · 1块<br>M0独立调流；D9→IN1。必须先修改VREF下拉与模式设置，不能直接使用原板默认限流。</td></tr><tr data-part="D1"><th scope="row">D1 · 8只端部线圈驱动</th><td><a href="https://www.pololu.com/product/4035">Pololu #4035 · DRV8874</a> · 8块<br>8块独立驱动板，每只S线圈各一路；D10经F同步控制。三维D1轮廓只表示组合占位，不是一块8路成品板。</td></tr><tr data-part="F"><th scope="row">F · 8路逻辑缓冲</th><td><a href="https://www.ti.com/product/SN74HC244/part-details/SN74HC244N">TI SN74HC244N · PDIP-20</a> · 1只<br>底部电子仓；D10接8个A，各Y分别到S驱动IN1。20脚5V、10脚GND、OE 1/19接GND。</td></tr><tr data-part="E"><th scope="row">E · 5V逻辑降压</th><td><a href="https://www.pololu.com/product/2831">Pololu D24V10F5 · #2831</a> · 1块<br>12V降为5V/1A；底部电子仓。VOUT经JP1接逻辑5V总线；接电脑USB前先拔JP1。</td></tr><tr data-part="P"><th scope="row">P · 外置动力电源</th><td><a href="https://www.meanwell.com/Upload/PDF/GST60A/GST60A-SPEC.PDF">MEAN WELL GST60A12-P1J</a> · 1只<br>12V/5A/60W适配器放在装置外。图中P为低压接入端，60W为额定容量，不是持续耗电。</td></tr><tr data-part="M0"><th scope="row">M0 · 中央大线圈</th><td>定制试绕 · 600匝 · 铜裸线Ø0.50mm · 1只<br>试制绕组ID22 / OD约46 / 高16mm；从约0.23A起测，计划逐级至约1.5A调流阈值。图形沿用构型示意，非精确加工轮廓。</td></tr><tr data-part="S"><th scope="row">S · 端部小线圈 S1–S8</th><td>定制试绕 · 每只300匝 · 铜裸线Ø0.30mm · 8只<br>试制绕组ID10 / OD约18 / 高10mm，中心R118，轴线均为Z。每只单独调流，从约0.23A起测，计划逐级至约0.6A阈值。</td></tr></tbody></table>
+<p>DRV8874实体设置：PMODE与SLEEP接5V，IN2与IMODE接GND；每路独立设置VREF限流。图中信号线仍为功能走向，JP1、急停、保险、温控及FAULT反馈等完整接线以实施包为准。网页中的相对电流滑块不设定实际安培值。</p></section>
 <div class="viz-controls"><label class="form-label" for="press-view">观察角度<select class="form-select" id="press-view"><option value="perspective">斜视构造</option><option value="front">正视</option><option value="top">俯视线圈</option></select></label><label class="form-label" for="press-selected">放大分支<select class="form-select" id="press-selected"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label></div>
 <div class="viz-controls"><button type="button" class="btn" id="press-fit">复位视角</button><label class="form-check"><input type="checkbox" class="form-check-input" id="press-wires" checked><span class="form-check-label">显示接线</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-topcut"><span class="form-check-label">整机顶板局部剖开</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-open"><span class="form-check-label">移开放大腔前板</span></label></div>
 <div class="viz-controls"><label class="form-check"><input type="checkbox" class="form-check-input" id="press-show-flow" checked><span class="form-check-label">显示路径亮点</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-slow-signal" checked><span class="form-check-label">放慢信号过程</span></label></div>
 <p id="press-baseline">0%为原有荷载基线，100%为本演示相对增量上限，不表示结构承载能力。当前为模拟输入，未连接硬件。</p>
 <p>为看清先后，放慢模式分两段各0.35秒展示，再交给Arduino控制模型；这不是实际导线传播时间或HX711采样延迟。路径亮点只示意方向，高低电平与线圈通断相对应。</p>
-<section class="press-section" aria-labelledby="press-flat-title"><h2 id="press-flat-title">藏在顶板夹层，保留原线圈</h2><p>现有示意的中央线圈内孔Ø20 mm，铁芯约Ø18 mm，单边仅约1 mm，不能把测力元件直接塞进这个内孔。本版采用：平顶板 → 传力压头 → 应变式测力元件 → 固定承压座。器件位于绕组上方，HX711保留在柱底。</p><p>顶面整体做成平板，图示整体厚16 mm。传感器的Ø26×6 mm只表示预留占位，未选定商品；选型后可整体加厚夹层，顶面仍保持平整。</p></section>
+<section class="press-section" aria-labelledby="press-flat-title"><h2 id="press-flat-title">LLB130藏在平顶夹层内</h2><p>A采用FUTEK LLB130 / FSH04855，10lb（44.5N）四线全桥，本体Ø9.5×3.3mm。三维已按该本体尺寸缩小测力元件，位置在中央绕组上方，不占用已有铁芯的内孔；B采样模块仍在柱底。</p><p>顶面保持完整平面。剖面简化表示压头、传感器和承座；实体实施包还包含串联弹簧、约2mm顶板工作行程及三点限位，需要约24mm夹层。这里没有把弹簧和完整承压节点建成加工模型，实际按实施包装配并复核干涉。</p></section>
 <section class="press-section" aria-labelledby="press-sequence-title"><h2 id="press-sequence-title">大开 → 小开 → 大关 → 小关</h2><p>上部短时增载触发一轮；持续受压让整机重复循环；卸载后结束当前轮，再共同接两轮逐渐放慢的余波。8只小线圈始终同步通断。压力较大时缩短轮间等待，电流由下方独立上限控制。</p></section>
 <section class="press-section" aria-labelledby="press-settings-title"><h2 id="press-settings-title">数量与通断时序</h2>
 <label class="form-label" for="press-count">粒子数量 <output id="press-count-value" class="tabular-nums">200 / 腔 · 共1600颗</output><input type="range" class="form-range" id="press-count" min="50" max="400" step="25" value="200"></label>
@@ -1583,21 +1587,21 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 <div class="press-field"><label class="form-label" for="press-current-small">小线圈相对电流 <output id="press-current-small-value">1.6×</output></label><input class="form-range" type="range" id="press-current-small" min="0.5" max="2.5" step="0.1" value="1.6"></div>
 </div><p>最快轮间隔为四段之和：<output id="press-period">2.8 s</output>（模型）。调时序会回到待机，请重新加载；调数量会重置珠群。相对电流倍数不是安培值。高数量时计算采用预算，模型时间可能慢于墙钟时间。</p></section>
 <section class="press-section" aria-labelledby="press-wire-title"><h2 id="press-wire-title">一个感知信号，两组线圈时序</h2>
-<p>桥式模拟信号先到HX711；数据由DT走向Arduino D3，采样时钟由D2反向送到HX711 SCK。D9控制M0驱动；D10经F缓冲器分成8路EN，8只端部线圈同时通断。5V、地线与线圈功率回路另行标出，Arduino引脚不供线圈电流。</p>
+<p>桥式模拟信号先到HX711；数据由DT走向Arduino D3，采样时钟由D2反向送到HX711 SCK。D9控制D0的IN1；D10经F缓冲器分成8路指令，分别送到D1各块驱动的IN1，8只端部线圈同时通断。5V、地线与线圈功率回路另行标出，Arduino引脚不供线圈电流。</p>
 <table class="table table-sm"><caption class="sr-only">功能接线示意，驱动器接口须按实际型号核对</caption><thead><tr><th scope="col">输入</th><th scope="col">连接</th><th scope="col">作用</th></tr></thead><tbody>
-<tr><td>内藏测力桥 E±、S±</td><td>沿独立线槽至柱底HX711 E±、A±</td><td>屏蔽双绞桥线；量程待定</td></tr><tr><td>HX711 DT / SCK</td><td>Nano D3 / D2</td><td>采样与时钟</td></tr>
-<tr><td>Nano D9</td><td>M0恒流驱动 EN</td><td>大线圈组的起止</td></tr><tr><td>Nano D10</td><td>SN74HC244 A输入 → 8个Y输出 → S1–S8驱动 EN</td><td>8只小线圈同步起止</td></tr>
-<tr><td>动力低压电源 + / 0V</td><td>M0驱动、8路S驱动及匹配的降压模块</td><td>供电能力按9线圈同时工况核定</td></tr><tr><td>5V稳压 + / GND</td><td>Nano 5V/GND、HX711供电/GND</td><td>逻辑支路；与动力共地参考</td></tr>
-<tr><td>M0驱动 OUT±</td><td>中央大线圈两端</td><td>单独限流与快速关断</td></tr><tr><td>8路S驱动各OUT±</td><td>分别接8只端部线圈</td><td>时序共用，各自限流</td></tr></tbody></table>
+<tr><td>A测力桥 E±、S±</td><td>沿独立线槽至B HX711 E±、A±</td><td>FSH04855，44.5N量程，屏蔽桥线</td></tr><tr><td>B DT / SCK</td><td>C Nano D3 / D2</td><td>数据与反向采样时钟</td></tr>
+<tr><td>C D9</td><td>D0 DRV8874 EN/IN1</td><td>M0起止，IN2接地</td></tr><tr><td>C D10</td><td>F全部A输入 → 各Y → D1各DRV8874 IN1</td><td>8只S同步起止，各路限流</td></tr>
+<tr><td>P 12V + / 0V</td><td>D0、D1与E降压输入</td><td>适配器12V/5A，布置在装置外</td></tr><tr><td>E 5V输出 / GND</td><td>经JP1供C、B、F及驱动逻辑</td><td>接电脑USB前拔JP1；动力回线分路共地</td></tr>
+<tr><td>D0 OUT1 / OUT2</td><td>M0两端</td><td>不能把任一输出当GND</td></tr><tr><td>D1每块OUT1 / OUT2</td><td>对应S1–S8两端</td><td>8块驱动板，不共用一个总限流</td></tr></tbody></table>
 <p>D是“M0一路＋S组8路”的功能块。GPIO只输出逻辑，不供线圈电流；需核对输入电平、分配负载、各路限流和关断能量处理。动力电压与容量按实际绕组匹配，不沿用单腔电源/功耗推算整机。外部5V与USB供电不应未经核对直接并联。</p></section>
 <details><summary>构造尺寸、材料与验证边界</summary>
 <table class="table table-sm"><thead><tr><th scope="col">部件</th><th scope="col">示意参数</th></tr></thead><tbody>
 <tr><td>总体与薄腔</td><td>8腔等分45°；壳体R130、弧底R126；底板300×280 mm；平顶面标高266 mm，顶板整体厚16 mm（示意）</td></tr><tr><td>单腔与铁珠</td><td>径向净宽96、净隙2.8 mm，透明板各1.5 mm；Ø2 mm珠，每腔50–400颗</td></tr>
-<tr><td>中央线圈 M0</td><td>绕组示意外径48、内径20、高14 mm；匝数、电流与温升待定</td></tr><tr><td>端部线圈 S1–S8</td><td>中心R118，绕组外径18、内径8、高8 mm；9只线圈轴线均竖直</td></tr><tr><td>采样、控制与驱动</td><td>上部适配量程测力元件、HX711、经典5V Nano、M0一路与S组8路驱动、匹配的动力及5V电源</td></tr>
+<tr><td>中央线圈 M0</td><td>定制试绕600匝、铜裸线Ø0.50mm；试制绕组外径约46、内径22、高16mm。三维沿用原构型轮廓，实际骨架需另核对</td></tr><tr><td>端部线圈 S1–S8</td><td>各300匝、铜裸线Ø0.30mm；试制绕组外径约18、内径10、高10mm。中心R118，9只轴线均为Z，温升及磁力待测</td></tr><tr><td>采样、控制与驱动</td><td>A–P编号对应上方器件表；完整8分支共9块DRV8874，首轮只装M0与S1两路</td></tr>
 </tbody></table>
 <p>顶板正常受力时，载荷须经过压头和测力元件；导向及限位保留工作间隙，不能让固定外框把载荷旁路。图中0.2 mm外框间隙仅供看清关系，实际须按测力元件允许变形和公差确定。承压座需单独接到柱身固定受力构件，不以绕组或磁芯作为承压柱；图中尚未完成该节点的承载设计。</p>
-<p>内藏位置靠近磁场和热源，需测量“同一静载、线圈开/关”的零点差，分辨载荷与电磁/温度干扰；桥线用屏蔽双绞、避开动力线，放大采样板置于柱底。需要按实际工作温度校准，不能靠软件归零掩盖线圈引起的假信号。布线依据：<a href="https://cloud.hbkworld.com/en/knowledge/resource-center/articles/wiring-of-strain-gauges1">HBK应变测量布线</a>。应变式测力垫圈是可用技术类别，尺寸须查具体器件及传力垫片：<a href="https://www.hbm.com/fileadmin/mediapool/hbmdoc/technical/B05474.pdf">HBK示例数据表</a>；本图未按该商品选型。</p>
-<p>图示保留中央＋8端部线圈构型，不套用收口U形磁路小样的匝数、电流或功耗。隐藏位置和器件轮廓为功能占位，不是承重节点加工图；真实建筑中的测量与承载连接须按实际荷载设计。</p>
+<p>内藏位置靠近磁场和热源，需测量“同一静载、线圈开/关”的零点差，分辨载荷与电磁/温度干扰；桥线用屏蔽双绞、避开动力线，放大采样板置于柱底。需要按实际工作温度校准，不能靠软件归零掩盖线圈引起的假信号。传感器尺寸与线色依据：<a href="https://media.futek.com/content/futek/files/pdf/productdrawings/llb130.pdf">FUTEK LLB130原厂资料</a>。</p>
+<p>图示保留中央＋8端部构型。线圈参数来自实施包的试绕方案，不是已经验证的吸力、功耗或运动行程；不套用此前U形磁路小样的性能。商品型号已确定，模块组合与承压节点仍需实物装配核对。实体程序初测4秒，网页2.8秒及粒子数量均为模型演示。</p>
 <p>压力以稳定基线F₀上的增量ΔF触发，持续增载期间不自动归零。演示滤波80 ms，高于相对刻度8%约100 ms时触发，低于约3.3%约150 ms时释放；实体阈值需标定。</p>
 <p>粒子运动沿用原网页的磁吸代理、重力与接触计算；为减轻负荷，8腔复制一个腔的定性轨迹，展示统一指令。没有求解真实磁场、磁路耦合、摩擦、剩磁和温升，不能用动画证明1600颗实体可按2.8 s循环或产生涌现。先验证单腔吸起与可靠释放，再逐步扩展。</p>
 </details>

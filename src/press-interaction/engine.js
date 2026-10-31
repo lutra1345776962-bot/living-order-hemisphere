@@ -263,8 +263,9 @@
     let start=commands.length;
     if(local){box(-34,-22,248,34,22,250,neutral,.65);tag(start,'bearing-support',248,250);start=commands.length;}
     ring(18,0,250,252,neutral,[0,0,0],{segments:24,alpha:.85});tag(start,'bearing-seat',250,252);start=commands.length;
-    // Functional envelope only, not a selected commercial sensor or rated bearing node.
-    ring(13,0,252,258,palette.particle,[0,0,0],{segments:28,alpha:.85});tag(start,'embedded-force-sensor',252,258);start=commands.length;
+    // Selected LLB130 body envelope only; seats and load path remain schematic.
+    ring(4.75,0,252,255.3,palette.particle,[0,0,0],{segments:28,alpha:.85});tag(start,'embedded-force-sensor',252,255.3);start=commands.length;
+    ring(4,0,255.3,258,neutral,[0,0,0],{segments:20,alpha:.8});tag(start,'sensor-spacer',255.3,258);start=commands.length;
     ring(5,0,258,260,neutral,[0,0,0],{segments:20,alpha:.95});tag(start,'load-button',258,260);start=commands.length;
     const r=local?42:135,front=local?-28:-135,back=local?28:135;
     if(cut){

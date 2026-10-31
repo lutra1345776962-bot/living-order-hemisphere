@@ -1,0 +1,1859 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>面包板接线 · 平顶柱头</title>
+<style>
+:root {
+  color-scheme: light dark;
+  background-color: var(
+    --background,
+    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
+  ) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: var(
+    --color-background-primary,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --card-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --popover: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255), rgb(45 45 45))
+  );
+  --popover-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --primary: var(
+    --color-text-info,
+    light-dark(rgb(27 104 171), rgb(131 195 255))
+  );
+  --primary-foreground: var(
+    --color-text-inverse,
+    light-dark(rgb(255 255 255), rgb(13 13 13))
+  );
+  --secondary: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+  );
+  --secondary-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: var(
+    --color-text-secondary,
+    light-dark(rgb(26 28 31 / 70%), rgb(255 255 255 / 70%))
+  );
+  --accent: var(
+    --color-background-info,
+    light-dark(rgb(229 242 255), rgb(13 39 63))
+  );
+  --accent-foreground: var(
+    --color-text-info,
+    light-dark(rgb(27 104 171), rgb(131 195 255))
+  );
+  --destructive: var(
+    --color-text-warning,
+    light-dark(rgb(226 85 7), rgb(255 133 73))
+  );
+  --border: var(
+    --color-border-secondary,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+  --input: var(
+    --color-border-primary,
+    light-dark(
+      rgb(26 28 31 / 11.8%),
+      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+    )
+  );
+  --ring: var(
+    --color-ring-primary,
+    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
+  );
+  --font-size-base: var(--font-text-md-size, 16px);
+  --blue: light-dark(rgb(27 104 171), rgb(131 195 255));
+  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
+  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
+  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
+  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
+  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans:
+    -apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI",
+    Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --icon-size: 16px;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --corner-shape: round;
+  --radius: var(--border-radius-lg, 8px);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 17'%3E%3Cpath d='M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z'/%3E%3C/svg%3E");
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html > body {
+  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
+  --color-background-primary: var(
+    --background,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --color-text-primary: var(
+    --foreground,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --color-border-secondary: var(
+    --border,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+
+  margin: 0;
+  padding: var(--visualize-paint-gutter, 0px);
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-weight: var(--font-weight-normal);
+}
+
+.cursor-interaction {
+  cursor: var(--cursor-interaction, pointer);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  font-weight: inherit;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+.table {
+  font-family: var(--font-sans);
+}
+
+h1 {
+  font-size: calc(var(--font-size-base) * 1.5);
+  line-height: 1.3333333333;
+}
+
+h2 {
+  font-size: calc(var(--font-size-base) * 1.25);
+  line-height: 1.4;
+}
+h3 {
+  font-size: calc(var(--font-size-base) * 1.125);
+  line-height: 1.5555555556;
+}
+h4 {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+h5,
+h6 {
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong,
+th {
+  font-weight: 600;
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: var(--corner-shape);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+pre,
+pre code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: calc(var(--font-size-base) * 0.875);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-family: var(--font-sans);
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+.table :is(th, td):not(:last-child) {
+  padding-inline-end: calc(var(--font-size-base) * 1.5);
+}
+
+.table-responsive > .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead :is(th, td) {
+  border-bottom-color: var(--border-strong, var(--input));
+  padding-block: calc(var(--font-size-base) / 2);
+  line-height: var(--font-size-base);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+.table tbody :is(th, td) {
+  padding-block: calc(var(--font-size-base) * 0.625);
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 8px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align="right"]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align="center"]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: var(--corner-shape);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+.widget {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  box-shadow: 0 0 0 0.5px var(--border-strong, var(--border));
+  color: var(--foreground);
+  background: var(--background);
+}
+
+#widget > :not(.card, .widget, .progress) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  border: 1px solid var(--border);
+  corner-shape: var(--corner-shape);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-sans);
+  padding: 5px 12px;
+  border-color: color-mix(
+    in oklab,
+    light-dark(var(--primary-foreground), var(--foreground)) 5%,
+    transparent
+  );
+  border-radius: var(--radius-2xl);
+  color: light-dark(var(--primary-foreground), var(--foreground));
+  background: light-dark(var(--foreground), var(--popover));
+  box-shadow: 0 8px 18px rgb(15 23 42 / 20%);
+  letter-spacing: -0.15px;
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin-block: 6px;
+  border: 0;
+  background: var(--border);
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress {
+  display: flex;
+  height: 8px;
+  margin-block: calc((var(--line-height-normal, 1.5em) - 8px) / 2);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.progress-bar:only-child {
+  border-radius: var(--radius-full);
+}
+
+.progress-bar {
+  height: 100%;
+  flex-shrink: 0;
+  border: 0;
+  background: var(--viz-series-1);
+}
+
+.viz-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: color-mix(in srgb, var(--foreground) 40%, var(--muted-foreground));
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-family: var(--font-sans);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+}
+
+small,
+.text-small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls > .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls > .form-label > :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.nav-link,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+/* Match inline alignment without overriding a containing flex or grid layout. */
+.btn,
+.nav-link,
+.form-control,
+.form-select,
+.form-range,
+.form-check {
+  vertical-align: middle;
+}
+
+.btn,
+.nav-link {
+  --btn-size: calc(12px + 2 * var(--control-spacing, 12px));
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: inherit;
+  font-family: var(--font-sans);
+  height: fit-content;
+  min-height: var(--btn-size);
+  padding-inline: var(--control-spacing, 12px);
+  border-color: transparent;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.btn {
+  border-color: var(--border);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+}
+
+/* Codex Button size="compact"; appearance stays with the button variant. */
+.btn-sm {
+  --btn-size: 24px;
+  padding-inline: 8px;
+  font-size: calc(var(--font-size-base) * 12 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 12 / 16), 1px);
+  line-height: 16px;
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-link:not(:disabled):not([aria-disabled="true"]):hover {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.btn-primary {
+  border-color: var(--border);
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: border-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: border-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--muted-foreground);
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-pills .nav-link {
+  min-width: 0;
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.nav-justified .nav-link {
+  flex: 1 1 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.nav-pills .nav-link.active {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+/* Shared preview chrome; product styles stay inside each variant. */
+.viz-dotted-background {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 0.8px,
+    transparent 0.8px
+  );
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+.viz-carousel {
+  position: relative;
+  min-width: 0;
+}
+
+.viz-carousel:has(> .viz-carousel-controls) {
+  min-height: calc(60px + var(--viz-carousel-picker-height, 0px));
+  padding-bottom: 60px;
+}
+
+.viz-carousel > [data-variant][hidden] {
+  display: none !important;
+}
+
+.viz-carousel > [data-variant] {
+  isolation: isolate;
+}
+
+.viz-carousel-controls {
+  --viz-carousel-hover: light-dark(
+    color-mix(in srgb, var(--foreground) 5.4%, transparent),
+    color-mix(in srgb, var(--foreground) 7.8%, transparent)
+  );
+  position: absolute;
+  z-index: 2;
+  bottom: 8px;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  /* Leave room for the host's design-controls launcher at the trailing edge. */
+  max-width: calc(100% - 96px);
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  /* Match the settings dropdown chrome independently of the content font size. */
+  font-size: 13px;
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+/* Keep authored mockup button styles out of the shared carousel chrome. */
+.viz-carousel-controls button,
+.viz-carousel-picker > summary {
+  display: flex !important;
+  height: auto !important;
+  min-height: 30px;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px;
+  padding: 0 6px !important;
+  -webkit-app-region: no-drag;
+  border: 0 !important;
+  border-radius: 14px !important;
+  color: inherit !important;
+  background: transparent !important;
+  font: inherit !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viz-carousel-controls > button,
+.viz-carousel-picker > summary {
+  position: relative;
+  isolation: isolate;
+}
+
+.viz-carousel-controls > button {
+  --icon-size: 16px;
+  width: 30px !important;
+  padding: 0 !important;
+}
+
+.viz-carousel-picker > summary {
+  padding-inline: 12px !important;
+}
+
+.viz-carousel-controls .viz-carousel-caret {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin: 0;
+  color: inherit;
+  transform: rotate(180deg);
+}
+
+.viz-carousel-controls > button > svg,
+.viz-carousel-controls .viz-carousel-caret,
+.viz-carousel-count {
+  opacity: 0.5;
+}
+
+.viz-carousel-controls > button::before,
+.viz-carousel-picker > summary::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  border-radius: 12px;
+  content: "";
+  pointer-events: none;
+}
+
+.viz-carousel-controls > button:hover::before,
+.viz-carousel-picker > summary:hover::before {
+  background: var(--viz-carousel-hover);
+}
+
+.viz-carousel-controls > button,
+.viz-carousel-controls [data-lucide],
+.viz-carousel-controls .lucide {
+  flex-shrink: 0;
+}
+
+.viz-carousel-picker {
+  min-width: 0;
+}
+
+.viz-carousel-picker > summary {
+  min-width: 0;
+  list-style: none;
+}
+
+.viz-carousel-picker > summary::-webkit-details-marker {
+  display: none;
+}
+
+.viz-carousel-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.viz-carousel-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viz-carousel-options {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  max-height: 240px;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  box-shadow: 0 4px 12px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 25%));
+}
+
+.viz-carousel-options > button {
+  border-radius: max(0px, calc(var(--radius-lg) - 5px)) !important;
+  width: 100% !important;
+  min-height: 28px;
+  justify-content: flex-start !important;
+  padding: 4px 8px !important;
+  font-size: var(--font-size-small) !important;
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.viz-carousel-options > [aria-current="true"],
+.viz-carousel-options > button:hover {
+  background: var(--viz-carousel-hover) !important;
+}
+
+.btn:disabled,
+.nav-link:disabled,
+.nav-link[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding-inline: calc(4px + var(--control-spacing, 12px) / 2);
+  border-color: var(--input);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--popover) 96%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.4285714286;
+}
+.form-control:is(
+  [type="file"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="week"],
+  [type="color"]
+) {
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  line-height: 18px;
+}
+.form-control:is(
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="week"]
+) {
+  padding-inline: var(--control-spacing, 12px);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type="file"] {
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+  padding: 0;
+}
+
+.form-control[type="file"]::file-selector-button {
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+  min-height: calc(10px + 2 * var(--control-spacing, 12px));
+  padding-inline: var(--control-spacing, 12px);
+  margin-inline-end: var(--control-spacing, 12px);
+}
+
+.form-control[type="file"]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type="color"] {
+  width: 40px;
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: var(--corner-shape);
+}
+
+textarea.form-control {
+  height: auto;
+  resize: vertical;
+  min-height: 96px;
+  padding: 8px 10px;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: none;
+}
+.form-control:disabled {
+  color: var(--muted-foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  opacity: 1;
+}
+.form-control[aria-invalid="true"] {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: fit-content;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  margin: 0;
+  /* The secondary icon role is 14px at compact density and 16px at web density. */
+  --icon-size: calc(10px + var(--control-spacing, 12px) / 2);
+  /* Settings dropdowns retain a 12px inset and a 4px text-to-chevron gap. */
+  padding: 0 calc(16px + var(--icon-size)) 0 12px;
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    ),
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    );
+  background-position:
+    calc(100% - 12px - var(--icon-size) / 2) 50%,
+    calc(100% - 12px - var(--icon-size) * 0.18) 50%;
+  background-repeat: no-repeat;
+  background-size: calc(var(--icon-size) * 0.32) calc(var(--icon-size) * 0.32);
+  cursor: var(--cursor-interaction, default);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.form-select :is(option, optgroup) {
+  color: var(--popover-foreground);
+  background-color: var(--popover);
+}
+
+.form-select :is(option, optgroup):disabled {
+  color: var(--muted-foreground);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.form-select:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+.form-select:disabled {
+  opacity: 0.4;
+}
+
+.form-check {
+  display: flex;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+  corner-shape: round;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  width: calc(10px + var(--control-spacing, 12px) / 2);
+  height: calc(10px + var(--control-spacing, 12px) / 2);
+  border-color: var(--border-strong, var(--input));
+  border-radius: calc(var(--radius-sm) / 2);
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:is(:checked, :indeterminate) {
+  border-color: var(--border-strong, var(--input));
+  background-color: color-mix(in srgb, var(--popover) 96%, transparent);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: "";
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+  background-color: var(--foreground);
+}
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:indeterminate::before {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 65%;
+  height: 6.65%;
+  margin: auto;
+  border-radius: var(--radius-full);
+  background: var(--foreground);
+  mask: none;
+  content: "";
+}
+
+.form-check-input[type="radio"] {
+  border-radius: var(--radius-full);
+  width: 16px;
+  height: 16px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--input);
+}
+
+.form-check-input[type="radio"]:checked {
+  border: 0;
+  background: radial-gradient(
+    circle,
+    var(--primary-foreground) 0 3px,
+    var(--foreground) 3px
+  );
+  box-shadow: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:focus-visible {
+  border-color: var(--ring);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+.form-check:not(.form-switch) .form-check-input[type="radio"]:disabled,
+.form-check:not(.form-switch)
+  .form-check-input[type="radio"]:disabled
+  + .form-check-label {
+  opacity: 0.5;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  content: "";
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  border-color: #fff;
+  background: #fff;
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--blue);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+  outline: none;
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  accent-color: var(--primary);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  outline: none;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: transparent;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  margin-top: -9px;
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Outline the native track and thumb, preserving the larger input hit area. */
+.form-range:focus-visible::-webkit-slider-runnable-track {
+  outline: 2px auto Highlight;
+  outline-color: -webkit-focus-ring-color;
+}
+
+.form-range::-moz-range-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+.form-range:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+  [aria-pressed="true"],
+  [aria-selected="true"],
+  .is-selected
+) {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--blue);
+}
+
+.btn.viz-tile:is([aria-pressed="true"], [aria-selected="true"], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.viz-carousel-controls :is(button, summary):focus-visible {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Web recipes are the default, including on renderers without inline style queries. */
+@supports (border-radius: if(style(--corner-shape: round): 1px; else: 2px)) {
+  /* Match the host's proportional text-sm scale at every text preference. */
+  .tooltip,
+  .viz-badge,
+  .btn,
+  .nav-link,
+  .form-control,
+  .form-select {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 14 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 13 / 14), 1px)
+    );
+  }
+
+  .btn-sm {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 12 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 12 / 14), 1px)
+    );
+  }
+
+  .btn,
+  .nav-link,
+  .form-select {
+    border-radius: if(
+      style(--corner-shape: round): var(--radius-full); else: var(--radius-lg)
+    );
+  }
+
+  .form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+    border-radius: if(
+      style(--corner-shape: round): calc(var(--radius-sm) / 2);
+        else: calc(var(--radius-lg) * 0.4)
+    );
+  }
+
+  .tooltip {
+    font-weight: if(
+      style(--corner-shape: round): 600; else: var(--font-weight-normal)
+    );
+  }
+}
+
+@media (pointer: coarse) {
+  .viz-carousel:has(> .viz-carousel-controls) {
+    min-height: calc(76px + var(--viz-carousel-picker-height, 0px));
+    padding-bottom: 76px;
+  }
+
+  .btn,
+  .nav-link,
+  .viz-carousel-controls button,
+  .viz-carousel-picker > summary,
+  .form-control,
+  .form-select {
+    --btn-size: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Keep small-screen WebKit from zooming when a text field receives focus. */
+  .form-control,
+  .form-select {
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+  .form-control:is(
+    [type="file"],
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="week"],
+    [type="time"],
+    [type="color"]
+  ) {
+    height: 44px;
+    min-height: 44px;
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+
+  .form-control[type="file"]::file-selector-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-control-color[type="color"] {
+    width: 44px;
+    height: 44px;
+  }
+
+  .form-control:is(
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="time"],
+    [type="week"]
+  ) {
+    min-width: 0;
+    max-width: 100%;
+    padding-block: 8px;
+  }
+
+  .form-check {
+    min-height: 44px;
+    padding-inline: 15px;
+  }
+
+  .form-check-input {
+    position: relative;
+  }
+
+  .form-check-input::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    content: "";
+    transform: translate(-50%, -50%);
+  }
+
+  .form-check-label {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .form-range {
+    height: 44px;
+    touch-action: pan-y;
+  }
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget > svg {
+  width: 100%;
+}
+
+/* Model-authored chart rules can otherwise stretch icons after these styles load. */
+svg.lucide {
+  display: block;
+  width: var(--icon-size) !important;
+  height: var(--icon-size) !important;
+  flex: none;
+  margin: 0 !important;
+  stroke-width: 1.6;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html>body{padding:0}
+</style><style>:root{--font-size-base:16px;--wire5:#a43431;--wire0:#405a74;--wireAnalog:#784d93;--wireData:#0a7075;--wireCommand:#195fa6;--wireFeedback:#237049;--wire12:#b04f09;}
+@media(prefers-color-scheme:dark){:root{--wire5:#fa9993;--wire0:#a5c9ee;--wireAnalog:#c9a5f0;--wireData:#77d2cf;--wireCommand:#8bbdf5;--wireFeedback:#9bd4b1;--wire12:#ffbd80;}}
+html{min-height:100%;overflow-y:auto;}body{margin:0;background:var(--background);color:var(--foreground);}
+main{box-sizing:border-box;max-width:1480px;margin:0 auto;padding:24px;display:grid;gap:24px;min-width:0;}
+main>*{min-width:0;}p{line-height:1.6;text-wrap:pretty;}h1{margin:0;}h2{margin:0 0 12px;}section{min-width:0;}
+.page-head{max-width:74ch;display:grid;gap:8px;}.page-head p{margin:0;}.boundary{max-width:85ch;margin:0;}
+.step-nav{display:flex;flex-wrap:wrap;gap:8px;}.step-nav button{padding:9px 12px;min-height:44px;text-align:left;}
+.step-nav button[aria-current="step"],button[aria-pressed="true"]{font-weight:600;text-decoration:underline;text-underline-offset:5px;}
+.step-heading{max-width:90ch;}.step-heading p{margin:0;}.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:14px;}
+.toolbar fieldset{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;border:0;}.toolbar button,#clear-wire{min-height:44px;}
+.branch-label{display:flex;gap:10px;align-items:center;}.branch-label select{width:90px;min-height:44px;}
+figure{margin:0;min-width:0;display:grid;gap:10px;}figcaption{font-weight:500;line-height:1.5;}
+.diagram-scroll{box-sizing:border-box;padding:12px;max-width:100%;overflow:auto;border:1px solid var(--border);background:var(--background);max-height:780px;overscroll-behavior-x:contain;touch-action:pan-x pan-y;}
+#diagram{display:block;width:100%;min-width:1080px;height:auto;font-family:inherit;isolation:isolate;}
+.diagram-help{margin:0;max-width:85ch;}.wire-inspector{display:grid;gap:12px;max-width:90ch;}.wire-inspector h2{margin:0;}
+.wire-inspector label{margin:0;}.wire-inspector select{max-width:100%;min-height:44px;}.wire-detail{margin:0;font-weight:500;min-height:3em;}.wire-inspector p{margin:0;}
+#clear-wire{justify-self:start;}ul{padding-left:24px;line-height:1.65;}li+li{margin-top:8px;}
+.table-scroll{overflow:auto;max-width:100%;}table{width:100%;table-layout:fixed;}th,td{overflow-wrap:anywhere;vertical-align:top;line-height:1.6;}
+#wire-table th:first-child{width:46%;}#wire-table td:first-child button{background:none;color:var(--foreground);font:inherit;text-align:left;border:0;padding:6px 2px;min-height:44px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+#wire-table tr[aria-current="true"]{font-weight:600;}button,select,summary{cursor:pointer;}button:focus-visible,select:focus-visible,summary:focus-visible,.diagram-scroll:focus-visible{outline:2px solid var(--foreground);outline-offset:3px;}
+::selection{background:var(--muted);color:var(--foreground);}details{line-height:1.6;}summary{min-height:44px;display:list-item;}
+svg .paper{fill:var(--background);}svg .board{fill:var(--muted);stroke:var(--border);stroke-width:2;}
+svg .module{fill:var(--background);stroke:var(--muted-foreground);stroke-width:1.5;}svg .chip{fill:var(--muted);stroke:var(--foreground);stroke-width:1.5;}
+svg text{fill:var(--foreground);font-size:16px;}svg .small{font-size:13px;}svg .tiny{font-size:12px;}svg .title{font-size:21px;font-weight:600;}svg .subtitle{font-size:16px;}
+svg .metal{stroke:var(--border);stroke-width:7;stroke-linecap:round;}svg .hole{fill:var(--background);stroke:var(--muted-foreground);stroke-width:1;}
+svg .contact{fill:var(--foreground);}svg .wire{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+svg .wire-hit{fill:none;stroke:transparent;stroke-width:18;cursor:pointer;}svg .wire-glow{fill:none;stroke-width:7;opacity:.15;}
+svg .net5V{stroke:var(--wire5);}svg .netGND{stroke:var(--wire0);}svg .netAnalog{stroke:var(--wireAnalog);}svg .netData{stroke:var(--wireData);}svg .netCommand{stroke:var(--wireCommand);}svg .netFeedback{stroke:var(--wireFeedback);}svg .net12V,svg .netCOIL{stroke:var(--wire12);}
+svg .wire-shadow{stroke:var(--background);stroke-width:7;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+svg .chosen .wire{stroke-width:5;}svg .chosen .wire-glow{opacity:.35;}svg .other{opacity:.14;}svg .focus-strip{fill:none;stroke:var(--foreground);stroke-width:2;}
+svg .component-value{fill:var(--background);stroke:var(--muted-foreground);}svg .flow{stroke-dasharray:9 14;animation:trace 1.4s linear infinite;}
+@keyframes trace{to{stroke-dashoffset:-46;}}@media(prefers-reduced-motion:reduce){svg .flow{animation:none;}}
+@media(max-width:600px){main{padding:14px;gap:20px;}.toolbar{gap:10px;}.toolbar fieldset{width:100%;}.step-nav button{flex:1 1 140px;}#diagram{min-width:1080px;}.diagram-scroll{max-height:620px;}}
+</style></head>
+<body><main id="breadboard-app">
+<header class="page-head"><h1>把受压信号接到线圈</h1><p>Arduino Nano、HX711与74HC244通过面包板连接。先看接线逻辑，再按孔位追踪每根跳线。</p><p><a href="press-interaction.html">返回柱头三维动态示意</a></p></header>
+<p class="boundary"><strong>面包板只走逻辑5V与信号。</strong>12V、驱动功率回流和线圈用端子排直连。此页为接线教学图，未连接或控制实体硬件。</p>
+<nav aria-label="分步接线" id="step-nav" class="step-nav"><button type="button" class="btn" data-step="power">1 · 5V与公共地</button><button type="button" class="btn" data-step="sensor">2 · 传感器接HX711</button><button type="button" class="btn" data-step="adc">3 · HX711接Nano</button><button type="button" class="btn" data-step="central">4 · D9控制M0</button><button type="button" class="btn" data-step="branches">5 · D10分配8路</button><button type="button" class="btn" data-step="feedback">6 · 故障与温控反馈</button><button type="button" class="btn" data-step="actuator">7 · 驱动与线圈动力</button><button type="button" class="btn" data-step="all">全部连接</button></nav>
+<section class="step-heading" aria-labelledby="step-title"><h2 id="step-title">5V与公共地</h2><p id="step-body">先连接逻辑供电与公共参考地。</p></section>
+<div class="toolbar">
+<fieldset><legend class="sr-only">图示方式</legend><button type="button" class="btn" data-view="logic" aria-pressed="true">接线逻辑</button><button type="button" class="btn" data-view="board" aria-pressed="false">面包板孔位</button><button type="button" class="btn" data-view="driver" aria-pressed="false">单路驱动详图</button></fieldset>
+<button type="button" class="btn" id="play" aria-pressed="false">播放接线顺序</button>
+<label for="branch" class="branch-label">展开驱动<select id="branch" class="form-select"><option value="0">M0</option><option value="1" selected>S1</option><option value="2">S2</option><option value="3">S3</option><option value="4">S4</option><option value="5">S5</option><option value="6">S6</option><option value="7">S7</option><option value="8">S8</option></select></label>
+</div>
+<figure><figcaption id="diagram-caption">逻辑图：传感器 → HX711 → Arduino → 驱动 → 线圈。</figcaption>
+<div class="diagram-scroll" id="diagram-scroll" tabindex="0" role="region" aria-label="可横向滚动的接线图；可用方向键滚动"><svg id="diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 1120" role="img" aria-labelledby="svg-title svg-desc"><title id="svg-title">面包板接线教学图</title><desc id="svg-desc">可通过下方线路选择器获取同样的端点和孔位信息。</desc></svg></div>
+<p class="diagram-help">图内点击线路可查看端点；也可用下方选择器操作。孔位图保留细节宽度，窄屏请在图内横向滚动。</p></figure>
+<section class="wire-inspector" aria-labelledby="wire-title"><h2 id="wire-title">当前线路</h2><label class="form-label" for="wire-select">选择这一步的连接<select class="form-select" id="wire-select"></select></label>
+<p id="wire-detail" class="wire-detail" aria-live="polite"></p><p id="strip-detail"></p><button class="btn" type="button" id="clear-wire">取消单线高亮</button></section>
+<section class="connections" aria-labelledby="connections-title"><h2 id="connections-title">这一步要接哪些线</h2><p>孔号由字母与排号组成，例如a24。左半区a至e同排相通，右半区f至j同排相通；中央沟槽两边不相通。</p>
+<div class="table-scroll"><table class="table table-sm" id="wire-table"><thead><tr><th scope="col">连接/元件</th><th scope="col">起点</th><th scope="col">终点</th></tr></thead><tbody></tbody></table></div></section>
+<section aria-labelledby="board-rule-title"><h2 id="board-rule-title">插板前先认清内部连接</h2><ul>
+<li>Nano顶视图：USB端朝第1排，左排针插c5至c19，右排针插g5至g19；跳线用同排空孔，不与模块针脚挤同一孔。</li>
+<li>SN74HC244N缺口朝第1排，左侧1至10脚插e35至e44，右侧20至11脚插f35至f44，跨中央沟槽。</li>
+<li>图中220Ω电阻竖装，占相邻两排；如果采用平放电阻，需要增加排距并相应调整孔号。100nF陶瓷跨第34/35排，靠近244的20脚。</li>
+<li>本图的电源轨按L+/L−/R+/R−各50孔编号，上下各25孔。上下段及左右轨不会自动连通，图中明确画了跨接线。实物轨道分段和孔位可能不同，先用通断档确认。</li>
+<li>传感器四线转接用于短线台架调试；实体优先用屏蔽成对线直接到HX711端子，减少面包板接点噪声。E+不能直接接面包板5V轨。</li>
+</ul></section>
+<section aria-labelledby="driver-title"><h2 id="driver-title">9路驱动的共同设置</h2><p>中央1块与端部8块均用Pololu #4035。三维中的D1组合占位，在这里展开为S1至S8八块独立板。模块端子按名称接，不把图中位置当成PCB物理顺序。</p>
+<table class="table table-sm"><thead><tr><th scope="col">端子</th><th scope="col">连接</th></tr></thead><tbody>
+<tr><th scope="row">PMODE / SLEEP</th><td>逻辑5V；PMODE选择IN/IN模式</td></tr><tr><th scope="row">PH/IN2 / IMODE</th><td>本路GND；IMODE接地使用固定关断时间调流</td></tr>
+<tr><th scope="row">EN/IN1</th><td>D9或独立244输出，经220Ω；板端10kΩ下拉</td></tr><tr><th scope="row">VREF</th><td>每路各自接下拉电阻；先用560Ω低流档。M0计划逐级至5.11kΩ、S逐级至1.58kΩ，均须实测</td></tr>
+<tr><th scope="row">VIN / GND</th><td>VIN由12V支路供电，GND独立回0V端子；不经面包板走功率电流</td></tr><tr><th scope="row">OUT1 / OUT2</th><td>对应线圈两端；任一输出都不当作GND，不跨绕组加普通续流二极管</td></tr>
+<tr><th scope="row">VM</th><td>本地并470µF/35V、100nF/50V及SMCJ18A（阴极VM、阳极GND）；按实测电感复核吸收能量</td></tr><tr><th scope="row">FAULT / CS</th><td>开漏FAULT汇接到D4；CS保留原板2.49kΩ，不短地</td></tr>
+</tbody></table><p>首次0.23A、M0约1.5A与S约0.6A都是典型调流阈值的试验档，不是实测RMS电流或起吸保证。完整保护、标定和控制程序沿用实体实施包。</p></section>
+<details><summary>引脚依据与图示范围</summary><p>Nano排针方向依据<a href="https://docs.arduino.cc/resources/pinouts/A000005-full-pinout.pdf">Arduino官方Nano引脚图</a>；缓冲器依据<a href="https://www.ti.com/lit/ds/scls130f/scls130f.pdf">TI SN74HC244数据表</a>。驱动设置依据<a href="https://www.pololu.com/product/4035">Pololu #4035模块</a>与既有实体实施包。</p><p>本页用一块63排、两侧分段电源轨的教学面包板表达连接；比例与外部模块端子位置是示意。线路亮点只用于追踪先后，不表示导线传播速度、实际电压、采样周期或磁力。未做实物接线、起吸、温升和干扰测试。</p></details>
+<noscript><p>交互图需要JavaScript。上方模块设置、板内连接规则与引脚来源仍可阅读；此文件不依赖外网脚本。</p></noscript>
+</main><script>(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.BreadboardPlan=api;})(typeof window!=='undefined'?window:globalThis,function(){
+ 'use strict';
+ const nodes={},edges=[],parts=[],pins={},steps=[
+  {id:'power',title:'1 · 5V与公共地',body:'面包板四条电源轨只分配5V与GND。四条轨道的上下段、左右同极性轨道分别用跳线接通；接电脑USB前先拔JP1。'},
+  {id:'sensor',title:'2 · 传感器接HX711',body:'红E+、黑E−、绿S+、白S−分别经左半区第24至27排接HX711 E+、E−、A+、A−。E+是HX711的桥路激励，不接5V电源轨。'},
+  {id:'adc',title:'3 · HX711接Nano',body:'HX711 DAT接Nano D3；Nano D2回送CLK。这是专用同步接口，不是I²C。'},
+  {id:'central',title:'4 · D9控制M0',body:'D9经220Ω串联电阻到中央DRV8874的IN1；IN1端10kΩ下拉，复位时默认关闭。12V与线圈回路不经过面包板。'},
+  {id:'branches',title:'5 · D10分配8路',body:'D10经第30至32排的连接总线送到74HC244八个A输入。八个Y各经220Ω到对应S驱动IN1，每路10kΩ下拉。Y输出彼此不并联。'},
+  {id:'feedback',title:'6 · 故障与温控反馈',body:'9个开漏FAULT在外部F端子汇接，再到Nano D4；D5连接绕组常闭温控串联链。两路各4.7kΩ上拉。故障LOW或温控链断开HIGH时程序关闭输出。'},
+  {id:'actuator',title:'7 · 驱动与线圈动力',body:'12V经总保险、急停和各路保险进入驱动VIN。每只线圈接自己驱动的OUT1/OUT2；各驱动GND独立回到0V端子。模式、限流及VM吸收网络按右下方表配置。'},
+  {id:'all',title:'全部连接',body:'完整图包含所有支路。选中一根跳线可单独追踪；面包板上相交的导线不自动相连，只有孔、金属条和明确端子形成连接。'}
+ ];
+ const cols={a:500,b:514,c:528,d:542,e:556,f:598,g:612,h:626,i:640,j:654};
+ const rowY=n=>172+(n-1)*12;
+ const hole=(c,r)=>c+r;
+ for(let r=1;r<=63;r++)for(const [c,x]of Object.entries(cols))nodes[hole(c,r)]={id:hole(c,r),x,y:rowY(r),type:'hole',group:(c<='e'?'L':'R')+r,label:c+r};
+ for(const [rail,x]of [['L+',458],['L-',476],['R+',680],['R-',698]])for(let n=1;n<=50;n++){
+  const k=(n-1)%25,slot=(n<=25?1:35)+Math.floor(k/5)*6+k%5,id=rail+String(n).padStart(2,'0');
+  nodes[id]={id,x,y:rowY(slot),type:'rail',group:rail+(n<=25?'U':'D'),label:id};
+ }
+ function node(id,x,y,label){nodes[id]={id,x,y,type:'port',group:id,label:label||id};return id;}
+ function edge(id,stage,a,b,label,net,kind='wire',value=''){if(!nodes[a]||!nodes[b])throw Error('Unknown endpoint '+id);edges.push({id,stage,a,b,label,net,kind,value});return id;}
+ function part(id,title,subtitle,x,y,w,h){parts.push({id,title,subtitle,x,y,w,h});}
+ const occupied=new Set();
+ const left=['D13','3V3','AREF','A0','A1','A2','A3','A4','A5','A6','A7','5V','RESET-L','GND-L','VIN'];
+ const right=['D12','D11','D10','D9','D8','D7','D6','D5','D4','D3','D2','GND-R','RESET-R','RX0','TX1'];
+ left.forEach((name,k)=>{pins['Nano.'+name]=hole('c',k+5);occupied.add(hole('c',k+5));});
+ right.forEach((name,k)=>{pins['Nano.'+name]=hole('g',k+5);occupied.add(hole('g',k+5));});
+ for(let p=1;p<=20;p++){const addr=p<=10?hole('e',34+p):hole('f',55-p);pins['U244.'+p]=addr;occupied.add(addr);}
+ part('sensor','A · LLB130 / FSH04855','10lb · 顶板夹层内',35,170,310,175);
+ for(const [k,y]of [['E+',218],['E-',252],['S+',286],['S-',320]])node('sensor.'+k,345,y,k);
+ part('hx','B · SEN-13879 / HX711','模块端子按名称接线',35,405,310,295);
+ for(const [k,y]of [['E+',450],['E-',484],['A+',518],['A-',552],['DAT',594],['CLK',628],['VCC',662],['VDD',687]])node('hx.'+k,345,y,k);
+ node('hx.GND',35,662,'GND');
+ part('buck','E · D24V10F5','12V → 5V；JP1后接面包板',35,745,310,110);
+ node('buck.VIN',35,780,'VIN');node('buck.GND',35,824,'GND');node('buck.VOUT',345,790,'VOUT');node('JP1.in',375,790,'JP1');node('JP1.out',405,790,'JP1后5V');
+ part('supply','P · GST60A12-P1J','外置12V / 5A适配器',35,935,310,130);
+ node('P.+12',345,970,'+12V');node('P.0V',345,1030,'0V');
+ part('m0','D0 · DRV8874 #4035','中央线圈驱动',1070,155,350,160);
+ node('M0.IN1',1070,212,'IN1');node('M0.FAULT',1070,252,'FAULT');node('M0.VIN',1420,195,'VIN');node('M0.GND',1420,272,'GND');
+ node('M0.OUT1',1225,315,'OUT1');node('M0.OUT2',1355,315,'OUT2');
+ node('M0.coil1',1225,370,'绕组1');node('M0.coil2',1355,370,'绕组2');
+ for(let i=1;i<=8;i++){
+  const x=i<=4?1050:1240,y=430+((i-1)%4)*104,id='S'+i;
+  part(id,id+' · DRV8874','独立调流',x,y,170,74);
+  node(id+'.IN1',i<=4?x:x+170,y+28,'IN1');node(id+'.FAULT',x+65,y+74,'FAULT');node(id+'.VIN',x+170,y+14,'VIN');node(id+'.GND',x+170,y+58,'GND');
+  node(id+'.OUT1',x+35,y+74,'OUT1');node(id+'.OUT2',x+140,y+74,'OUT2');node(id+'.coil1',x+35,y+94,'绕组1');node(id+'.coil2',x+140,y+94,'绕组2');
+ }
+ part('terminal','外部端子排 · 12V与0V','动力回流不经过面包板',1045,935,375,145);
+ node('T.+12',1050,970,'急停后+12V');node('T.0V',1050,1030,'公共0V');node('F.bus',940,850,'F 故障汇接');
+ node('thermal.in',865,915,'NC温控串联链');node('thermal.out',1000,915,'NC链回0V');
+ const reserved={'L+':[46],'L-':[19,20,40,41,42,43],'R+':[46],'R-':[40,41,42,43]};
+ const free={};for(const r of ['L+','L-','R+','R-'])free[r]=Array.from({length:50},(_,i)=>i+1).filter(i=>![1,2,25,26,...reserved[r]].includes(i));
+ function railHole(rail){const n=free[rail].shift();if(!n)throw Error('Rail exhausted');return rail+String(n).padStart(2,'0');}
+ const to5=(id,a,stage='power')=>edge(id,stage,a,railHole('L+'),'接逻辑5V','5V');
+ const toG=(id,a,stage='power')=>edge(id,stage,a,railHole('L-'),'接逻辑GND','GND');
+ edge('buck-in','actuator','P.+12','buck.VIN','12V经逻辑支路T0.5A到降压VIN','12V', 'wire','T0.5A');
+ edge('buck-gnd','actuator','buck.GND','T.0V','降压输入地回星形0V','GND');
+ edge('p12','actuator','P.+12','T.+12','12V经T5A、NC急停后到动力分配','12V','wire','T5A / NC急停');
+ edge('p0','actuator','P.0V','T.0V','适配器0V到公共回线端子','GND');
+ edge('buck-jp','power','buck.VOUT','JP1.in','降压5V到JP1输入','5V');
+ edge('jp','power','JP1.in','JP1.out','独立运行接通JP1；连接电脑USB前拔掉','5V','jumper','JP1');
+ edge('feed5','power','JP1.out','L+01','JP1后5V送入面包板L+上段','5V');
+ edge('feed0','power','T.0V','L-01','0V参考接面包板L−上段，非线圈回流','GND');
+ for(const r of ['L+','L-','R+','R-'])edge('bridge-'+r,'power',r+'25',r+'26','跨接'+r+'电源轨上下段',r.includes('+')?'5V':'GND');
+ edge('cross5','power','L+02','R+01','连接左右5V电源轨','5V');edge('cross0','power','L-02','R-01','连接左右GND电源轨','GND');
+ to5('nano5','a16');toG('nano0','a18');
+ to5('hx-vcc','hx.VCC');to5('hx-vdd','hx.VDD');toG('hx-gnd','hx.GND');
+ to5('244-vcc','j35');toG('244-gnd','a44');toG('244-oe1','a35');toG('244-oe2','j36');
+ edge('c244','power','h35','h34','244电源旁100nF去耦','5V','capacitor','100nF');toG('c244-gnd','j34');
+ ['E+','E-','S+','S-'].forEach((p,i)=>{
+  const row=24+i,q=['E+','E-','A+','A-'][i];
+  edge('sensor-'+p,'sensor','sensor.'+p,'a'+row,'传感器'+p+'到左半区第'+row+'排',q);
+  edge('bridge-hx-'+q,'sensor','d'+row,'hx.'+q,'同排金属条转接至HX711 '+q,q);
+ });
+ edge('dat','adc','hx.DAT','j14','HX711 DAT → Nano D3（g14所在右半排）','DAT');
+ edge('clk','adc','j15','hx.CLK','Nano D2（g15）→ HX711 CLK','CLK');
+ edge('d9','central','j8','a22','Nano D9 → 第22排串阻前','D9');
+ edge('r-m0','central','b22','b23','串联220Ω，隔开两排','M0_IN1','resistor','220Ω');
+ edge('m0-command','central','c23','M0.IN1','串阻后 → M0 IN1','M0_IN1');
+ edge('pd-m0','central','d23','L-19','M0 IN1端10kΩ下拉','GND','resistor','10kΩ');
+ edge('d10','branches','j7','a30','Nano D10到逻辑分配总线','D10');
+ edge('pd-d10','branches','b30','L-20','D10总线10kΩ下拉','GND','resistor','10kΩ');
+ edge('hub1','branches','c30','a31','第30排与31排总线跨接','D10');edge('hub2','branches','d31','a32','第31排与32排总线跨接','D10');
+ const fanoutSources=['d30','e30','b31','c31','e31','b32','c32','d32'];
+ const inputHoles=['a36','b38','c40','d42','j44','i42','h40','g38'];
+ const outHoles=['j37','j39','j41','j43','a43','a41','a39','a37'];
+ const bufferMap=[[2,18],[4,16],[6,14],[8,12],[11,9],[13,7],[15,5],[17,3]];
+ for(let k=0;k<8;k++){
+  const id='S'+(k+1),row=49+(k%4)*2,leftHalf=k<4,pre=(leftHalf?'a':'j')+row,r0=(leftHalf?'b':'i')+row,r1=(leftHalf?'b':'i')+(row+1),out=(leftHalf?'c':'h')+(row+1),pd=(leftHalf?'d':'g')+(row+1);
+  edge('in-'+id,'branches',fanoutSources[k],inputHoles[k],'D10总线 → 244 A脚'+bufferMap[k][0],'D10');
+  edge('buf-'+id,'branches',outHoles[k],pre,'244 Y脚'+bufferMap[k][1]+' → '+id+'串阻前',id+'_BUF');
+  edge('r-'+id,'branches',r0,r1,id+'串联220Ω',id+'_IN1','resistor','220Ω');
+  edge('cmd-'+id,'branches',out,id+'.IN1','串阻后 → '+id+'驱动IN1',id+'_IN1');
+  edge('pd-'+id,'branches',pd,(leftHalf?'L-':'R-')+(40+k%4),id+' IN1端10kΩ下拉','GND','resistor','10kΩ');
+ }
+ edge('f-to-board','feedback','F.bus','a58','外部开漏FAULT汇接端 → 左半区58排','FAULT');
+ edge('f-nano','feedback','b58','j13','FAULT → Nano D4（g13）','FAULT');
+ edge('f-pull','feedback','c58','L+46','FAULT 4.7kΩ上拉','5V','resistor','4.7kΩ');
+ edge('t-nano','feedback','j12','j59','Nano D5（g12）→ 右半区59排','THERMAL');
+ edge('t-loop','feedback','i59','thermal.in','D5 → 常闭温控串联链','THERMAL');
+ edge('t-pull','feedback','h59','R+46','温控输入4.7kΩ上拉','5V','resistor','4.7kΩ');
+ edge('t-return','feedback','thermal.out','T.0V','温控链另一端 → 0V','GND');
+ const drivers=['M0',...Array.from({length:8},(_,i)=>'S'+(i+1))];
+ for(const id of drivers){
+  edge('fault-'+id,'feedback',id+'.FAULT','F.bus',id+'开漏FAULT并入F端子','FAULT');
+  edge('vin-'+id,'actuator','T.+12',id+'.VIN',id+' VIN独立保险支路','12V','wire',id==='M0'?'T2A':'T1A');
+  edge('ground-'+id,'actuator',id+'.GND','T.0V',id+'独立动力回线到0V端子','GND');
+  edge('out1-'+id,'actuator',id+'.OUT1',id+'.coil1',id+' OUT1 → 本路线圈1','COIL');
+  edge('out2-'+id,'actuator',id+'.coil2',id+'.OUT2',id+'本路线圈2 → OUT2','COIL');
+  edge('coil-'+id,'actuator',id+'.coil1',id+'.coil2',id+'本路线圈绕组','COIL','inductor','定制试绕');
+ }
+ const driverConfig={model:'Pololu #4035 / DRV8874',pins:{PMODE:'5V',SLEEP:'5V','PH/IN2':'GND',IMODE:'GND'},startShunt:'560Ω',mainShunt:'5.11kΩ',branchShunt:'1.58kΩ',bufferMap};
+ return{nodes,edges,parts,pins,occupied:[...occupied],steps,cols,rowY,bufferMap,drivers,driverConfig};
+});
+
+(function(){
+ 'use strict';
+ const D=window.BreadboardPlan,$=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+ const state={step:'power',view:'logic',selected:'feed5',branch:1,playing:false};let timer=null;
+ const query=new URLSearchParams(location.search);
+ if(D.steps.some(s=>s.id===query.get('step')))state.step=query.get('step');
+ if(['logic','board','driver'].includes(query.get('view')))state.view=query.get('view');
+ if(query.has('branch')&&/^[0-8]$/.test(query.get('branch')))state.branch=Number(query.get('branch'));
+ if(query.has('wire'))state.selected=D.edges.some(e=>e.id===query.get('wire'))?query.get('wire'):'';
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function text(x,y,s,cls='',anchor='start'){return `<text x="${x}" y="${y}" class="${cls}" text-anchor="${anchor}">${esc(s)}</text>`;}
+ function box(x,y,w,h,title,sub,cls='module'){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" class="${cls}"/>`+text(x+16,y+30,title,'title')+(sub?text(x+16,y+57,sub,'subtitle'):'');}
+ function netClass(e){if(e.net==='5V')return'net5V';if(e.net==='GND')return'netGND';if(e.net==='12V')return'net12V';if(e.net==='COIL')return'netCOIL';if(['E+','E-','A+','A-'].includes(e.net))return'netAnalog';if(['DAT','CLK'].includes(e.net))return'netData';if(['FAULT','THERMAL'].includes(e.net))return'netFeedback';return'netCommand';}
+ function active(e){return state.step==='all'||e.stage===state.step;}
+ function titleOf(id){const n=D.nodes[id];return n.type==='hole'?`面包板 ${id}`:n.type==='rail'?`电源轨 ${id}`:n.label+'（'+id+'）';}
+ function strip(id){const n=D.nodes[id];if(n.type==='hole'){const group=n.group;const k=Number(group.slice(1));return(group[0]==='L'?'a至e':'f至j')+k+'同排相通';}if(n.type==='rail')return n.group+'段内相通；上下段需跳线连接';return'外部器件或端子，按名称连接';}
+ function route(a,b,index=0){
+  const p=D.nodes[a],q=D.nodes[b];
+  const sid=[a,b].find(id=>/^S[1-8]\.(VIN|GND)$/.test(id));
+  if(sid){const n=D.nodes[sid],source=D.nodes[sid===a?b:a],left=Number(sid[1])<=4,x=left?1230:1444,y=left?850:1100;return`M${source.x} ${source.y} L1025 ${source.y} L1025 ${y} L${x} ${y} L${x} ${n.y} L${n.x} ${n.y}`;}
+  if(/^S[5-8]\.IN1$/.test(b)){const y=355+(index%6)*6;return`M${p.x} ${p.y} L${820+(index%6)*7} ${p.y} L${820+(index%6)*7} ${y} L1432 ${y} L1432 ${q.y} L${q.x} ${q.y}`;}
+  if(p.type!=='port'&&q.type!=='port'){
+   if(Math.abs(p.x-q.x)<25)return `M${p.x} ${p.y} L${q.x} ${q.y}`;
+   const dx=Math.abs(p.x-q.x),bend=Math.min(45,dx*.25);
+   return `M${p.x} ${p.y} C${p.x+bend} ${p.y-18},${q.x-bend} ${q.y-18},${q.x} ${q.y}`;
+  }
+  const lane=(index%7)*8;
+  if(p.x<420&&q.type!=='port')return`M${p.x} ${p.y} L${400-lane} ${p.y} L${400-lane} ${q.y} L${q.x} ${q.y}`;
+  if(q.x<420&&p.type!=='port')return`M${p.x} ${p.y} L${405-lane} ${p.y} L${405-lane} ${q.y} L${q.x} ${q.y}`;
+  if(q.x>800&&p.type!=='port')return`M${p.x} ${p.y} L${830+lane} ${p.y} L${830+lane} ${q.y} L${q.x} ${q.y}`;
+  if(p.x>800&&q.type!=='port')return`M${p.x} ${p.y} L${840+lane} ${p.y} L${840+lane} ${q.y} L${q.x} ${q.y}`;
+  if(p.x>900&&q.x>900)return`M${p.x} ${p.y} L${1440+lane*.25} ${p.y} L${1440+lane*.25} ${q.y} L${q.x} ${q.y}`;
+  const y=Math.min(1100,Math.max(p.y,q.y)+30+lane);
+  return`M${p.x} ${p.y} L${p.x} ${y} L${q.x} ${y} L${q.x} ${q.y}`;
+ }
+ function path(d,e,selected=false){selected=selected||e.id===state.selected;const c=netClass(e),pulse=selected&&state.playing?' flow':'',known=D.edges.some(n=>n.id===e.id);return`<g ${known?'data-edge="'+esc(e.id)+'"':''} class="${selected?'chosen':state.selected?'other':''}"><path d="${d}" class="wire-shadow"/><path d="${d}" class="wire-glow ${c}"/><path d="${d}" class="wire ${c}${pulse}"/>${known?'<path d="'+d+'" class="wire-hit"/>':''}<title>${esc(e.label)}</title></g>`;}
+ function boardPath(e,i,selected=false){const p=D.nodes[e.a],q=D.nodes[e.b],component=['resistor','capacitor','inductor'].includes(e.kind),d=component?`M${p.x} ${p.y} L${q.x} ${q.y}`:route(e.a,e.b,i);let s=path(d,e,selected);if(component){const x=(p.x+q.x)/2,y=(p.y+q.y)/2,angle=Math.atan2(q.y-p.y,q.x-p.x)*180/Math.PI;s+=`<g transform="translate(${x} ${y}) rotate(${angle})" class="${!selected&&state.selected?'other':''}">`+(e.kind==='resistor'?'<rect x="-4" y="-3" width="8" height="6" class="component-value"/>':e.kind==='capacitor'?'<path d="M-2 -5 L-2 5 M2 -5 L2 5" class="wire netGND"/>':'<rect x="-18" y="-6" width="36" height="12" class="component-value"/>')+'</g>';if(selected)s+=`<rect x="${x+10}" y="${y-20}" width="92" height="24" class="component-value"/>`+text(x+15,y-3,e.value,'small');}return s;}
+ function board(){let s=box(430,80,290,901,'面包板','63排 · 电源轨各50孔','board');
+  for(const [c,x]of Object.entries(D.cols))s+=text(x,159,c,'small','middle');
+  for(let r=1;r<=63;r++){
+   const y=D.rowY(r);s+=`<line x1="500" x2="556" y1="${y}" y2="${y}" class="metal"/><line x1="598" x2="654" y1="${y}" y2="${y}" class="metal"/>`;
+   s+=text(734,y+4,r,'tiny');
+  }
+  for(const [rail,x]of [['L+',458],['L-',476],['R+',680],['R-',698]]){
+   s+=text(x,160,rail[1],rail[1]==='+'?'small':'small','middle');
+   for(const half of ['U','D']){
+    const arr=Object.values(D.nodes).filter(n=>n.type==='rail'&&n.group===rail+half);
+    s+=`<line x1="${x}" x2="${x}" y1="${arr[0].y}" y2="${arr.at(-1).y}" class="wire ${rail[1]==='+'?'net5V':'netGND'}"/>`;
+   }
+  }
+  for(const n of Object.values(D.nodes))if(n.type!=='port')s+=`<circle cx="${n.x}" cy="${n.y}" r="2.8" class="hole"/>`;
+  s+=box(520,214,101,202,'','','chip');s+=`<rect x="550" y="210" width="42" height="20" class="module"/>`+text(571,225,'USB','tiny','middle');
+  s+=`<text x="574" y="318" transform="rotate(-90 574 318)" text-anchor="middle">Nano A000005</text>`;
+  for(const name of ['5V','GND-L']){const n=D.nodes[D.pins['Nano.'+name]];s+=text(424,n.y+5,name.replace('-L',''),'small','end');}
+  for(const name of ['D2','D3','D4','D5','D9','D10']){const id=D.pins['Nano.'+name],n=D.nodes[id];s+=text(758,n.y+4,name+' '+id,'small');}
+  s+=`<rect x="560" y="571" width="34" height="126" rx="5" class="chip"/><path d="M567 571 Q577 585 587 571" class="wire netGND"/>`;
+  s+=`<text x="582" y="636" transform="rotate(-90 582 636)" text-anchor="middle" class="small">SN74HC244N</text>`;
+  s+=text(551,569,'1','tiny','end')+text(602,569,'20','tiny')+text(551,713,'10','tiny','end')+text(602,713,'11','tiny');
+  for(const id of D.occupied){const n=D.nodes[id];s+=`<circle cx="${n.x}" cy="${n.y}" r="3.8" class="contact"/>`;}
+  s+=text(758,540,'30至32排：D10分配总线','small');s+=text(758,775,'49至56排：8路串阻与下拉','small');
+  s+=text(758,885,'左58排：D4 / 右59排：D5','small');
+  for(const p of D.parts)s+=box(p.x,p.y,p.w,p.h,p.title,p.subtitle);
+  const shownPorts=new Set();
+  for(const e of D.edges)if(active(e))for(const id of [e.a,e.b])if(D.nodes[id].type==='port')shownPorts.add(id);
+  for(const id of shownPorts){const n=D.nodes[id];s+=`<circle cx="${n.x}" cy="${n.y}" r="4.2" class="contact"/>`;
+   if(id.startsWith('hx.')&&id!=='hx.GND'||id.startsWith('sensor.'))s+=text(n.x-10,n.y+5,n.label,'small','end');
+   if(id==='hx.GND')s+=text(n.x+10,n.y+5,'GND','small');
+   if(id.endsWith('.IN1'))s+=text(n.x+(n.x>=1400?10:-10),n.y-7,'IN1','small',n.x>=1400?'start':'end');
+   if(id.startsWith('M0.')&&['VIN','GND'].includes(n.label))s+=text(n.x+8,n.y+4,n.label,'small');
+  }
+  s+=text(870,901,'9个NC50℃串联','small')+text(880,835,'9路开漏FAULT汇接','small');
+  for(const [i,e]of D.edges.entries())if(active(e)&&e.id!==state.selected){s+=boardPath(e,i);}
+  const e=D.edges.find(e=>e.id===state.selected&&active(e));
+  if(e){s+=boardPath(e,D.edges.indexOf(e),true);for(const id of [e.a,e.b]){const n=D.nodes[id];s+=`<circle cx="${n.x}" cy="${n.y}" r="8" class="focus-strip"/>`;if(n.type==='hole'){const x=n.group[0]==='L'?495:593;s+=`<rect x="${x}" y="${n.y-6}" width="66" height="12" rx="5" class="focus-strip"/>`;}}}
+  s+=text(440,1010,'中央沟槽隔开左右金属条；线交叉不自动相接。','small');s+=text(440,1040,'红色轨仅逻辑5V，12V和线圈走右侧端子。','small');
+  return s;
+ }
+ function logic(){let s='';
+  s+=box(35,185,265,170,'A 内藏测力传感器','LLB130 / FSH04855');
+  s+=box(390,185,265,170,'B 放大与采样','SEN-13879 / HX711');
+  s+=box(745,165,265,220,'C Arduino Nano','A000005 · 经典5V');
+  s+=box(745,535,265,180,'F 逻辑分配','SN74HC244N · 8个缓冲');
+  s+=box(1110,165,315,155,'D0 中央驱动','DRV8874 #4035 ×1');
+  s+=box(1110,405,315,95,'M0 中央线圈','独立动力回路');
+  s+=box(1110,550,315,250,'D1 端部驱动','DRV8874 #4035 ×8');
+  for(let i=1;i<=8;i++)s+=text(1130,626+(i-1)*21,`S${i} · 独立IN1 / 独立限流`,'small');
+  s+=box(1110,885,315,100,'8只端部线圈','分别接各自OUT1 / OUT2');
+  s+=box(35,790,265,160,'P 外置电源','GST60A12-P1J · 12V/5A');
+  s+=box(390,790,265,160,'E 逻辑降压','D24V10F5 · 5V/1A');
+  s+=box(745,870,265,130,'面包板分配5V/GND','JP1后供逻辑；动力回流分路');
+  const lines=[];
+  const add=(id,d,label,x,y)=>{const e=D.edges.find(e=>e.id===id);if(e&&(active(e)||state.step==='all'))lines.push(path(d,e,state.selected===id)+text(x,y,label,'small'));};
+  ['E+','E-','S+','S-'].forEach((q,k)=>add('sensor-'+q,`M300 ${246+k*28} L390 ${246+k*28}`,['E+ → E+','E− → E−','S+ → A+','S− → A−'][k],306,238+k*28));
+  add('dat','M655 250 L745 250','DAT → D3',663,238);add('clk','M745 320 L655 320','D2 → CLK',663,308);
+  add('m0-command','M1010 245 L1110 245','D9 / 220Ω',1018,230);
+  add('d10','M875 385 L875 535','D10送8个A',892,468);
+  for(let k=0;k<8;k++)add('cmd-S'+(k+1),`M1010 ${590+k*13} L1055 ${590+k*13} L1055 ${620+k*21} L1110 ${620+k*21}`,k===0?'各Y → 220Ω → IN1':'',1018,575);
+  add('p12','M300 900 L350 900 L350 1060 L1450 1060 L1450 300 L1425 300','12V经保险/急停直达驱动VIN',650,1092);
+  add('buck-in','M300 835 L390 835','12V支路',306,822);
+  add('feed5','M655 850 L710 850 L710 925 L745 925','5V / JP1',659,832);
+  add('cross5','M875 870 L875 825 L700 825 L700 90 L520 90 L520 185','5V与GND经面包板分配',746,74);
+  add('nano5','M700 90 L875 90 L875 165','逻辑5V',883,119);
+  add('244-vcc','M700 825 L700 485 L790 485 L790 535','逻辑供电',708,509);
+  add('feed0','M805 1000 L805 1020 L338 1020 L338 936 L300 936','公共0V参考',448,1007);
+  add('nano0','M945 870 L945 845 L725 845 L725 128 L985 128 L985 165','GND',992,150);
+  add('hx-gnd','M725 128 L625 128 L625 185','GND',634,155);
+  add('244-gnd','M725 750 L1035 750 L1035 697 L1010 697','GND',1040,738);
+  add('out1-M0','M1200 320 L1200 405','OUT1/2',1212,372);
+  add('out2-M0','M1330 405 L1330 320','',0,0);
+  add('out1-S'+state.branch,'M1265 800 L1265 885','各自OUT1/2',1280,848);
+  add('out2-S'+state.branch,'M1370 885 L1370 800','',0,0);
+  add('vin-S1','M1450 650 L1425 650','12V',1455,633);
+  add('ground-M0','M1425 285 L1470 285 L1470 1100 L325 1100 L325 936 L300 936','动力0V回线',445,1088);
+  add('ground-S1','M1425 780 L1470 780','0V',1435,765);
+  add('f-nano','M1425 590 L1460 590 L1460 115 L955 115 L955 165','开漏FAULT → D4',1060,104);
+  add('t-loop','M1010 355 L1065 355 L1065 445 L980 445 L980 385','NC温控链 → D5',1080,438);
+  s+=lines.join('');s+=text(38,1020,'信号经过面包板；线圈功率绕过面包板。','subtitle');
+  s+=text(38,1052,'逻辑图合并同功能连接，精确孔号切换到“面包板孔位”。','small');
+  return s;
+ }
+ function driver(){let s='',id=state.branch===0?'M0':'S'+state.branch;
+  s+=box(570,205,370,430,id+' · Pololu #4035','DRV8874 / IN-IN模式');
+  s+=box(35,185,350,210,'面包板发出的逻辑','M0取D9；S取244独立Y');
+  s+=text(55,280,'220Ω串联后到IN1；端口10k下拉');
+  s+=box(1100,230,330,190,id+'本路线圈','OUT1 / OUT2分别接两端');
+  s+=box(35,675,350,185,'端子排来的动力','12V经过本路'+(id==='M0'?'T2A':'T1A')+'到VIN');
+  const labels=['EN/IN1','PH/IN2 = GND','PMODE = 5V','IMODE = GND','SLEEP = 5V','VREF → Rd → GND','CS保留原板2.49k','FAULT → F端子 → D4'];
+  labels.forEach((q,k)=>s+=text(590,295+k*39,q));
+  const fake=(key,net)=>({id:key,label:key,net});
+  s+=path('M385 285 L570 285',fake(id==='M0'?'m0-command':'cmd-'+id,'S_CMD'))+text(402,267,'IN1', 'small');
+  s+=path('M940 300 L1100 300',fake('out1-'+id,'COIL'))+text(978,284,'OUT1','small');
+  s+=path('M1100 365 L940 365',fake('out2-'+id,'COIL'))+text(978,351,'OUT2','small');
+  s+=path('M385 740 L465 740 L465 595 L570 595',fake('vin-'+id,'12V'));
+  s+=text(438,720,'VIN', 'small');
+  s+=box(1030,510,400,130,'每块独立设置VREF','先用560Ω；'+id+'计划逐级至'+(id==='M0'?'5.11kΩ':'1.58kΩ'));
+  s+=box(570,780,860,210,'VM侧本地储能与钳位','470µF/35V +100nF/50V +SMCJ18A');
+  s+=text(592,890,'TVS阴极到VM、阳极到本地GND；按实测电感和重复能量复核。');
+  s+=text(592,933,'驱动GND独立回0V端子，不能让线圈电流流经面包板。');
+  s+=path('M755 635 L755 780',fake('vm','12V'))+text(770,719,'VM（反接保护后）','small');
+  s+=text(40,1035,'这是所有9块驱动共用的端子设置；外部模块未按PCB针脚物理顺序绘制。');
+  return s;
+ }
+ function render(){
+  const step=D.steps.find(s=>s.id===state.step);$('step-title').textContent=step.title;$('step-body').textContent=step.body;
+  document.querySelectorAll('[data-step]').forEach(b=>{if(b.dataset.step===state.step)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+  document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===state.view)));
+  $('branch').value=state.branch;
+  const list=D.edges.filter(active),sel=list.find(e=>e.id===state.selected);
+  $('wire-select').innerHTML='<option value="">查看本步骤全部线路</option>'+list.map(e=>`<option value="${esc(e.id)}">${esc(e.label)} · ${esc(e.a)} → ${esc(e.b)}</option>`).join('');$('wire-select').value=sel?.id||'';
+  $('wire-detail').textContent=sel?sel.label+'：'+titleOf(sel.a)+' → '+titleOf(sel.b)+(sel.value?'；'+sel.value:''):'选中一根线路，查看端点和对应孔号。';
+  $('strip-detail').textContent=sel?'起点：'+strip(sel.a)+'；终点：'+strip(sel.b)+'。'+(sel.kind==='resistor'?'这是电阻，不是裸跳线；两端不能短接。':''):step.body;
+  $('wire-table').querySelector('tbody').innerHTML=list.map(e=>`<tr${e.id===sel?.id?' aria-current="true"':''}><td><button type="button" data-wire="${esc(e.id)}">${esc(e.label)}${e.value?' · '+esc(e.value):''}</button></td><td>${esc(titleOf(e.a))}</td><td>${esc(titleOf(e.b))}</td></tr>`).join('');
+  $('diagram').innerHTML='<title id="svg-title">'+esc(state.view==='board'?'面包板孔位接线图':state.view==='driver'?'单路DRV8874接线详图':'受压信号与动力接线逻辑')+'</title><desc id="svg-desc">图下的线路选择器和表格提供同样的连接信息。</desc><rect width="1480" height="1120" class="paper"/>'+(state.view==='board'?board():state.view==='driver'?driver():logic());
+  $('diagram-caption').textContent=state.view==='board'?'孔位图 · Nano USB朝上，244缺口朝上；孔号与下表一致。':state.view==='driver'?'单路驱动详图 · 当前展开'+(state.branch===0?'M0':'S'+state.branch)+'，相同模式适用于其他驱动。':'逻辑图 · 数据与控制经面包板，12V与线圈功率经端子排。';
+  $('play').textContent=state.playing?'暂停接线顺序':'播放接线顺序';$('play').setAttribute('aria-pressed',String(state.playing));
+ }
+ function stop(){state.playing=false;if(timer){clearInterval(timer);timer=null;}}
+ function focusDiagram(){if(state.view!=='board')return;const frame=$('diagram-scroll'),scale=$('diagram').getBoundingClientRect().width/1480;if(!scale||!frame.clientWidth)return;const edge=D.edges.find(e=>e.id===state.selected&&active(e));let x=575,y=310;if(edge){const a=D.nodes[edge.a],b=D.nodes[edge.b];x=(a.x+b.x)/2;y=(a.y+b.y)/2;if(Math.abs(a.x-b.x)*scale>frame.clientWidth-40)x=a.type==='hole'?a.x:b.type==='hole'?b.x:575;}frame.scrollLeft=Math.max(0,x*scale-frame.clientWidth/2+12);frame.scrollTop=Math.max(0,y*scale-frame.clientHeight/2+12);}
+ function selectWire(id){const e=D.edges.find(e=>e.id===id);if(!e)return;const restore=document.activeElement?.dataset?.wire===id;if(state.step!=='all'&&state.step!==e.stage)state.step=e.stage;state.selected=id;render();if(restore)document.querySelector('[data-wire="'+id+'"]')?.focus({preventScroll:true});window.requestAnimationFrame?.(focusDiagram);}
+ document.addEventListener('click',ev=>{const b=ev.target.closest('[data-step],[data-view],[data-wire],[data-edge]');if(!b)return;if(b.dataset.step){stop();state.step=b.dataset.step;state.selected='';if(state.view==='driver'&&state.step!=='actuator')state.view='board';}else if(b.dataset.view){state.view=b.dataset.view;if(state.view==='driver'){state.step='actuator';state.selected='vin-'+(state.branch===0?'M0':'S'+state.branch);}}else{selectWire(b.dataset.wire||b.dataset.edge);return;}render();window.requestAnimationFrame?.(focusDiagram);});
+ $('wire-select').addEventListener('change',e=>{state.selected=e.target.value;render();});$('clear-wire').addEventListener('click',()=>{state.selected='';render();});
+ $('branch').addEventListener('change',e=>{state.branch=Math.max(0,Math.min(8,Number(e.target.value)));if(state.step==='branches')state.selected=state.branch===0?'m0-command':'cmd-S'+state.branch;if(state.view==='driver'){state.step='actuator';state.selected='vin-'+(state.branch===0?'M0':'S'+state.branch);}render();});
+ $('play').addEventListener('click',()=>{if(state.playing)stop();else{state.playing=true;timer=setInterval(()=>{const i=D.steps.findIndex(s=>s.id===state.step);state.step=D.steps[(i+1)%7].id;state.selected=D.edges.find(e=>e.stage===state.step)?.id||'';render();},2600);}render();});
+ window.addEventListener('pagehide',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();render();}});
+ window.__breadboard={state,render,selectWire,stop,data:D};render();window.requestAnimationFrame?.(focusDiagram);
+})();
+</script></body></html>

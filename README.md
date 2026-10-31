@@ -31,6 +31,12 @@ python -m http.server 8000
 - [V4：水滴涟漪](archive/ripple-v4.html)
 - [V3：磁体颗粒](archive/magnet-v3.html)
 
+## 面包板接线可视化
+
+[交互接线图](breadboard-wiring.html?view=board&step=adc&wire=dat)提供逻辑图、63排面包板孔位图和逐路DRV8874设置。7步接线及全部模式可切换，点击线路或表中按钮查看端点/孔号，支持M0/S1–S8详图、手动播放和键盘等价操作。144项连接按真实五孔金属条、中央沟槽和四条分段电源轨生成；Nano/244按官方顶视引脚方向放置。面包板只走5V与信号；12V、线圈和功率回流经外部端子。无实体连接，不是磁力/电气/温升模拟。
+
+维护源`src/breadboard-wiring/`，重建`python scripts/build-breadboard.py`。独立HTML内嵌样式与脚本，不需要CDN。原三维页保持。
+
 ## 上部受压，Arduino信号链
 
 [三维信号链交互页](press-interaction.html)保留连续平顶、内藏测力元件、1只中央M0＋8只外端S线圈与弧底放射薄腔。底部标注SparkFun SEN-13879、Arduino Nano A000005、SN74HC244N、Pololu4035 DRV8874中央一路及端部八路、D24V10F5；LLB130 FSH04855位于平顶内，GST60A12-P1J为外置电源。三维编号与页面选型表对应；线圈为定制试绕，不是现成商品。

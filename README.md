@@ -30,3 +30,11 @@ python -m http.server 8000
 - [V5：半球立面颗粒](archive/hemisphere-v5.html)
 - [V4：水滴涟漪](archive/ripple-v4.html)
 - [V3：磁体颗粒](archive/magnet-v3.html)
+
+## 按压交互单腔小样
+
+独立页面：[按压交互 · 单腔16珠](press-interaction.html)。使用独立按压面、全桥测力元件、HX711、经典5 V Nano、一路峰值/保持恒流驱动和单线圈收口磁隙；包含三维布置、接线表、材料与尺寸。轻按一轮，持续按压重复，松手后两轮间歇余波再停止。
+
+该页是定性运动示意，未连接传感器；示例上移量、2.8 s节奏和磁场系数均未由实体试验确认。控制规则与运动模型分离，实体应先完成可靠释放与温升测试。
+
+维护源：`src/press-interaction/`；构建：`python scripts/build-press.py`。该命令只生成独立页面；首页仍由`python scripts/build.py`维护。

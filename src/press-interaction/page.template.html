@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>平顶内置测力 · 中央与端部线圈接力</title>
+<title>平顶受压 · Arduino信号与线圈接力</title>
 <style>
 
 :root {
@@ -1537,13 +1537,17 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 #press-prototype th,#press-prototype td{overflow-wrap:anywhere;}
 #press-prototype details>*+*{margin-top:calc(var(--font-size-base)*.75);}
 #press-prototype .press-status{min-height:1.5em;}
+#press-prototype .signal-chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--font-size-base)*.8);list-style:none;margin:0;padding:0;}
+#press-prototype .signal-chain li{display:grid;gap:calc(var(--font-size-base)*.3);min-width:0;}
+#press-prototype .signal-chain li[aria-current="step"]>span{font-weight:500;text-decoration:underline;text-underline-offset:.25em;}
+#press-prototype .signal-chain output{font-variant-numeric:tabular-nums;}
+@media(max-width:600px){#press-prototype .signal-chain{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:780px){#press-prototype .press-views{grid-template-columns:minmax(0,1fr);}#press-prototype canvas{height:390px;}}
 @media(max-width:500px){#press-prototype .press-sliders{grid-template-columns:minmax(0,1fr);}#press-prototype .press-heading{padding-right:0;}#press-prototype canvas{height:350px;}}
 </style>
 <header class="press-heading">
-<h1>平整顶面，内藏测力</h1>
-<p>中央大线圈 M0 ＋ 8只端部小线圈 · 放射状弧底薄腔</p>
-<p>保留中央＋8只端部线圈及弧底薄腔。测力元件移至顶板内部、中央线圈正上方，外表面连续平整；9只线圈仍共用压力触发信号，按原时序接力。</p>
+<h1>平顶柱头的Arduino信号链</h1>
+<p>内藏测力 → HX711 → Arduino → M0与8只端部线圈。模拟输入，未连接实体硬件。</p>
 </header>
 <div class="viz-controls" aria-label="上部加载演示">
 <button type="button" class="btn btn-primary" id="press-tap">短时加载</button><button type="button" class="btn" id="press-hold" aria-pressed="false">持续受压</button><button type="button" class="btn" id="press-release">卸载</button><button type="button" class="btn" id="press-play">暂停动画</button>
@@ -1551,18 +1555,21 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 </div>
 <div class="viz-controls">
 <label class="form-label" for="press-force">上部荷载增量 <output id="press-force-value" class="tabular-nums">67%</output><input type="range" class="form-range" id="press-force" min="0" max="100" step="1" value="67" aria-describedby="press-baseline"></label>
-<label class="form-label" for="press-view">观察角度<select class="form-select" id="press-view"><option value="perspective">斜视构造</option><option value="front">正视</option><option value="top">俯视线圈</option></select></label>
-<label class="form-label" for="press-selected">放大分支<select class="form-select" id="press-selected"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label>
-<label class="form-label" for="press-detail-mode">右侧放大<select class="form-select" id="press-detail-mode"><option value="sensor">内藏测力剖面</option><option value="chamber">铁珠分支运动</option></select></label>
+<label class="form-label" for="press-detail-mode">右侧放大<select class="form-select" id="press-detail-mode"><option value="electronics">Arduino与接线</option><option value="sensor">内藏测力剖面</option><option value="chamber">铁珠分支运动</option></select></label>
 </div>
-<p id="press-baseline">0%为原有荷载基线，100%为本演示相对增量上限，不表示结构承载能力。当前为模拟输入，未连接硬件。</p>
-<div class="viz-controls"><button type="button" class="btn" id="press-fit">复位视角</button><label class="form-check"><input type="checkbox" class="form-check-input" id="press-wires" checked><span class="form-check-label">显示接线</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-topcut"><span class="form-check-label">整机顶板局部剖开</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-open"><span class="form-check-label">移开放大腔前板</span></label></div>
+<ol class="signal-chain" aria-label="受压信号传递过程"><li id="press-signal-sensor"><span>内藏测力元件</span><output id="press-signal-sensor-value">桥信号0%</output></li><li id="press-signal-hx"><span>HX711放大与采样</span><output id="press-signal-hx-value">采样值0%</output></li><li id="press-signal-arduino"><span>Arduino读取与判断</span><output id="press-signal-arduino-value">收到0%</output></li><li id="press-signal-driver"><span>D9 / D10两组输出</span><output id="press-signal-driver-value">M0关 / S×8关</output></li></ol>
 <p id="press-status" class="press-status" aria-live="polite">正在准备三维示意…</p>
-<div class="press-readout tabular-nums"><span>荷载增量 <output id="press-pressure">0%</output></span><span id="press-current">M0 关 · S组 关</span><span id="press-active">0 / 8只小线圈</span><span>模型中心上移 <output id="press-rise">0.0 mm</output></span></div>
 <div class="press-views">
 <figure><figcaption>整机 · 连续平顶面，无外露测力凸起</figcaption><canvas id="press-whole" role="img" aria-label="平顶板内部隐藏测力元件，中央一只大线圈与8只端部小线圈保持原位；8个放射状弧底薄腔共同响应上部荷载。">测力元件在顶板夹层内，HX711与控制器仍在底部，顶面无凸起。</canvas><p class="text-small text-muted">拖动旋转；Ctrl或Shift＋滚轮缩放。剖开仅供观察。</p></figure>
-<figure><figcaption id="press-detail-caption">顶板中央局部剖面 · 测力元件内藏</figcaption><canvas id="press-detail" role="img" aria-label="平顶板下方的传力压头、内藏测力元件和固定承压座的局部三维剖面；上表面连续平整。">在右侧放大中可切换内藏测力剖面和铁珠分支运动。</canvas><p class="text-small text-muted">右侧可切回铁珠运动；剖面不表示实体顶板开孔。</p></figure>
+<figure><figcaption id="press-detail-caption">接线放大 · HX711、Arduino与两组驱动</figcaption><canvas id="press-detail" role="img" aria-label="底部电子仓三维接线放大，包括HX711、Arduino Nano、74HC244缓冲器、中央线圈驱动、8路端部驱动和5V降压模块。">右侧可选择Arduino接线、内藏测力剖面或铁珠分支。</canvas><p class="text-small text-muted">B采样 · C Arduino · F缓冲 · D0/D1驱动。线路为功能走向示意。</p></figure>
 </div>
+<p id="press-signal-description">持续采样待机：等待上部荷载增量</p>
+<div class="press-readout tabular-nums"><span>荷载增量 <output id="press-pressure">0%</output></span><span id="press-current">M0 关 · S组 关</span><span id="press-active">0 / 8只小线圈</span><span>模型中心上移 <output id="press-rise">0.0 mm</output></span></div>
+<div class="viz-controls"><label class="form-label" for="press-view">观察角度<select class="form-select" id="press-view"><option value="perspective">斜视构造</option><option value="front">正视</option><option value="top">俯视线圈</option></select></label><label class="form-label" for="press-selected">放大分支<select class="form-select" id="press-selected"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label></div>
+<div class="viz-controls"><button type="button" class="btn" id="press-fit">复位视角</button><label class="form-check"><input type="checkbox" class="form-check-input" id="press-wires" checked><span class="form-check-label">显示接线</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-topcut"><span class="form-check-label">整机顶板局部剖开</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-open"><span class="form-check-label">移开放大腔前板</span></label></div>
+<div class="viz-controls"><label class="form-check"><input type="checkbox" class="form-check-input" id="press-show-flow" checked><span class="form-check-label">显示路径亮点</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-slow-signal" checked><span class="form-check-label">放慢信号过程</span></label></div>
+<p id="press-baseline">0%为原有荷载基线，100%为本演示相对增量上限，不表示结构承载能力。当前为模拟输入，未连接硬件。</p>
+<p>为看清先后，放慢模式分两段各0.35秒展示，再交给Arduino控制模型；这不是实际导线传播时间或HX711采样延迟。路径亮点只示意方向，高低电平与线圈通断相对应。</p>
 <section class="press-section" aria-labelledby="press-flat-title"><h2 id="press-flat-title">藏在顶板夹层，保留原线圈</h2><p>现有示意的中央线圈内孔Ø20 mm，铁芯约Ø18 mm，单边仅约1 mm，不能把测力元件直接塞进这个内孔。本版采用：平顶板 → 传力压头 → 应变式测力元件 → 固定承压座。器件位于绕组上方，HX711保留在柱底。</p><p>顶面整体做成平板，图示整体厚16 mm。传感器的Ø26×6 mm只表示预留占位，未选定商品；选型后可整体加厚夹层，顶面仍保持平整。</p></section>
 <section class="press-section" aria-labelledby="press-sequence-title"><h2 id="press-sequence-title">大开 → 小开 → 大关 → 小关</h2><p>上部短时增载触发一轮；持续受压让整机重复循环；卸载后结束当前轮，再共同接两轮逐渐放慢的余波。8只小线圈始终同步通断。压力较大时缩短轮间等待，电流由下方独立上限控制。</p></section>
 <section class="press-section" aria-labelledby="press-settings-title"><h2 id="press-settings-title">数量与通断时序</h2>
@@ -1576,9 +1583,10 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 <div class="press-field"><label class="form-label" for="press-current-small">小线圈相对电流 <output id="press-current-small-value">1.6×</output></label><input class="form-range" type="range" id="press-current-small" min="0.5" max="2.5" step="0.1" value="1.6"></div>
 </div><p>最快轮间隔为四段之和：<output id="press-period">2.8 s</output>（模型）。调时序会回到待机，请重新加载；调数量会重置珠群。相对电流倍数不是安培值。高数量时计算采用预算，模型时间可能慢于墙钟时间。</p></section>
 <section class="press-section" aria-labelledby="press-wire-title"><h2 id="press-wire-title">一个感知信号，两组线圈时序</h2>
+<p>桥式模拟信号先到HX711；数据由DT走向Arduino D3，采样时钟由D2反向送到HX711 SCK。D9控制M0驱动；D10经F缓冲器分成8路EN，8只端部线圈同时通断。5V、地线与线圈功率回路另行标出，Arduino引脚不供线圈电流。</p>
 <table class="table table-sm"><caption class="sr-only">功能接线示意，驱动器接口须按实际型号核对</caption><thead><tr><th scope="col">输入</th><th scope="col">连接</th><th scope="col">作用</th></tr></thead><tbody>
 <tr><td>内藏测力桥 E±、S±</td><td>沿独立线槽至柱底HX711 E±、A±</td><td>屏蔽双绞桥线；量程待定</td></tr><tr><td>HX711 DT / SCK</td><td>Nano D3 / D2</td><td>采样与时钟</td></tr>
-<tr><td>Nano D9</td><td>M0恒流驱动 EN</td><td>大线圈组的起止</td></tr><tr><td>Nano D10</td><td>逻辑分配 → S1–S8驱动 EN</td><td>8只小线圈同步起止</td></tr>
+<tr><td>Nano D9</td><td>M0恒流驱动 EN</td><td>大线圈组的起止</td></tr><tr><td>Nano D10</td><td>SN74HC244 A输入 → 8个Y输出 → S1–S8驱动 EN</td><td>8只小线圈同步起止</td></tr>
 <tr><td>动力低压电源 + / 0V</td><td>M0驱动、8路S驱动及匹配的降压模块</td><td>供电能力按9线圈同时工况核定</td></tr><tr><td>5V稳压 + / GND</td><td>Nano 5V/GND、HX711供电/GND</td><td>逻辑支路；与动力共地参考</td></tr>
 <tr><td>M0驱动 OUT±</td><td>中央大线圈两端</td><td>单独限流与快速关断</td></tr><tr><td>8路S驱动各OUT±</td><td>分别接8只端部线圈</td><td>时序共用，各自限流</td></tr></tbody></table>
 <p>D是“M0一路＋S组8路”的功能块。GPIO只输出逻辑，不供线圈电流；需核对输入电平、分配负载、各路限流和关断能量处理。动力电压与容量按实际绕组匹配，不沿用单腔电源/功耗推算整机。外部5V与USB供电不应未经核对直接并联。</p></section>

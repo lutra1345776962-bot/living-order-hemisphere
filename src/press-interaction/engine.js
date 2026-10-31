@@ -100,6 +100,72 @@
  return{create,STEP};
 });
 
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SignalPath=api;})(typeof window!=='undefined'?window:globalThis,function(){
+ 'use strict';
+ const clamp=v=>Math.max(0,Math.min(15,v));
+ function create(deliver){
+  const s={source:0,hx:0,nano:0,slow:true,queue:[],events:[],stage:'idle',stageAt:-100,commands:{big:{value:0,at:-100},small:{value:0,at:-100}}};
+  function event(type,force,time){s.stage=type;s.stageAt=time;s.events.push({type,force,time});if(s.events.length>32)s.events.shift();}
+  function input(force,now){if(!Number.isFinite(force))return;force=clamp(force);if(force===s.source)return;s.source=force;event('sensor',force,now);
+   if(!s.slow){s.hx=s.nano=force;deliver(force);event('arduino',force,now);return;}
+   s.queue.push({at:now+.35,type:'hx',force},{at:now+.7,type:'arduino',force});s.queue.sort((a,b)=>a.at-b.at);
+   // UI input is not a hardware sample stream; bound unusually fast slider floods.
+   if(s.queue.length>128)s.queue.splice(0,s.queue.length-128);
+  }
+  function tick(now){while(s.queue.length&&s.queue[0].at<=now+1e-9){const e=s.queue.shift();if(e.type==='hx')s.hx=e.force;else{s.nano=e.force;deliver(e.force);}event(e.type,e.force,e.at);}s.events=s.events.filter(e=>now-e.time<2);}
+  function setSlow(value,now){s.slow=!!value;s.queue=[];s.hx=s.nano=s.source;deliver(s.source);event('arduino',s.source,now);}
+  function outputs(d,now){for(const k of ['big','small'])if(s.commands[k].value!==d[k]){s.commands[k]={value:d[k],at:now};event('driver',s.nano,now);}}
+  function snapshot(now,d){const stage=now-s.stageAt<1.1?s.stage:d.level?'driver':s.source>0?'arduino':'idle';return{source:s.source,hx:s.hx,nano:s.nano,stage,slow:s.slow,pending:s.queue.length,big:d.big,small:d.small};}
+  return{state:s,input,tick,setSlow,outputs,snapshot};
+ }
+ return{create};
+});
+
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.CapitalWiring=api;})(typeof window!=='undefined'?window:globalThis,function(){
+ 'use strict';
+ const boards=[
+  {id:'hx',label:'HX711',bounds:[-115,-116,14,-84,-90,19],color:'particle'},
+  {id:'nano',label:'Arduino Nano',bounds:[-65,-116,14,-20,-98,19],color:'spacer'},
+  {id:'buffer',label:'74HC244',bounds:[-15,-72,14,10,-58,19],color:'small'},
+  {id:'m0driver',label:'M0驱动',bounds:[0,-116,14,28,-86,19],color:'coil'},
+  {id:'sdriver',label:'S组8路驱动',bounds:[36,-116,14,79,-86,19],color:'small'},
+  {id:'supply',label:'5V降压',bounds:[90,-116,14,120,-96,19],color:'surface'}
+ ];
+ const nets=[];
+ function net(id,kind,from,to,points,color,localPoints){nets.push({id,kind,from,to,points,color,localPoints});}
+ for(let k=0;k<4;k++){
+  const excitation=k<2,x=-7+k*3,hx=-112+k*3,sensor=[x,-14,255],base=[x,-16,25],port=[hx,-90,21],stub=[hx,-78,27];
+  net(['E+','E-','A+','A-'][k],excitation?'excitation':'analog',excitation?'HX711 E':'传感器 S',excitation?'传感器 E':'HX711 A',excitation?[port,base,sensor]:[sensor,base,port],excitation?'muted':'particle',excitation?[port,stub]:[stub,port]);
+ }
+ net('DT','data','HX711 DT','Nano D3',[[-84,-100,21],[-65,-100,21]],'spacer');
+ net('SCK','clock','Nano D2','HX711 SCK',[[-65,-108,21],[-84,-108,21]],'spacer');
+ net('D9','cmdBig','Nano D9','M0驱动 EN',[[-20,-101,21],[0,-101,21]],'coil');
+ net('D10','cmdSmall','Nano D10','74HC244 A输入',[[-20,-109,21],[-27,-80,24],[-15,-65,21]],'small');
+ for(let i=0;i<8;i++)net('EN-S'+(i+1),'fanout','74HC244 Y'+(i+1),'S'+(i+1)+'驱动 EN',[[3-i*2,-58,21],[28,-49-i*1.7,24],[39+i*5,-86,21]],'small');
+ net('M0+','powerBig','M0驱动 OUT+','M0绕组',[[12,-86,21],[3,-18,30],[3,-18,228],[0,-24,234]],'coil',[[12,-86,21],[12,-76,28]]);
+ net('M0-','returnBig','M0绕组','M0驱动 OUT-',[[0,-24,243],[8,-18,228],[8,-18,30],[20,-86,21]],'muted',[[20,-76,28],[20,-86,21]]);
+ for(let i=0;i<8;i++){
+  const a=(i+.5)*Math.PI/4,p=[118*Math.cos(a),118*Math.sin(a),234];
+  net('S'+(i+1)+'+','powerSmall','S'+(i+1)+'驱动 OUT+','S'+(i+1)+'绕组',[[39+i*5,-86,21],[10+i*.3,0,35],[10+i*.3,0,226],p],'small',[[39+i*5,-86,21],[39+i*5,-74,28]]);
+  net('S'+(i+1)+'-','returnSmall','S'+(i+1)+'绕组','S'+(i+1)+'驱动 OUT-',[[p[0],p[1],236],[14+i*.3,0,226],[14+i*.3,0,35],[41+i*5,-86,21]],'muted',[[41+i*5,-74,28],[41+i*5,-86,21]]);
+ }
+ net('logic5V','supply','降压5V','Nano 5V / HX711 / 244',[[90,-100,21],[84,-124,21],[-95,-124,21],[-95,-116,21]],'muted');
+ net('nano5V','supply','5V总线','Nano 5V',[[-55,-124,21],[-55,-116,21]],'muted');
+ net('buffer5V','supply','5V总线','244 VCC',[[5,-124,21],[18,-80,22],[5,-72,21]],'muted');
+ net('logicGND','ground','降压GND','HX711 / Nano / 244 GND',[[90,-108,21],[83,-129,21],[-103,-129,21],[-103,-116,21]],'muted');
+ net('nanoGND','ground','GND总线','Nano GND',[[-47,-129,21],[-47,-116,21]],'muted');
+ net('bufferGND','ground','GND总线','244 GND',[[11,-129,21],[24,-81,22],[9,-72,21]],'muted');
+ net('starGND','ground','逻辑GND','动力0V公共参考',[[83,-129,21],[126,-129,21],[126,-133,21]],'muted');
+ net('buckIn','supply','外部动力+','降压输入+',[[126,-126,21],[120,-113,21]],'muted');
+ net('buckReturn','ground','降压输入-','动力0V',[[120,-108,21],[126,-133,21]],'muted');
+ for(const [id,x]of [['M0',23],['S',73]]){
+  net('bus'+id,'supply','外部动力+','驱动电源+',[[126,-126,21],[x,-126,21],[x,-116,21]],'muted');
+  net('gnd'+id,'ground','驱动GND','动力0V',[[x-5,-116,21],[x-5,-133,21],[126,-133,21]],'muted');
+ }
+ function pointAt(points,u){u=Math.max(0,Math.min(1,u));const lengths=[];let total=0;for(let i=1;i<points.length;i++){const d=Math.hypot(...points[i].map((v,k)=>v-points[i-1][k]));lengths.push(d);total+=d;}let target=u*total;for(let i=0;i<lengths.length;i++){if(target<=lengths[i]||i===lengths.length-1){const t=lengths[i]?target/lengths[i]:0;return points[i].map((v,k)=>v+(points[i+1][k]-v)*t);}target-=lengths[i];}return points[0];}
+ return{boards,nets,pointAt};
+});
+
 (function(){
  const E=window.VerticalGranular,{W,H,BASE,RIN}=E;
  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),sub=(a,b)=>a.map((v,i)=>v-b[i]);
@@ -217,6 +283,24 @@
     }
    }
    if(index===2){flatTop(true,true);commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};}
+
+   function electronics(local){
+    for(const b of window.CapitalWiring.boards){
+      const v=b.bounds,start=commands.length,col=palette[b.color]||palette.surface;
+      box(v[0],v[1],v[2],v[3],v[4],v[5],mix(col,palette.bg,.55),.9);
+      box(v[0]+4,v[1]+4,v[5],v[3]-4,v[4]-4,v[5]+3,steel,.82);
+      for(let j=start;j<commands.length;j++)commands[j].component=b.id;
+    }
+    if(!wires)return;
+    for(const net of window.CapitalWiring.nets){
+      const pts=local?(net.localPoints||net.points):net.points;
+      const high=/Big/.test(net.kind)?drive.big:/Small|fanout/.test(net.kind)?drive.small:null;
+      const start=commands.length;
+      addLine(pts,palette[net.color],high?1.9:1.05,high===null?.65:high?.94:.3,net.kind==='ground');
+      for(let j=start;j<commands.length;j++)commands[j].netID=net.id;
+    }
+   }
+   if(index===3){electronics(true);commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};}
    if(index===0){
     if(state.view!=='top'){
      box(-150,-140,0,150,140,14,neutral);ring(16,0,14,120,neutral,[0,0,0],{segments:24});
@@ -243,20 +327,7 @@
 
     // The force sensor is enclosed below the continuous plane z=266.
     if(load>0)for(const x of [-65,0,65]){addLine([[x,0,293],[x,0,269],[x-3,0,274]],palette.particle,2,.9);addLine([[x,0,269],[x+3,0,274]],palette.particle,2,.9);}
-    const boards=[[-115,-116,-84,-90],[-65,-116,-20,-98],[0,-116,65,-86],[83,-116,113,-96]];
-    for(const b of boards){box(b[0],b[1],14,b[2],b[3],19,palette.surface);box(b[0]+5,b[1]+4,19,b[2]-5,b[3]-4,21,steel,.65);}
-    if(wires){
-      for(let k=0;k<4;k++)addLine([[-7+k*3,-14,255],[-7+k*3,-16,25],[-110+k*3,-90,21]],palette.particle,.9,.8);
-      addLine([[-84,-103,21],[-65,-103,21]],palette.particle,1.5,.9);
-      addLine([[-20,-104,21],[0,-104,21]],palette.particle,1.5,.9);
-      addLine([[65,-105,21],[83,-105,21]],palette.spacer,1.4,.85);
-      addLine([[83,-111,21],[-93,-123,21],[-93,-116,21]],palette.spacer,1.2,.8);
-      addLine([[83,-108,21],[-55,-120,21],[-55,-116,21]],palette.muted,1.2,.8);
-      addLine([[65,-112,21],[70,-126,21],[-100,-126,21],[-100,-116,21]],palette.muted,1.2,.8);
-      addLine([[83,-114,21],[70,-128,21],[57,-128,21],[57,-116,21]],palette.coil,1.5,.9);
-      for(const x of [3,8])addLine([[20+(x===3?0:4),-86,21],[x,0,30],[x,0,239]],x===3?palette.coil:palette.muted,1.4,.85);
-      for(let l=0;l<8;l++){const a=(l+.5)*Math.PI/4;for(const offset of [0,2])addLine([[30+l*3,-86,21],[10+offset,0,35],[10+offset,0,226],[118*Math.cos(a),118*Math.sin(a),232+offset]],offset?palette.muted:palette.small,1,.6);}
-    }
+    electronics(false);
    }else chamber(state.selected,true);
    commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};
   }

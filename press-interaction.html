@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>平顶内置测力 · 中央与端部线圈接力</title>
+<title>平顶受压 · Arduino信号与线圈接力</title>
 <style>
 
 :root {
@@ -1537,13 +1537,17 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 #press-prototype th,#press-prototype td{overflow-wrap:anywhere;}
 #press-prototype details>*+*{margin-top:calc(var(--font-size-base)*.75);}
 #press-prototype .press-status{min-height:1.5em;}
+#press-prototype .signal-chain{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:calc(var(--font-size-base)*.8);list-style:none;margin:0;padding:0;}
+#press-prototype .signal-chain li{display:grid;gap:calc(var(--font-size-base)*.3);min-width:0;}
+#press-prototype .signal-chain li[aria-current="step"]>span{font-weight:500;text-decoration:underline;text-underline-offset:.25em;}
+#press-prototype .signal-chain output{font-variant-numeric:tabular-nums;}
+@media(max-width:600px){#press-prototype .signal-chain{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media(max-width:780px){#press-prototype .press-views{grid-template-columns:minmax(0,1fr);}#press-prototype canvas{height:390px;}}
 @media(max-width:500px){#press-prototype .press-sliders{grid-template-columns:minmax(0,1fr);}#press-prototype .press-heading{padding-right:0;}#press-prototype canvas{height:350px;}}
 </style>
 <header class="press-heading">
-<h1>平整顶面，内藏测力</h1>
-<p>中央大线圈 M0 ＋ 8只端部小线圈 · 放射状弧底薄腔</p>
-<p>保留中央＋8只端部线圈及弧底薄腔。测力元件移至顶板内部、中央线圈正上方，外表面连续平整；9只线圈仍共用压力触发信号，按原时序接力。</p>
+<h1>平顶柱头的Arduino信号链</h1>
+<p>内藏测力 → HX711 → Arduino → M0与8只端部线圈。模拟输入，未连接实体硬件。</p>
 </header>
 <div class="viz-controls" aria-label="上部加载演示">
 <button type="button" class="btn btn-primary" id="press-tap">短时加载</button><button type="button" class="btn" id="press-hold" aria-pressed="false">持续受压</button><button type="button" class="btn" id="press-release">卸载</button><button type="button" class="btn" id="press-play">暂停动画</button>
@@ -1551,18 +1555,21 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 </div>
 <div class="viz-controls">
 <label class="form-label" for="press-force">上部荷载增量 <output id="press-force-value" class="tabular-nums">67%</output><input type="range" class="form-range" id="press-force" min="0" max="100" step="1" value="67" aria-describedby="press-baseline"></label>
-<label class="form-label" for="press-view">观察角度<select class="form-select" id="press-view"><option value="perspective">斜视构造</option><option value="front">正视</option><option value="top">俯视线圈</option></select></label>
-<label class="form-label" for="press-selected">放大分支<select class="form-select" id="press-selected"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label>
-<label class="form-label" for="press-detail-mode">右侧放大<select class="form-select" id="press-detail-mode"><option value="sensor">内藏测力剖面</option><option value="chamber">铁珠分支运动</option></select></label>
+<label class="form-label" for="press-detail-mode">右侧放大<select class="form-select" id="press-detail-mode"><option value="electronics">Arduino与接线</option><option value="sensor">内藏测力剖面</option><option value="chamber">铁珠分支运动</option></select></label>
 </div>
-<p id="press-baseline">0%为原有荷载基线，100%为本演示相对增量上限，不表示结构承载能力。当前为模拟输入，未连接硬件。</p>
-<div class="viz-controls"><button type="button" class="btn" id="press-fit">复位视角</button><label class="form-check"><input type="checkbox" class="form-check-input" id="press-wires" checked><span class="form-check-label">显示接线</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-topcut"><span class="form-check-label">整机顶板局部剖开</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-open"><span class="form-check-label">移开放大腔前板</span></label></div>
+<ol class="signal-chain" aria-label="受压信号传递过程"><li id="press-signal-sensor"><span>内藏测力元件</span><output id="press-signal-sensor-value">桥信号0%</output></li><li id="press-signal-hx"><span>HX711放大与采样</span><output id="press-signal-hx-value">采样值0%</output></li><li id="press-signal-arduino"><span>Arduino读取与判断</span><output id="press-signal-arduino-value">收到0%</output></li><li id="press-signal-driver"><span>D9 / D10两组输出</span><output id="press-signal-driver-value">M0关 / S×8关</output></li></ol>
 <p id="press-status" class="press-status" aria-live="polite">正在准备三维示意…</p>
-<div class="press-readout tabular-nums"><span>荷载增量 <output id="press-pressure">0%</output></span><span id="press-current">M0 关 · S组 关</span><span id="press-active">0 / 8只小线圈</span><span>模型中心上移 <output id="press-rise">0.0 mm</output></span></div>
 <div class="press-views">
 <figure><figcaption>整机 · 连续平顶面，无外露测力凸起</figcaption><canvas id="press-whole" role="img" aria-label="平顶板内部隐藏测力元件，中央一只大线圈与8只端部小线圈保持原位；8个放射状弧底薄腔共同响应上部荷载。">测力元件在顶板夹层内，HX711与控制器仍在底部，顶面无凸起。</canvas><p class="text-small text-muted">拖动旋转；Ctrl或Shift＋滚轮缩放。剖开仅供观察。</p></figure>
-<figure><figcaption id="press-detail-caption">顶板中央局部剖面 · 测力元件内藏</figcaption><canvas id="press-detail" role="img" aria-label="平顶板下方的传力压头、内藏测力元件和固定承压座的局部三维剖面；上表面连续平整。">在右侧放大中可切换内藏测力剖面和铁珠分支运动。</canvas><p class="text-small text-muted">右侧可切回铁珠运动；剖面不表示实体顶板开孔。</p></figure>
+<figure><figcaption id="press-detail-caption">接线放大 · HX711、Arduino与两组驱动</figcaption><canvas id="press-detail" role="img" aria-label="底部电子仓三维接线放大，包括HX711、Arduino Nano、74HC244缓冲器、中央线圈驱动、8路端部驱动和5V降压模块。">右侧可选择Arduino接线、内藏测力剖面或铁珠分支。</canvas><p class="text-small text-muted">B采样 · C Arduino · F缓冲 · D0/D1驱动。线路为功能走向示意。</p></figure>
 </div>
+<p id="press-signal-description">持续采样待机：等待上部荷载增量</p>
+<div class="press-readout tabular-nums"><span>荷载增量 <output id="press-pressure">0%</output></span><span id="press-current">M0 关 · S组 关</span><span id="press-active">0 / 8只小线圈</span><span>模型中心上移 <output id="press-rise">0.0 mm</output></span></div>
+<div class="viz-controls"><label class="form-label" for="press-view">观察角度<select class="form-select" id="press-view"><option value="perspective">斜视构造</option><option value="front">正视</option><option value="top">俯视线圈</option></select></label><label class="form-label" for="press-selected">放大分支<select class="form-select" id="press-selected"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label></div>
+<div class="viz-controls"><button type="button" class="btn" id="press-fit">复位视角</button><label class="form-check"><input type="checkbox" class="form-check-input" id="press-wires" checked><span class="form-check-label">显示接线</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-topcut"><span class="form-check-label">整机顶板局部剖开</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-open"><span class="form-check-label">移开放大腔前板</span></label></div>
+<div class="viz-controls"><label class="form-check"><input type="checkbox" class="form-check-input" id="press-show-flow" checked><span class="form-check-label">显示路径亮点</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-slow-signal" checked><span class="form-check-label">放慢信号过程</span></label></div>
+<p id="press-baseline">0%为原有荷载基线，100%为本演示相对增量上限，不表示结构承载能力。当前为模拟输入，未连接硬件。</p>
+<p>为看清先后，放慢模式分两段各0.35秒展示，再交给Arduino控制模型；这不是实际导线传播时间或HX711采样延迟。路径亮点只示意方向，高低电平与线圈通断相对应。</p>
 <section class="press-section" aria-labelledby="press-flat-title"><h2 id="press-flat-title">藏在顶板夹层，保留原线圈</h2><p>现有示意的中央线圈内孔Ø20 mm，铁芯约Ø18 mm，单边仅约1 mm，不能把测力元件直接塞进这个内孔。本版采用：平顶板 → 传力压头 → 应变式测力元件 → 固定承压座。器件位于绕组上方，HX711保留在柱底。</p><p>顶面整体做成平板，图示整体厚16 mm。传感器的Ø26×6 mm只表示预留占位，未选定商品；选型后可整体加厚夹层，顶面仍保持平整。</p></section>
 <section class="press-section" aria-labelledby="press-sequence-title"><h2 id="press-sequence-title">大开 → 小开 → 大关 → 小关</h2><p>上部短时增载触发一轮；持续受压让整机重复循环；卸载后结束当前轮，再共同接两轮逐渐放慢的余波。8只小线圈始终同步通断。压力较大时缩短轮间等待，电流由下方独立上限控制。</p></section>
 <section class="press-section" aria-labelledby="press-settings-title"><h2 id="press-settings-title">数量与通断时序</h2>
@@ -1576,9 +1583,10 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 <div class="press-field"><label class="form-label" for="press-current-small">小线圈相对电流 <output id="press-current-small-value">1.6×</output></label><input class="form-range" type="range" id="press-current-small" min="0.5" max="2.5" step="0.1" value="1.6"></div>
 </div><p>最快轮间隔为四段之和：<output id="press-period">2.8 s</output>（模型）。调时序会回到待机，请重新加载；调数量会重置珠群。相对电流倍数不是安培值。高数量时计算采用预算，模型时间可能慢于墙钟时间。</p></section>
 <section class="press-section" aria-labelledby="press-wire-title"><h2 id="press-wire-title">一个感知信号，两组线圈时序</h2>
+<p>桥式模拟信号先到HX711；数据由DT走向Arduino D3，采样时钟由D2反向送到HX711 SCK。D9控制M0驱动；D10经F缓冲器分成8路EN，8只端部线圈同时通断。5V、地线与线圈功率回路另行标出，Arduino引脚不供线圈电流。</p>
 <table class="table table-sm"><caption class="sr-only">功能接线示意，驱动器接口须按实际型号核对</caption><thead><tr><th scope="col">输入</th><th scope="col">连接</th><th scope="col">作用</th></tr></thead><tbody>
 <tr><td>内藏测力桥 E±、S±</td><td>沿独立线槽至柱底HX711 E±、A±</td><td>屏蔽双绞桥线；量程待定</td></tr><tr><td>HX711 DT / SCK</td><td>Nano D3 / D2</td><td>采样与时钟</td></tr>
-<tr><td>Nano D9</td><td>M0恒流驱动 EN</td><td>大线圈组的起止</td></tr><tr><td>Nano D10</td><td>逻辑分配 → S1–S8驱动 EN</td><td>8只小线圈同步起止</td></tr>
+<tr><td>Nano D9</td><td>M0恒流驱动 EN</td><td>大线圈组的起止</td></tr><tr><td>Nano D10</td><td>SN74HC244 A输入 → 8个Y输出 → S1–S8驱动 EN</td><td>8只小线圈同步起止</td></tr>
 <tr><td>动力低压电源 + / 0V</td><td>M0驱动、8路S驱动及匹配的降压模块</td><td>供电能力按9线圈同时工况核定</td></tr><tr><td>5V稳压 + / GND</td><td>Nano 5V/GND、HX711供电/GND</td><td>逻辑支路；与动力共地参考</td></tr>
 <tr><td>M0驱动 OUT±</td><td>中央大线圈两端</td><td>单独限流与快速关断</td></tr><tr><td>8路S驱动各OUT±</td><td>分别接8只端部线圈</td><td>时序共用，各自限流</td></tr></tbody></table>
 <p>D是“M0一路＋S组8路”的功能块。GPIO只输出逻辑，不供线圈电流；需核对输入电平、分配负载、各路限流和关断能量处理。动力电压与容量按实际绕组匹配，不沿用单腔电源/功耗推算整机。外部5V与USB供电不应未经核对直接并联。</p></section>
@@ -1695,6 +1703,72 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
   return{state:s,hold,setInput:hold,tap,release,step,advance,stats,drive};
  }
  return{create,STEP};
+});
+
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.SignalPath=api;})(typeof window!=='undefined'?window:globalThis,function(){
+ 'use strict';
+ const clamp=v=>Math.max(0,Math.min(15,v));
+ function create(deliver){
+  const s={source:0,hx:0,nano:0,slow:true,queue:[],events:[],stage:'idle',stageAt:-100,commands:{big:{value:0,at:-100},small:{value:0,at:-100}}};
+  function event(type,force,time){s.stage=type;s.stageAt=time;s.events.push({type,force,time});if(s.events.length>32)s.events.shift();}
+  function input(force,now){if(!Number.isFinite(force))return;force=clamp(force);if(force===s.source)return;s.source=force;event('sensor',force,now);
+   if(!s.slow){s.hx=s.nano=force;deliver(force);event('arduino',force,now);return;}
+   s.queue.push({at:now+.35,type:'hx',force},{at:now+.7,type:'arduino',force});s.queue.sort((a,b)=>a.at-b.at);
+   // UI input is not a hardware sample stream; bound unusually fast slider floods.
+   if(s.queue.length>128)s.queue.splice(0,s.queue.length-128);
+  }
+  function tick(now){while(s.queue.length&&s.queue[0].at<=now+1e-9){const e=s.queue.shift();if(e.type==='hx')s.hx=e.force;else{s.nano=e.force;deliver(e.force);}event(e.type,e.force,e.at);}s.events=s.events.filter(e=>now-e.time<2);}
+  function setSlow(value,now){s.slow=!!value;s.queue=[];s.hx=s.nano=s.source;deliver(s.source);event('arduino',s.source,now);}
+  function outputs(d,now){for(const k of ['big','small'])if(s.commands[k].value!==d[k]){s.commands[k]={value:d[k],at:now};event('driver',s.nano,now);}}
+  function snapshot(now,d){const stage=now-s.stageAt<1.1?s.stage:d.level?'driver':s.source>0?'arduino':'idle';return{source:s.source,hx:s.hx,nano:s.nano,stage,slow:s.slow,pending:s.queue.length,big:d.big,small:d.small};}
+  return{state:s,input,tick,setSlow,outputs,snapshot};
+ }
+ return{create};
+});
+
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.CapitalWiring=api;})(typeof window!=='undefined'?window:globalThis,function(){
+ 'use strict';
+ const boards=[
+  {id:'hx',label:'HX711',bounds:[-115,-116,14,-84,-90,19],color:'particle'},
+  {id:'nano',label:'Arduino Nano',bounds:[-65,-116,14,-20,-98,19],color:'spacer'},
+  {id:'buffer',label:'74HC244',bounds:[-15,-72,14,10,-58,19],color:'small'},
+  {id:'m0driver',label:'M0驱动',bounds:[0,-116,14,28,-86,19],color:'coil'},
+  {id:'sdriver',label:'S组8路驱动',bounds:[36,-116,14,79,-86,19],color:'small'},
+  {id:'supply',label:'5V降压',bounds:[90,-116,14,120,-96,19],color:'surface'}
+ ];
+ const nets=[];
+ function net(id,kind,from,to,points,color,localPoints){nets.push({id,kind,from,to,points,color,localPoints});}
+ for(let k=0;k<4;k++){
+  const excitation=k<2,x=-7+k*3,hx=-112+k*3,sensor=[x,-14,255],base=[x,-16,25],port=[hx,-90,21],stub=[hx,-78,27];
+  net(['E+','E-','A+','A-'][k],excitation?'excitation':'analog',excitation?'HX711 E':'传感器 S',excitation?'传感器 E':'HX711 A',excitation?[port,base,sensor]:[sensor,base,port],excitation?'muted':'particle',excitation?[port,stub]:[stub,port]);
+ }
+ net('DT','data','HX711 DT','Nano D3',[[-84,-100,21],[-65,-100,21]],'spacer');
+ net('SCK','clock','Nano D2','HX711 SCK',[[-65,-108,21],[-84,-108,21]],'spacer');
+ net('D9','cmdBig','Nano D9','M0驱动 EN',[[-20,-101,21],[0,-101,21]],'coil');
+ net('D10','cmdSmall','Nano D10','74HC244 A输入',[[-20,-109,21],[-27,-80,24],[-15,-65,21]],'small');
+ for(let i=0;i<8;i++)net('EN-S'+(i+1),'fanout','74HC244 Y'+(i+1),'S'+(i+1)+'驱动 EN',[[3-i*2,-58,21],[28,-49-i*1.7,24],[39+i*5,-86,21]],'small');
+ net('M0+','powerBig','M0驱动 OUT+','M0绕组',[[12,-86,21],[3,-18,30],[3,-18,228],[0,-24,234]],'coil',[[12,-86,21],[12,-76,28]]);
+ net('M0-','returnBig','M0绕组','M0驱动 OUT-',[[0,-24,243],[8,-18,228],[8,-18,30],[20,-86,21]],'muted',[[20,-76,28],[20,-86,21]]);
+ for(let i=0;i<8;i++){
+  const a=(i+.5)*Math.PI/4,p=[118*Math.cos(a),118*Math.sin(a),234];
+  net('S'+(i+1)+'+','powerSmall','S'+(i+1)+'驱动 OUT+','S'+(i+1)+'绕组',[[39+i*5,-86,21],[10+i*.3,0,35],[10+i*.3,0,226],p],'small',[[39+i*5,-86,21],[39+i*5,-74,28]]);
+  net('S'+(i+1)+'-','returnSmall','S'+(i+1)+'绕组','S'+(i+1)+'驱动 OUT-',[[p[0],p[1],236],[14+i*.3,0,226],[14+i*.3,0,35],[41+i*5,-86,21]],'muted',[[41+i*5,-74,28],[41+i*5,-86,21]]);
+ }
+ net('logic5V','supply','降压5V','Nano 5V / HX711 / 244',[[90,-100,21],[84,-124,21],[-95,-124,21],[-95,-116,21]],'muted');
+ net('nano5V','supply','5V总线','Nano 5V',[[-55,-124,21],[-55,-116,21]],'muted');
+ net('buffer5V','supply','5V总线','244 VCC',[[5,-124,21],[18,-80,22],[5,-72,21]],'muted');
+ net('logicGND','ground','降压GND','HX711 / Nano / 244 GND',[[90,-108,21],[83,-129,21],[-103,-129,21],[-103,-116,21]],'muted');
+ net('nanoGND','ground','GND总线','Nano GND',[[-47,-129,21],[-47,-116,21]],'muted');
+ net('bufferGND','ground','GND总线','244 GND',[[11,-129,21],[24,-81,22],[9,-72,21]],'muted');
+ net('starGND','ground','逻辑GND','动力0V公共参考',[[83,-129,21],[126,-129,21],[126,-133,21]],'muted');
+ net('buckIn','supply','外部动力+','降压输入+',[[126,-126,21],[120,-113,21]],'muted');
+ net('buckReturn','ground','降压输入-','动力0V',[[120,-108,21],[126,-133,21]],'muted');
+ for(const [id,x]of [['M0',23],['S',73]]){
+  net('bus'+id,'supply','外部动力+','驱动电源+',[[126,-126,21],[x,-126,21],[x,-116,21]],'muted');
+  net('gnd'+id,'ground','驱动GND','动力0V',[[x-5,-116,21],[x-5,-133,21],[126,-133,21]],'muted');
+ }
+ function pointAt(points,u){u=Math.max(0,Math.min(1,u));const lengths=[];let total=0;for(let i=1;i<points.length;i++){const d=Math.hypot(...points[i].map((v,k)=>v-points[i-1][k]));lengths.push(d);total+=d;}let target=u*total;for(let i=0;i<lengths.length;i++){if(target<=lengths[i]||i===lengths.length-1){const t=lengths[i]?target/lengths[i]:0;return points[i].map((v,k)=>v+(points[i+1][k]-v)*t);}target-=lengths[i];}return points[0];}
+ return{boards,nets,pointAt};
 });
 
 (function(){
@@ -1814,6 +1888,24 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
     }
    }
    if(index===2){flatTop(true,true);commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};}
+
+   function electronics(local){
+    for(const b of window.CapitalWiring.boards){
+      const v=b.bounds,start=commands.length,col=palette[b.color]||palette.surface;
+      box(v[0],v[1],v[2],v[3],v[4],v[5],mix(col,palette.bg,.55),.9);
+      box(v[0]+4,v[1]+4,v[5],v[3]-4,v[4]-4,v[5]+3,steel,.82);
+      for(let j=start;j<commands.length;j++)commands[j].component=b.id;
+    }
+    if(!wires)return;
+    for(const net of window.CapitalWiring.nets){
+      const pts=local?(net.localPoints||net.points):net.points;
+      const high=/Big/.test(net.kind)?drive.big:/Small|fanout/.test(net.kind)?drive.small:null;
+      const start=commands.length;
+      addLine(pts,palette[net.color],high?1.9:1.05,high===null?.65:high?.94:.3,net.kind==='ground');
+      for(let j=start;j<commands.length;j++)commands[j].netID=net.id;
+    }
+   }
+   if(index===3){electronics(true);commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};}
    if(index===0){
     if(state.view!=='top'){
      box(-150,-140,0,150,140,14,neutral);ring(16,0,14,120,neutral,[0,0,0],{segments:24});
@@ -1840,20 +1932,7 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 
     // The force sensor is enclosed below the continuous plane z=266.
     if(load>0)for(const x of [-65,0,65]){addLine([[x,0,293],[x,0,269],[x-3,0,274]],palette.particle,2,.9);addLine([[x,0,269],[x+3,0,274]],palette.particle,2,.9);}
-    const boards=[[-115,-116,-84,-90],[-65,-116,-20,-98],[0,-116,65,-86],[83,-116,113,-96]];
-    for(const b of boards){box(b[0],b[1],14,b[2],b[3],19,palette.surface);box(b[0]+5,b[1]+4,19,b[2]-5,b[3]-4,21,steel,.65);}
-    if(wires){
-      for(let k=0;k<4;k++)addLine([[-7+k*3,-14,255],[-7+k*3,-16,25],[-110+k*3,-90,21]],palette.particle,.9,.8);
-      addLine([[-84,-103,21],[-65,-103,21]],palette.particle,1.5,.9);
-      addLine([[-20,-104,21],[0,-104,21]],palette.particle,1.5,.9);
-      addLine([[65,-105,21],[83,-105,21]],palette.spacer,1.4,.85);
-      addLine([[83,-111,21],[-93,-123,21],[-93,-116,21]],palette.spacer,1.2,.8);
-      addLine([[83,-108,21],[-55,-120,21],[-55,-116,21]],palette.muted,1.2,.8);
-      addLine([[65,-112,21],[70,-126,21],[-100,-126,21],[-100,-116,21]],palette.muted,1.2,.8);
-      addLine([[83,-114,21],[70,-128,21],[57,-128,21],[57,-116,21]],palette.coil,1.5,.9);
-      for(const x of [3,8])addLine([[20+(x===3?0:4),-86,21],[x,0,30],[x,0,239]],x===3?palette.coil:palette.muted,1.4,.85);
-      for(let l=0;l<8;l++){const a=(l+.5)*Math.PI/4;for(const offset of [0,2])addLine([[30+l*3,-86,21],[10+offset,0,35],[10+offset,0,226],[118*Math.cos(a),118*Math.sin(a),232+offset]],offset?palette.muted:palette.small,1,.6);}
-    }
+    electronics(false);
    }else chamber(state.selected,true);
    commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};
   }
@@ -1867,8 +1946,8 @@ return buildScene(index,projector);
  const root=document.getElementById('press-prototype'),by=id=>root.querySelector('#press-'+id),clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
  const E=window.VerticalGranular,reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const defaults={lead:.8,overlap:.3,hold:.3,allOff:1.4};
- const state={playing:!reduced.matches,auto:true,force:10,selected:6,beadCount:200,wires:true,open:false,cutTop:false,detailMode:'sensor',view:'perspective',durations:{...defaults},currents:{big:1.8,small:1.6},cameras:[{yaw:-.48,elev:.29,zoom:1},{yaw:-.20,elev:.10,zoom:1}]};
- let controller,particles,initialMean,last=0,lastDraw=0,accumulator=0,autoWas=-1,palette,scenePalette,disposed=false;
+ const state={playing:!reduced.matches,auto:true,force:10,selected:6,beadCount:200,wires:true,showFlow:true,slowSignal:true,open:false,cutTop:false,detailMode:'electronics',view:'perspective',durations:{...defaults},currents:{big:1.8,small:1.6},cameras:[{yaw:-.48,elev:.29,zoom:1},{yaw:-.20,elev:.10,zoom:1}]};
+ let controller,particles,signals,tapUntil=-1,initialMean,last=0,lastDraw=0,accumulator=0,autoWas=-1,palette,scenePalette,disposed=false,themeRevision=0,sceneBuilds=0;
  const canvases=[by('whole'),by('detail')],contexts=canvases.map(c=>c.getContext('2d')),sizes=[{},{}],labelBounds=[[],[]],drag=[null,null];
    function rgbToken(name) {
     const styles=getComputedStyle(root);
@@ -1897,57 +1976,89 @@ return buildScene(index,projector);
     return values;
   }
 
- function theme(){scenePalette={bg:rgbToken('--background'),fg:rgbToken('--foreground'),muted:rgbToken('--muted-foreground'),surface:rgbToken('--muted'),edge:rgbToken('--border'),coil:rgbToken('--viz-series-1'),particle:rgbToken('--viz-series-2'),spacer:rgbToken('--viz-series-3'),small:rgbToken('--viz-series-4')};palette=Object.fromEntries(Object.entries(scenePalette).map(([k,v])=>[k,'rgb('+v.join(',')+')']));}
+ function theme(){scenePalette={bg:rgbToken('--background'),fg:rgbToken('--foreground'),muted:rgbToken('--muted-foreground'),surface:rgbToken('--muted'),edge:rgbToken('--border'),coil:rgbToken('--viz-series-1'),particle:rgbToken('--viz-series-2'),spacer:rgbToken('--viz-series-3'),small:rgbToken('--viz-series-4')};palette=Object.fromEntries(Object.entries(scenePalette).map(([k,v])=>[k,'rgb('+v.join(',')+')']));themeRevision++;}
  const limits={lead:[.2,5],overlap:[.1,3],hold:[.1,3],allOff:[.5,6]},base=()=>Object.values(state.durations).reduce((s,x)=>s+x,0);
  function validDurations(v){return v&&Object.entries(limits).every(([k,[lo,hi]])=>Number.isFinite(v[k])&&v[k]>=lo&&v[k]<=hi);}
  function setView(v){state.view=v;state.cameras=[{yaw:-.48,elev:.29,zoom:1},{yaw:-.20,elev:.10,zoom:1}];if(v==='front')state.cameras[0]={yaw:0,elev:0,zoom:1};if(v==='top')state.cameras[0]={yaw:0,elev:1.49,zoom:1};}
- function applySaved(saved){const s=saved?.privateContent;if(s?.kind!=='capital-central-relay-v1')return;
+ function applySaved(saved){const s=saved?.privateContent,legacy=s?.kind==='capital-central-relay-v1';if(s?.kind!=='capital-arduino-signal-v1'&&!legacy)return false;
   if(Number.isFinite(s.force))state.force=clamp(s.force,0,15);if(Number.isInteger(s.selected))state.selected=clamp(s.selected,0,7);
   if(Number.isInteger(s.beadCount)&&s.beadCount>=50&&s.beadCount<=400)state.beadCount=s.beadCount;
   if(validDurations(s.durations))state.durations={...s.durations};
   if(s.currents&&['big','small'].every(k=>Number.isFinite(s.currents[k])&&s.currents[k]>=.5&&s.currents[k]<=2.5))state.currents={...s.currents};
-  for(const k of ['wires','open','cutTop'])if(typeof s[k]==='boolean')state[k]=s[k];if(['sensor','chamber'].includes(s.detailMode))state.detailMode=s.detailMode;if(['perspective','front','top'].includes(s.view))setView(s.view);
+  for(const k of ['wires','open','cutTop','showFlow','slowSignal'])if(typeof s[k]==='boolean')state[k]=s[k];if(!legacy&&['sensor','chamber','electronics'].includes(s.detailMode))state.detailMode=s.detailMode;if(['perspective','front','top'].includes(s.view))setView(s.view);return true;
  }
- try{applySaved(window.openai?.widgetState||JSON.parse(localStorage.getItem('capital-central-relay-v1')||'null'));}catch(_){}
- function save(){const s={kind:'capital-central-relay-v1',force:state.force,selected:state.selected,beadCount:state.beadCount,durations:{...state.durations},currents:{...state.currents},wires:state.wires,open:state.open,cutTop:state.cutTop,detailMode:state.detailMode,view:state.view};try{window.openai?.setWidgetState({modelContent:{structure:'flat top with concealed sensor; central + 8 end coils, all axes Z',pressureIncrement_percent:state.force/15*100,beads:state.beadCount*8,timing:state.durations},privateContent:s})?.catch(()=>{});localStorage.setItem(s.kind,JSON.stringify({privateContent:s}));}catch(_){} }
+ try{applySaved(window.openai?.widgetState||JSON.parse(localStorage.getItem('capital-arduino-signal-v1')||localStorage.getItem('capital-central-relay-v1')||'null'));}catch(_){}
+ function save(){const s={kind:'capital-arduino-signal-v1',force:state.force,selected:state.selected,beadCount:state.beadCount,durations:{...state.durations},currents:{...state.currents},wires:state.wires,open:state.open,cutTop:state.cutTop,showFlow:state.showFlow,slowSignal:state.slowSignal,detailMode:state.detailMode,view:state.view};try{window.openai?.setWidgetState({modelContent:{structure:'flat top sensor > HX711 > Arduino D3/D2 > D9 M0 and D10 buffered S1..S8',pressureIncrement_percent:state.force/15*100,beads:state.beadCount*8,timing:state.durations,signalSlowIllustration:state.slowSignal},privateContent:s})?.catch(()=>{});localStorage.setItem(s.kind,JSON.stringify({privateContent:s}));}catch(_){} }
  const proxy={scenario:'normal',get layers(){return Array(8).fill(particles.layers[0]);},drive:()=>controller.drive(),stats:()=>particles.stats(0)};
  function resetParticles(){particles=E.createWorld({layerCount:1,beadCount:state.beadCount,currents:state.currents});particles.drive=()=>controller.drive();initialMean=particles.stats(0).meanHeight;}
- function reset(){controller=LoadRelay.create(()=>state.durations);resetParticles();autoWas=-1;accumulator=0;}
+ function reset(){controller=LoadRelay.create(()=>state.durations);signals=SignalPath.create(v=>controller.hold(v));signals.state.slow=state.slowSignal;resetParticles();tapUntil=-1;autoWas=-1;accumulator=0;}
  reset();
  function stats(){return{...controller.stats(),meanHeight:particles.stats(0).meanHeight,rise:Math.max(0,particles.stats(0).meanHeight-initialMean)};}
  function sync(){by('force').value=Math.round(state.force/15*100);by('force-value').textContent=Math.round(state.force/15*100)+'%';by('selected').value=state.selected;by('count').value=state.beadCount;by('count-value').textContent=state.beadCount+' / 腔 · 共'+state.beadCount*8+'颗';
   for(const k of Object.keys(limits)){by(k).value=state.durations[k];by(k+'-value').textContent=Number(state.durations[k].toFixed(1))+' s';}
   for(const k of ['big','small']){by('current-'+k).value=state.currents[k];by('current-'+k+'-value').textContent=state.currents[k].toFixed(1)+'×';}
-  by('wires').checked=state.wires;by('open').checked=state.open;by('open').disabled=state.detailMode==='sensor';by('topcut').checked=state.cutTop;by('detail-mode').value=state.detailMode;by('view').value=state.view;by('auto').checked=state.auto;by('play').textContent=state.playing?'暂停动画':'播放动画';by('hold').setAttribute('aria-pressed',String(!state.auto&&controller.state.raw>0&&controller.state.tapUntil<0));by('period').textContent=base().toFixed(1)+' s';by('detail-caption').textContent=state.detailMode==='sensor'?'顶板中央局部剖面 · 测力元件内藏':'第'+(state.selected+1)+'腔 · '+state.beadCount+'颗 · 与整机统一触发';by('detail').setAttribute('aria-label',state.detailMode==='sensor'?'平整顶板下方依次为传力压头、内藏应变式测力元件和固定承压座；剖开仅供观察。':'所选弧底透明薄腔，端部线圈随统一信号接力吸附，全部断电后铁珠落回。');}
- function projection(i){const {w,h}=sizes[i],original=state.cameras[i],sensor=i===1&&state.detailMode==='sensor',c=sensor?{...original,elev:.38}:original,bounds=i===0?[[-150,150],[-140,140],[0,301]]:sensor?[[-48,48],[-34,34],[246,277]]:[[-50,62],[state.open?-16:-12,12],[0,128]],ca=Math.cos(c.yaw),sa=Math.sin(c.yaw),ce=Math.cos(c.elev),se=Math.sin(c.elev);
+  by('wires').checked=state.wires;by('show-flow').checked=state.showFlow;by('slow-signal').checked=state.slowSignal;by('open').checked=state.open;by('open').disabled=state.detailMode!=='chamber';by('topcut').checked=state.cutTop;by('detail-mode').value=state.detailMode;by('view').value=state.view;by('auto').checked=state.auto;by('play').textContent=state.playing?'暂停动画':'播放动画';by('hold').setAttribute('aria-pressed',String(!state.auto&&signals.state.source>0&&tapUntil<0));by('period').textContent=base().toFixed(1)+' s';by('detail-caption').textContent=state.detailMode==='electronics'?'接线放大 · HX711、Arduino与两组驱动':state.detailMode==='sensor'?'顶板中央局部剖面 · 测力元件内藏':'第'+(state.selected+1)+'腔 · '+state.beadCount+'颗 · 与整机统一触发';by('detail').setAttribute('aria-label',state.detailMode==='electronics'?'底部电子仓：HX711 DT到Arduino D3、D2回送采样时钟；D9到中央驱动，D10经74HC244到8路端部驱动，另有5V和公共地线。':state.detailMode==='sensor'?'平整顶板下方依次为传力压头、内藏应变式测力元件和固定承压座；剖开仅供观察。':'所选弧底透明薄腔，端部线圈随统一信号接力吸附，全部断电后铁珠落回。');}
+ function projection(i){const {w,h}=sizes[i],original=state.cameras[i],sensor=i===1&&state.detailMode==='sensor',electronics=i===1&&state.detailMode==='electronics',c={...original,elev:clamp(original.elev+(sensor?.28:electronics?.75:0),-.2,1.5)},bounds=i===0?[[-150,150],[-140,140],[0,301]]:electronics?[[-125,134],[-138,-40],[12,48]]:sensor?[[-48,48],[-34,34],[246,277]]:[[-50,62],[state.open?-16:-12,12],[0,128]],ca=Math.cos(c.yaw),sa=Math.sin(c.yaw),ce=Math.cos(c.elev),se=Math.sin(c.elev);
   function rotate(p){return{x:p[0]*ca+p[1]*sa,y:-p[0]*sa*se+p[1]*ca*se+p[2]*ce,d:p[0]*sa*ce-p[1]*ca*ce+p[2]*se};}
   const pts=[];for(const x of bounds[0])for(const y of bounds[1])for(const z of bounds[2])pts.push(rotate([x,y,z]));const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),lx=Math.min(...xs),hx=Math.max(...xs),ly=Math.min(...ys),hy=Math.max(...ys),scale=Math.min((w-2*Math.min(w*.12,46))/(hx-lx),(h-2*Math.min(h*.13,48))/(hy-ly))*c.zoom;
   return{scale,project(p){const v=rotate(p);return{x:w/2+(v.x-(lx+hx)/2)*scale,y:h/2-6-(v.y-(ly+hy)/2)*scale,d:v.d};}};
  }
  const meshes=[[],[]];
- function scene(detail){const i=detail?1:0,P=projection(i),sceneState={selected:state.selected,beadCount:state.beadCount,open:true,explode:state.open,cutTop:state.cutTop,view:state.view};return window.RelayReferenceScene(detail&&state.detailMode==='sensor'?2:i,P,sceneState,proxy,scenePalette,controller.state.raw,state.wires);}
+ const sceneCaches=[null,null];
+ function scene(detail){const i=detail?1:0,P=projection(i),sceneState={selected:state.selected,beadCount:state.beadCount,open:true,explode:state.open,cutTop:state.cutTop,view:state.view},drive=controller.drive();
+  const mode=detail?(state.detailMode==='sensor'?2:state.detailMode==='electronics'?3:1):0;
+  const key=JSON.stringify([mode,state.selected,state.beadCount,state.open,state.cutTop,state.view,state.wires,state.cameras[i],sizes[i],themeRevision,drive.big,drive.small,signals.state.source>0]);
+  if(sceneCaches[i]?.key!==key){sceneCaches[i]={key,built:window.RelayReferenceScene(mode,P,sceneState,proxy,scenePalette,signals.state.source,state.wires)};sceneBuilds++;}
+  const built=sceneCaches[i].built;
+  for(const c of built.commands)if(c.kind==='ball'){
+    const p=particles.layers[0][c.id%state.beadCount];let xyz;
+    if(mode===0){const t=(c.branch+.5)*Math.PI/4;xyz=[(E.RIN+p.x)*Math.cos(t),(E.RIN+p.x)*Math.sin(t),E.BASE+p.z];}else xyz=[p.x-E.W/2,0,p.z];
+    c.world=xyz;c.pts[0]=P.project(xyz);c.depth=c.pts[0].d;
+  }
+  built.commands.sort((a,b)=>a.depth-b.depth);return built;
+ }
+ function flowMarkers(detail){if(!state.wires||!state.showFlow||(detail&&state.detailMode!=='electronics'))return[];const now=controller.state.time,d=controller.drive(),s=signals.state,P=projection(detail?1:0),list=[];
+  for(const n of CapitalWiring.nets){let u=null,bit=null;
+   if(n.kind==='analog'){const e=[...s.events].reverse().find(e=>e.type==='sensor'&&now-e.time>=0&&now-e.time<(s.slow?.35:.2));if(e)u=(now-e.time)/(s.slow?.35:.2);else if(s.source>0)u=(now%1.1)/1.1;}
+   if(n.kind==='data'){const e=[...s.events].reverse().find(e=>e.type==='hx'&&now-e.time>=0&&now-e.time<.35);if(e)u=(now-e.time)/.35;else if(s.hx>0)u=(now%1.1)/1.1;}
+   if(n.kind==='clock'&&(s.hx>0||s.queue.length))u=(now%.8)/.8;
+   if(['cmdBig','cmdSmall','fanout'].includes(n.kind)){const e=s.commands[n.kind==='cmdBig'?'big':'small'];if(now-e.at>=0&&now-e.at<.22){u=(now-e.at)/.22;bit=e.value;}}
+   if((n.kind==='powerBig'||n.kind==='returnBig')&&d.big)u=(now%.85)/.85;
+   if((n.kind==='powerSmall'||n.kind==='returnSmall')&&d.small)u=(now%.85)/.85;
+   if(u!==null){const pts=detail?(n.localPoints||n.points):n.points,p=P.project(CapitalWiring.pointAt(pts,u));list.push({id:n.id,kind:n.kind,p,color:palette[n.color],bit});}
+  }return list;
+ }
  function labels(i){if(i===1&&state.detailMode==='sensor')return[{p:[23,12,266],text:'连续平顶面'},{p:[0,0,259],text:'传力压头'},{p:[0,-12,255],text:'内藏测力元件'},{p:[0,-17,251],text:'固定承压座'},{p:[-27,-26,249],text:'桥线 → HX711'}];
+  if(i===1&&state.detailMode==='electronics')return[{p:[-100,-105,27],text:'B HX711'},{p:[-43,-107,27],text:'C Arduino Nano'},{p:[-2,-65,27],text:'F 74HC244'},{p:[14,-104,27],text:'D0 M0驱动'},{p:[57,-104,27],text:'D1 S组8路'},{p:[105,-106,27],text:'E 5V'},{p:[-75,-100,24],text:'DT → D3'},{p:[-75,-108,20],text:'D2 → SCK'},{p:[-10,-101,24],text:'D9'},{p:[-25,-82,25],text:'D10'},{p:[-109,-77,29],text:'顶部桥线'},{p:[61,-75,30],text:'至8只端部线圈'}];
   if(i===1)return[{p:[-19,-5,77],text:'弧底 R126'},{p:[E.SMALL_RADIUS-E.RIN-E.W/2,0,124],text:'端部小线圈 S'+(state.selected+1)},{p:[0,-6,12],text:'净宽96 · 净隙2.8 mm'}];
-  const a=[{p:[0,0,255],text:'A 内藏测力点'},{p:[90,60,266],text:'连续平顶面'},{p:[24,0,239],text:'M0 中央大线圈'},{p:[-100,-102,26],text:'B HX711'},{p:[-43,-106,26],text:'C 控制器'},{p:[32,-100,26],text:'D 两组驱动'},{p:[100,-106,26],text:'E 5V降压'}];
+  const a=[{p:[0,0,255],text:'A 内藏测力点'},{p:[90,60,266],text:'连续平顶面'},{p:[24,0,239],text:'M0 中央大线圈'},{p:[-100,-102,26],text:'B HX711'},{p:[-43,-106,26],text:'C Arduino'},{p:[14,-100,26],text:'D0'},{p:[57,-100,26],text:'D1'},{p:[-2,-65,26],text:'F 244'},{p:[105,-106,26],text:'E 5V'}];
   for(let l=0;l<8;l++){const t=(l+.5)*Math.PI/4;a.push({p:[124*Math.cos(t),124*Math.sin(t),218],text:'S'+(l+1)});}return a;
  }
  function paint(i){const ctx=contexts[i],{w,h}=sizes[i];ctx.clearRect(0,0,w,h);const built=scene(i===1);meshes[i]=built.commands;
   for(const c of built.commands){ctx.globalAlpha=c.alpha;if(c.kind==='ball'){const p=c.pts[0],r=Math.max(i===0?.8:1.6,c.radius);ctx.fillStyle=palette.fg;ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();continue;}ctx.beginPath();c.pts.forEach((p,k)=>k?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));if(c.kind==='face'){ctx.closePath();ctx.fillStyle=c.col;ctx.fill();}else{ctx.strokeStyle=c.col;ctx.lineWidth=c.width;ctx.setLineDash(c.dashed?[4,4]:[]);ctx.stroke();}}
-  ctx.globalAlpha=1;ctx.setLineDash([]);ctx.font='12px '+getComputedStyle(root).fontFamily;ctx.textBaseline='middle';labelBounds[i]=[];const P=projection(i);
+  ctx.globalAlpha=1;ctx.setLineDash([]);
+  for(const m of flowMarkers(i===1)){ctx.beginPath();ctx.arc(m.p.x,m.p.y,i===0?2.7:3.6,0,Math.PI*2);ctx.fillStyle=m.bit===0?palette.bg:m.color;ctx.fill();ctx.strokeStyle=m.color;ctx.lineWidth=1.2;ctx.stroke();}
+  ctx.font='12px '+getComputedStyle(root).fontFamily;ctx.textBaseline='middle';labelBounds[i]=[];const P=projection(i);
   for(const l of labels(i)){const p=P.project(l.p),tw=ctx.measureText(l.text).width+6;let x=clamp(p.x-tw/2,2,w-tw-2),y=clamp(p.y-7,10,h-12);for(let k=0;k<25;k++){if(!labelBounds[i].some(b=>x<b.x+b.w&&x+tw>b.x&&Math.abs(y-b.y)<17))break;y=clamp(y+(k%2?-(k+2)*9:(k+2)*9),10,h-12);}
    ctx.strokeStyle=palette.muted;ctx.lineWidth=.6;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(x+tw/2,y);ctx.stroke();ctx.fillStyle=palette.bg;ctx.globalAlpha=.9;ctx.fillRect(x,y-8,tw,16);ctx.globalAlpha=1;ctx.fillStyle=palette.fg;ctx.fillText(l.text,x+3,y);labelBounds[i].push({x,y,w:tw,text:l.text});}
  }
  let previousStatus='';
- function render(){if(!palette||!sizes[0].w)return;paint(0);paint(1);const s=stats(),d=controller.drive();by('pressure').textContent=Math.round(s.filtered/15*100)+'%';by('active').textContent=(d.small?8:0)+' / 8只小线圈';by('current').textContent='M0 '+(d.big?'开':'关')+' · S组 '+(d.small?'开':'关');by('rise').textContent=s.rise.toFixed(1)+' mm';const text=(state.playing?'':'已暂停 · ')+(state.auto?'自动演示 · ':'手动加载 · ')+d.phase+(s.tails?' · 待续余波'+s.tails+'轮':'');if(text!==previousStatus){by('status').textContent=text;previousStatus=text;}}
+ function render(){if(!palette||!sizes[0].w)return;paint(0);paint(1);const s=stats(),d=controller.drive(),p=signals.snapshot(controller.state.time,d),fmt=v=>Math.round(v/15*100)+'%';by('pressure').textContent=fmt(s.filtered);by('active').textContent=(d.small?8:0)+' / 8只小线圈';by('current').textContent='D9 '+(d.big?'HIGH':'LOW')+' · D10 '+(d.small?'HIGH':'LOW');by('rise').textContent=s.rise.toFixed(1)+' mm';
+  by('signal-sensor-value').textContent='桥信号 '+fmt(p.source);by('signal-hx-value').textContent='采样值 '+fmt(p.hx);by('signal-arduino-value').textContent='收到 '+fmt(p.nano);by('signal-driver-value').textContent='M0 '+(d.big?'开':'关')+' / S×8 '+(d.small?'开':'关');
+  for(const k of ['sensor','hx','arduino','driver']){const n=by('signal-'+k);if(k===p.stage)n.setAttribute('aria-current','step');else n.removeAttribute('aria-current');}
+  const messages={sensor:'受压：桥式模拟信号沿线传向HX711',hx:'HX711已更新：数字数据传向Arduino D3，D2提供时钟',arduino:'Arduino收到数据：滤波、判阈值并生成两组时序',driver:'Arduino输出：D9控制M0，D10经缓冲控制8只端部线圈',idle:'持续采样待机：等待上部荷载增量'};by('signal-description').textContent=messages[p.stage];
+  const text=(state.playing?'':'已暂停 · ')+(state.auto?'自动演示 · ':'手动加载 · ')+(p.pending&&!d.level?messages[p.stage]:d.phase)+(s.tails?' · 待续余波'+s.tails+'轮':'');if(text!==previousStatus){by('status').textContent=text;previousStatus=text;}}
  function resize(){canvases.forEach((c,i)=>{const r=c.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);sizes[i]={w:Math.max(100,r.width),h:Math.max(100,r.height)};c.width=Math.round(sizes[i].w*dpr);c.height=Math.round(sizes[i].h*dpr);contexts[i].setTransform(dpr,0,0,dpr,0,0);});render();}
- function automatic(){if(!state.auto)return;const t=controller.state.time%24,v=t>=.7&&t<1.1?4:t>=5.5&&t<13?10:0;if(v!==autoWas){controller.hold(v);autoWas=v;}}
- function step(){automatic();controller.step(E.STEP);particles.step();}
+ function sourceInput(value){tapUntil=-1;signals.input(value,controller.state.time);}
+ function automatic(){if(!state.auto)return;const t=controller.state.time%24,v=t>=.7&&t<1.1?4:t>=5.5&&t<13?10:0;if(v!==autoWas){sourceInput(v);autoWas=v;}}
+ function step(){automatic();const now=controller.state.time;if(tapUntil>=0&&now>=tapUntil){tapUntil=-1;signals.input(0,now);}signals.tick(now);controller.step(E.STEP);signals.outputs(controller.drive(),controller.state.time);particles.step();}
  function advance(t){if(!Number.isFinite(t)||t<0)return;for(let remaining=t;remaining>=E.STEP-1e-9;remaining-=E.STEP)step();render();}
  function manual(){state.auto=false;autoWas=-1;by('auto').checked=false;}
- by('tap').addEventListener('click',()=>{manual();controller.tap();sync();render();});by('hold').addEventListener('click',()=>{manual();if(!state.force)state.force=10;controller.hold(state.force);sync();render();});by('release').addEventListener('click',()=>{manual();controller.release();sync();render();});
- by('force').addEventListener('input',()=>{manual();state.force=Number(by('force').value)*.15;controller.hold(state.force);sync();save();render();});
+ by('tap').addEventListener('click',()=>{manual();signals.input(4,controller.state.time);tapUntil=controller.state.time+.35;sync();render();});by('hold').addEventListener('click',()=>{manual();if(!state.force)state.force=10;sourceInput(state.force);sync();render();});by('release').addEventListener('click',()=>{manual();sourceInput(0);sync();render();});
+ by('force').addEventListener('input',()=>{manual();state.force=Number(by('force').value)*.15;sourceInput(state.force);sync();save();render();});
  by('selected').addEventListener('change',()=>{state.selected=Number(by('selected').value);state.detailMode='chamber';sync();save();render();});
  by('detail-mode').addEventListener('change',()=>{state.detailMode=by('detail-mode').value;sync();save();render();});by('topcut').addEventListener('change',()=>{state.cutTop=by('topcut').checked;save();render();});
+ by('show-flow').addEventListener('change',()=>{state.showFlow=by('show-flow').checked;save();render();});by('slow-signal').addEventListener('change',()=>{state.slowSignal=by('slow-signal').checked;signals.setSlow(state.slowSignal,controller.state.time);save();render();});
  by('count').addEventListener('input',()=>{const n=Number(by('count').value);if(!Number.isInteger(n)||n<50||n>400)return;state.beadCount=n;resetParticles();sync();save();render();});
  for(const k of Object.keys(limits))by(k).addEventListener('input',()=>{const n=Number(by(k).value);if(n<limits[k][0]||n>limits[k][1])return;state.durations[k]=n;reset();sync();save();render();});
  for(const k of ['big','small'])by('current-'+k).addEventListener('input',()=>{state.currents[k]=Number(by('current-'+k).value);particles.currents={...state.currents};sync();save();render();});
@@ -1956,14 +2067,14 @@ return buildScene(index,projector);
  canvases.forEach((c,i)=>{c.addEventListener('pointerdown',e=>{if(e.button!==0&&e.button!==undefined)return;drag[i]={id:e.pointerId,x:e.clientX,y:e.clientY};try{c.setPointerCapture(e.pointerId);}catch(_){}});c.addEventListener('pointermove',e=>{const d=drag[i];if(!d||d.id!==e.pointerId)return;state.cameras[i].yaw+=(e.clientX-d.x)*.008;if(e.pointerType!=='touch')state.cameras[i].elev=clamp(state.cameras[i].elev+(e.clientY-d.y)*.005,-.2,1.5);d.x=e.clientX;d.y=e.clientY;render();});for(const ev of ['pointerup','pointercancel','lostpointercapture'])c.addEventListener(ev,()=>{drag[i]=null;});c.addEventListener('wheel',e=>{if(!e.ctrlKey&&!e.shiftKey)return;e.preventDefault();state.cameras[i].zoom=clamp(state.cameras[i].zoom*Math.exp(-e.deltaY*.001),.65,1.35);render();},{passive:false});});window.addEventListener('blur',()=>drag.fill(null));
  reduced.addEventListener?.('change',e=>{if(e.matches){state.playing=false;sync();render();}});matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{theme();render();});
  const observer=new ResizeObserver(resize);canvases.forEach(c=>observer.observe(c));const themes=new MutationObserver(()=>{theme();render();});themes.observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});window.addEventListener('pagehide',()=>{disposed=true;observer.disconnect();themes.disconnect();});
- window.addEventListener('openai:set_globals',e=>{applySaved(e.detail?.globals?.widgetState);reset();sync();render();});
+ window.addEventListener('openai:set_globals',e=>{if(applySaved(e.detail?.globals?.widgetState)){reset();sync();render();}});
  function frame(now){if(disposed)return;if(state.playing&&last){accumulator=Math.min(.16,accumulator+Math.min(.08,(now-last)/1000));const start=performance.now();let count=0;while(accumulator>=E.STEP&&count<4){step();accumulator-=E.STEP;count++;if(performance.now()-start>=8)break;}}last=now;if(now-lastDraw>=50){render();lastDraw=now;}requestAnimationFrame(frame);}
  theme();sync();resize();
  // Keep a useful static scene available while the document finishes loading.
  // Starting the simulation after load prevents animation work from competing with navigation.
  if(document.readyState==='complete')requestAnimationFrame(frame);
  else window.addEventListener('load',()=>requestAnimationFrame(frame),{once:true});
- window.__pressPrototype={state,get controller(){return controller;},get particles(){return particles;},stats,advance,render,scene,sizes,labelBounds,drag,reset:()=>{reset();sync();render();},setView,geometry:()=>meshes,branchSignals:()=>Array.from({length:8},(_,id)=>({id,...controller.drive()}))};
+ window.__pressPrototype={state,get controller(){return controller;},get particles(){return particles;},get signals(){return signals;},get sceneBuilds(){return sceneBuilds;},stats,advance,render,scene,sizes,labelBounds,drag,flowMarkers,reset:()=>{reset();sync();render();},setView,geometry:()=>meshes,branchSignals:()=>Array.from({length:8},(_,id)=>({id,...controller.drive()}))};
 })();
 
 </script>

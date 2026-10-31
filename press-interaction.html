@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>上部受压 · 中央与端部线圈接力</title>
+<title>平顶内置测力 · 中央与端部线圈接力</title>
 <style>
 
 :root {
@@ -1541,9 +1541,9 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 @media(max-width:500px){#press-prototype .press-sliders{grid-template-columns:minmax(0,1fr);}#press-prototype .press-heading{padding-right:0;}#press-prototype canvas{height:350px;}}
 </style>
 <header class="press-heading">
-<h1>上部受压，整个柱头一起响应</h1>
+<h1>平整顶面，内藏测力</h1>
 <p>中央大线圈 M0 ＋ 8只端部小线圈 · 放射状弧底薄腔</p>
-<p>按参考图保留原构型。9只线圈的绕组平面均水平，轴线均沿Z；小线圈位于分支端部R118。压力统一触发整机，8个分支共用同一时序。</p>
+<p>保留中央＋8只端部线圈及弧底薄腔。测力元件移至顶板内部、中央线圈正上方，外表面连续平整；9只线圈仍共用压力触发信号，按原时序接力。</p>
 </header>
 <div class="viz-controls" aria-label="上部加载演示">
 <button type="button" class="btn btn-primary" id="press-tap">短时加载</button><button type="button" class="btn" id="press-hold" aria-pressed="false">持续受压</button><button type="button" class="btn" id="press-release">卸载</button><button type="button" class="btn" id="press-play">暂停动画</button>
@@ -1553,15 +1553,17 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 <label class="form-label" for="press-force">上部荷载增量 <output id="press-force-value" class="tabular-nums">67%</output><input type="range" class="form-range" id="press-force" min="0" max="100" step="1" value="67" aria-describedby="press-baseline"></label>
 <label class="form-label" for="press-view">观察角度<select class="form-select" id="press-view"><option value="perspective">斜视构造</option><option value="front">正视</option><option value="top">俯视线圈</option></select></label>
 <label class="form-label" for="press-selected">放大分支<select class="form-select" id="press-selected"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label>
+<label class="form-label" for="press-detail-mode">右侧放大<select class="form-select" id="press-detail-mode"><option value="sensor">内藏测力剖面</option><option value="chamber">铁珠分支运动</option></select></label>
 </div>
 <p id="press-baseline">0%为原有荷载基线，100%为本演示相对增量上限，不表示结构承载能力。当前为模拟输入，未连接硬件。</p>
-<div class="viz-controls"><button type="button" class="btn" id="press-fit">复位视角</button><label class="form-check"><input type="checkbox" class="form-check-input" id="press-wires" checked><span class="form-check-label">显示接线</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-open"><span class="form-check-label">移开放大腔前板</span></label></div>
+<div class="viz-controls"><button type="button" class="btn" id="press-fit">复位视角</button><label class="form-check"><input type="checkbox" class="form-check-input" id="press-wires" checked><span class="form-check-label">显示接线</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-topcut"><span class="form-check-label">整机顶板局部剖开</span></label><label class="form-check"><input type="checkbox" class="form-check-input" id="press-open"><span class="form-check-label">移开放大腔前板</span></label></div>
 <p id="press-status" class="press-status" aria-live="polite">正在准备三维示意…</p>
 <div class="press-readout tabular-nums"><span>荷载增量 <output id="press-pressure">0%</output></span><span id="press-current">M0 关 · S组 关</span><span id="press-active">0 / 8只小线圈</span><span>模型中心上移 <output id="press-rise">0.0 mm</output></span></div>
 <div class="press-views">
-<figure><figcaption>整机 · 原半球构型与上部测力点</figcaption><canvas id="press-whole" role="img" aria-label="中央一只大线圈，8只水平小线圈位于放射分支端部，8个透明薄腔的下缘跟随半球圆弧。上部荷载触发中央与端部线圈顺序接力，所有分支共同响应。">中央M0、端部S1至S8、上部测力点、采样器、控制器和两组驱动的位置及连线。</canvas><p class="text-small text-muted">拖动旋转；Ctrl或Shift＋滚轮缩放。手机可上下滚动页面。</p></figure>
-<figure><figcaption id="press-detail-caption">第7腔 · 200颗 · 与整机统一触发</figcaption><canvas id="press-detail" role="img" aria-label="所选弧底透明薄腔放大，端部竖轴线圈先接力增强吸附，全部断电后铁珠在重力下落回；所有8支路共用时序。">弧底R126，薄腔径向净宽96毫米、净隙2.8毫米、铁珠直径2毫米；端部小线圈轴线与中央大线圈平行。</canvas><p class="text-small text-muted">铁珠通电上移、向端部聚集；全部断电后回落。</p></figure>
+<figure><figcaption>整机 · 连续平顶面，无外露测力凸起</figcaption><canvas id="press-whole" role="img" aria-label="平顶板内部隐藏测力元件，中央一只大线圈与8只端部小线圈保持原位；8个放射状弧底薄腔共同响应上部荷载。">测力元件在顶板夹层内，HX711与控制器仍在底部，顶面无凸起。</canvas><p class="text-small text-muted">拖动旋转；Ctrl或Shift＋滚轮缩放。剖开仅供观察。</p></figure>
+<figure><figcaption id="press-detail-caption">顶板中央局部剖面 · 测力元件内藏</figcaption><canvas id="press-detail" role="img" aria-label="平顶板下方的传力压头、内藏测力元件和固定承压座的局部三维剖面；上表面连续平整。">在右侧放大中可切换内藏测力剖面和铁珠分支运动。</canvas><p class="text-small text-muted">右侧可切回铁珠运动；剖面不表示实体顶板开孔。</p></figure>
 </div>
+<section class="press-section" aria-labelledby="press-flat-title"><h2 id="press-flat-title">藏在顶板夹层，保留原线圈</h2><p>现有示意的中央线圈内孔Ø20 mm，铁芯约Ø18 mm，单边仅约1 mm，不能把测力元件直接塞进这个内孔。本版采用：平顶板 → 传力压头 → 应变式测力元件 → 固定承压座。器件位于绕组上方，HX711保留在柱底。</p><p>顶面整体做成平板，图示整体厚16 mm。传感器的Ø26×6 mm只表示预留占位，未选定商品；选型后可整体加厚夹层，顶面仍保持平整。</p></section>
 <section class="press-section" aria-labelledby="press-sequence-title"><h2 id="press-sequence-title">大开 → 小开 → 大关 → 小关</h2><p>上部短时增载触发一轮；持续受压让整机重复循环；卸载后结束当前轮，再共同接两轮逐渐放慢的余波。8只小线圈始终同步通断。压力较大时缩短轮间等待，电流由下方独立上限控制。</p></section>
 <section class="press-section" aria-labelledby="press-settings-title"><h2 id="press-settings-title">数量与通断时序</h2>
 <label class="form-label" for="press-count">粒子数量 <output id="press-count-value" class="tabular-nums">200 / 腔 · 共1600颗</output><input type="range" class="form-range" id="press-count" min="50" max="400" step="25" value="200"></label>
@@ -1575,17 +1577,19 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 </div><p>最快轮间隔为四段之和：<output id="press-period">2.8 s</output>（模型）。调时序会回到待机，请重新加载；调数量会重置珠群。相对电流倍数不是安培值。高数量时计算采用预算，模型时间可能慢于墙钟时间。</p></section>
 <section class="press-section" aria-labelledby="press-wire-title"><h2 id="press-wire-title">一个感知信号，两组线圈时序</h2>
 <table class="table table-sm"><caption class="sr-only">功能接线示意，驱动器接口须按实际型号核对</caption><thead><tr><th scope="col">输入</th><th scope="col">连接</th><th scope="col">作用</th></tr></thead><tbody>
-<tr><td>上部测力桥 E±、S±</td><td>HX711 E±、A±</td><td>采集荷载变化；量程待定</td></tr><tr><td>HX711 DT / SCK</td><td>Nano D3 / D2</td><td>采样与时钟</td></tr>
+<tr><td>内藏测力桥 E±、S±</td><td>沿独立线槽至柱底HX711 E±、A±</td><td>屏蔽双绞桥线；量程待定</td></tr><tr><td>HX711 DT / SCK</td><td>Nano D3 / D2</td><td>采样与时钟</td></tr>
 <tr><td>Nano D9</td><td>M0恒流驱动 EN</td><td>大线圈组的起止</td></tr><tr><td>Nano D10</td><td>逻辑分配 → S1–S8驱动 EN</td><td>8只小线圈同步起止</td></tr>
 <tr><td>动力低压电源 + / 0V</td><td>M0驱动、8路S驱动及匹配的降压模块</td><td>供电能力按9线圈同时工况核定</td></tr><tr><td>5V稳压 + / GND</td><td>Nano 5V/GND、HX711供电/GND</td><td>逻辑支路；与动力共地参考</td></tr>
 <tr><td>M0驱动 OUT±</td><td>中央大线圈两端</td><td>单独限流与快速关断</td></tr><tr><td>8路S驱动各OUT±</td><td>分别接8只端部线圈</td><td>时序共用，各自限流</td></tr></tbody></table>
 <p>D是“M0一路＋S组8路”的功能块。GPIO只输出逻辑，不供线圈电流；需核对输入电平、分配负载、各路限流和关断能量处理。动力电压与容量按实际绕组匹配，不沿用单腔电源/功耗推算整机。外部5V与USB供电不应未经核对直接并联。</p></section>
 <details><summary>构造尺寸、材料与验证边界</summary>
 <table class="table table-sm"><thead><tr><th scope="col">部件</th><th scope="col">示意参数</th></tr></thead><tbody>
-<tr><td>总体与薄腔</td><td>8腔等分45°；壳体R130、弧底R126；底板300×280 mm；上板标高258 mm</td></tr><tr><td>单腔与铁珠</td><td>径向净宽96、净隙2.8 mm，透明板各1.5 mm；Ø2 mm珠，每腔50–400颗</td></tr>
+<tr><td>总体与薄腔</td><td>8腔等分45°；壳体R130、弧底R126；底板300×280 mm；平顶面标高266 mm，顶板整体厚16 mm（示意）</td></tr><tr><td>单腔与铁珠</td><td>径向净宽96、净隙2.8 mm，透明板各1.5 mm；Ø2 mm珠，每腔50–400颗</td></tr>
 <tr><td>中央线圈 M0</td><td>绕组示意外径48、内径20、高14 mm；匝数、电流与温升待定</td></tr><tr><td>端部线圈 S1–S8</td><td>中心R118，绕组外径18、内径8、高8 mm；9只线圈轴线均竖直</td></tr><tr><td>采样、控制与驱动</td><td>上部适配量程测力元件、HX711、经典5V Nano、M0一路与S组8路驱动、匹配的动力及5V电源</td></tr>
 </tbody></table>
-<p>图示保持参考构型，不把之前收口U形磁路小样的800匝、1.3 A或低功耗数字套到这里。上部测力点为功能占位，不是承重节点加工图；实际测量和承载连接需按荷载及结构设计确定。</p>
+<p>顶板正常受力时，载荷须经过压头和测力元件；导向及限位保留工作间隙，不能让固定外框把载荷旁路。图中0.2 mm外框间隙仅供看清关系，实际须按测力元件允许变形和公差确定。承压座需单独接到柱身固定受力构件，不以绕组或磁芯作为承压柱；图中尚未完成该节点的承载设计。</p>
+<p>内藏位置靠近磁场和热源，需测量“同一静载、线圈开/关”的零点差，分辨载荷与电磁/温度干扰；桥线用屏蔽双绞、避开动力线，放大采样板置于柱底。需要按实际工作温度校准，不能靠软件归零掩盖线圈引起的假信号。布线依据：<a href="https://cloud.hbkworld.com/en/knowledge/resource-center/articles/wiring-of-strain-gauges1">HBK应变测量布线</a>。应变式测力垫圈是可用技术类别，尺寸须查具体器件及传力垫片：<a href="https://www.hbm.com/fileadmin/mediapool/hbmdoc/technical/B05474.pdf">HBK示例数据表</a>；本图未按该商品选型。</p>
+<p>图示保留中央＋8端部线圈构型，不套用收口U形磁路小样的匝数、电流或功耗。隐藏位置和器件轮廓为功能占位，不是承重节点加工图；真实建筑中的测量与承载连接须按实际荷载设计。</p>
 <p>压力以稳定基线F₀上的增量ΔF触发，持续增载期间不自动归零。演示滤波80 ms，高于相对刻度8%约100 ms时触发，低于约3.3%约150 ms时释放；实体阈值需标定。</p>
 <p>粒子运动沿用原网页的磁吸代理、重力与接触计算；为减轻负荷，8腔复制一个腔的定性轨迹，展示统一指令。没有求解真实磁场、磁路耦合、摩擦、剩磁和温升，不能用动画证明1600颗实体可按2.8 s循环或产生涌现。先验证单腔吸起与可靠释放，再逐步扩展。</p>
 </details>
@@ -1784,13 +1788,39 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
      if(state.explode)for(const x of [0,W])for(const z of [E.floor(x),H])addLine([[x,-1.4,z],[x,front+1.5,z]].map(tr),palette.muted,.7,.4,true);
     }
    }
+
+   function flatTop(cut,local){
+    const tag=(start,name,z0,z1)=>{for(let j=start;j<commands.length;j++){commands[j].mechanical=name;commands[j].zRange=[z0,z1];}};
+    let start=commands.length;
+    if(local){box(-34,-22,248,34,22,250,neutral,.65);tag(start,'bearing-support',248,250);start=commands.length;}
+    ring(18,0,250,252,neutral,[0,0,0],{segments:24,alpha:.85});tag(start,'bearing-seat',250,252);start=commands.length;
+    // Functional envelope only, not a selected commercial sensor or rated bearing node.
+    ring(13,0,252,258,palette.particle,[0,0,0],{segments:28,alpha:.85});tag(start,'embedded-force-sensor',252,258);start=commands.length;
+    ring(5,0,258,260,neutral,[0,0,0],{segments:20,alpha:.95});tag(start,'load-button',258,260);start=commands.length;
+    const r=local?42:135,front=local?-28:-135,back=local?28:135;
+    if(cut){
+      box(-r,0,260,r,back,266,neutral,.54);
+      box(-r,front,260,-16,0,266,neutral,.54);box(16,front,260,r,0,266,neutral,.54);
+    }else box(-r,front,260,r,back,266,neutral,.66);
+    tag(start,'flat-cover',260,266);
+    if(!local){start=commands.length;
+      box(-135,-135,250,135,-132,259.8,neutral,.35);box(-135,132,250,135,135,259.8,neutral,.35);
+      box(-135,-132,250,-132,132,259.8,neutral,.35);box(132,-132,250,135,132,259.8,neutral,.35);
+      tag(start,'cover-frame',250,259.8);
+    }
+    if(local){
+      addLine([[-7,-14,255],[-30,-27,249]],palette.particle,1.1,.9);
+      for(const x of [-22,0,22]){addLine([[x,8,275],[x,8,267],[x-1.5,8,269]],palette.particle,1.7,.8);addLine([[x,8,267],[x+1.5,8,269]],palette.particle,1.7,.8);}
+    }
+   }
+   if(index===2){flatTop(true,true);commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};}
    if(index===0){
     if(state.view!=='top'){
      box(-150,-140,0,150,140,14,neutral);ring(16,0,14,120,neutral,[0,0,0],{segments:24});
      for(const x of [-6,6])addLine([[x,0,20],[x,0,121],[x,0,239]],drive.big>.05?palette.coil:palette.muted,1,.7);
 
     }
-    box(-135,-135,250,135,135,258,neutral,state.open?.045:.42);
+    flatTop(state.cutTop,false);
     for(let j=0;j<16;j++){const a=j*Math.PI/8,pts=[];for(let k=0;k<=24;k++){const t=k*Math.PI/48;pts.push([130*Math.sin(t)*Math.cos(a),130*Math.sin(t)*Math.sin(a),250-130*Math.cos(t)]);}addLine(pts,palette.muted,.8,state.open?.12:.48);}
     for(const z of [168,205,250]){const r=Math.sqrt(130**2-(250-z)**2),pts=[];for(let k=0;k<=64;k++){const t=k*Math.PI/32;pts.push([r*Math.cos(t),r*Math.sin(t),z]);}addLine(pts,palette.muted,.7,state.open?.14:.34);}
     // A single central winding with shared upper pole arms: conceptual magnetic circuit.
@@ -1808,13 +1838,12 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
      branchCoil(l);
     }
 
-    // A shallow upper load-sensing placeholder, retaining the reference capital outline.
-    ring(13,0,258,264,palette.particle,[0,0,0],{segments:20,alpha:.6});
+    // The force sensor is enclosed below the continuous plane z=266.
     if(load>0)for(const x of [-65,0,65]){addLine([[x,0,293],[x,0,269],[x-3,0,274]],palette.particle,2,.9);addLine([[x,0,269],[x+3,0,274]],palette.particle,2,.9);}
     const boards=[[-115,-116,-84,-90],[-65,-116,-20,-98],[0,-116,65,-86],[83,-116,113,-96]];
     for(const b of boards){box(b[0],b[1],14,b[2],b[3],19,palette.surface);box(b[0]+5,b[1]+4,19,b[2]-5,b[3]-4,21,steel,.65);}
     if(wires){
-      for(let k=0;k<4;k++)addLine([[-7+k*3,0,264],[-7+k*3,0,25],[-110+k*3,-90,21]],palette.particle,.9,.8);
+      for(let k=0;k<4;k++)addLine([[-7+k*3,-14,255],[-7+k*3,-16,25],[-110+k*3,-90,21]],palette.particle,.9,.8);
       addLine([[-84,-103,21],[-65,-103,21]],palette.particle,1.5,.9);
       addLine([[-20,-104,21],[0,-104,21]],palette.particle,1.5,.9);
       addLine([[65,-105,21],[83,-105,21]],palette.spacer,1.4,.85);
@@ -1838,7 +1867,7 @@ return buildScene(index,projector);
  const root=document.getElementById('press-prototype'),by=id=>root.querySelector('#press-'+id),clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
  const E=window.VerticalGranular,reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const defaults={lead:.8,overlap:.3,hold:.3,allOff:1.4};
- const state={playing:!reduced.matches,auto:true,force:10,selected:6,beadCount:200,wires:true,open:false,view:'perspective',durations:{...defaults},currents:{big:1.8,small:1.6},cameras:[{yaw:-.48,elev:.29,zoom:1},{yaw:-.20,elev:.10,zoom:1}]};
+ const state={playing:!reduced.matches,auto:true,force:10,selected:6,beadCount:200,wires:true,open:false,cutTop:false,detailMode:'sensor',view:'perspective',durations:{...defaults},currents:{big:1.8,small:1.6},cameras:[{yaw:-.48,elev:.29,zoom:1},{yaw:-.20,elev:.10,zoom:1}]};
  let controller,particles,initialMean,last=0,lastDraw=0,accumulator=0,autoWas=-1,palette,scenePalette,disposed=false;
  const canvases=[by('whole'),by('detail')],contexts=canvases.map(c=>c.getContext('2d')),sizes=[{},{}],labelBounds=[[],[]],drag=[null,null];
    function rgbToken(name) {
@@ -1877,10 +1906,10 @@ return buildScene(index,projector);
   if(Number.isInteger(s.beadCount)&&s.beadCount>=50&&s.beadCount<=400)state.beadCount=s.beadCount;
   if(validDurations(s.durations))state.durations={...s.durations};
   if(s.currents&&['big','small'].every(k=>Number.isFinite(s.currents[k])&&s.currents[k]>=.5&&s.currents[k]<=2.5))state.currents={...s.currents};
-  for(const k of ['wires','open'])if(typeof s[k]==='boolean')state[k]=s[k];if(['perspective','front','top'].includes(s.view))setView(s.view);
+  for(const k of ['wires','open','cutTop'])if(typeof s[k]==='boolean')state[k]=s[k];if(['sensor','chamber'].includes(s.detailMode))state.detailMode=s.detailMode;if(['perspective','front','top'].includes(s.view))setView(s.view);
  }
  try{applySaved(window.openai?.widgetState||JSON.parse(localStorage.getItem('capital-central-relay-v1')||'null'));}catch(_){}
- function save(){const s={kind:'capital-central-relay-v1',force:state.force,selected:state.selected,beadCount:state.beadCount,durations:{...state.durations},currents:{...state.currents},wires:state.wires,open:state.open,view:state.view};try{window.openai?.setWidgetState({modelContent:{structure:'central coil + 8 outer-end coils, all axes Z',pressureIncrement_percent:state.force/15*100,beads:state.beadCount*8,timing:state.durations},privateContent:s})?.catch(()=>{});localStorage.setItem(s.kind,JSON.stringify({privateContent:s}));}catch(_){} }
+ function save(){const s={kind:'capital-central-relay-v1',force:state.force,selected:state.selected,beadCount:state.beadCount,durations:{...state.durations},currents:{...state.currents},wires:state.wires,open:state.open,cutTop:state.cutTop,detailMode:state.detailMode,view:state.view};try{window.openai?.setWidgetState({modelContent:{structure:'flat top with concealed sensor; central + 8 end coils, all axes Z',pressureIncrement_percent:state.force/15*100,beads:state.beadCount*8,timing:state.durations},privateContent:s})?.catch(()=>{});localStorage.setItem(s.kind,JSON.stringify({privateContent:s}));}catch(_){} }
  const proxy={scenario:'normal',get layers(){return Array(8).fill(particles.layers[0]);},drive:()=>controller.drive(),stats:()=>particles.stats(0)};
  function resetParticles(){particles=E.createWorld({layerCount:1,beadCount:state.beadCount,currents:state.currents});particles.drive=()=>controller.drive();initialMean=particles.stats(0).meanHeight;}
  function reset(){controller=LoadRelay.create(()=>state.durations);resetParticles();autoWas=-1;accumulator=0;}
@@ -1889,16 +1918,17 @@ return buildScene(index,projector);
  function sync(){by('force').value=Math.round(state.force/15*100);by('force-value').textContent=Math.round(state.force/15*100)+'%';by('selected').value=state.selected;by('count').value=state.beadCount;by('count-value').textContent=state.beadCount+' / 腔 · 共'+state.beadCount*8+'颗';
   for(const k of Object.keys(limits)){by(k).value=state.durations[k];by(k+'-value').textContent=Number(state.durations[k].toFixed(1))+' s';}
   for(const k of ['big','small']){by('current-'+k).value=state.currents[k];by('current-'+k+'-value').textContent=state.currents[k].toFixed(1)+'×';}
-  by('wires').checked=state.wires;by('open').checked=state.open;by('view').value=state.view;by('auto').checked=state.auto;by('play').textContent=state.playing?'暂停动画':'播放动画';by('hold').setAttribute('aria-pressed',String(!state.auto&&controller.state.raw>0&&controller.state.tapUntil<0));by('period').textContent=base().toFixed(1)+' s';by('detail-caption').textContent='第'+(state.selected+1)+'腔 · '+state.beadCount+'颗 · 与整机统一触发';}
- function projection(i){const {w,h}=sizes[i],c=state.cameras[i],bounds=i===0?[[-150,150],[-140,140],[0,301]]:[[-50,62],[state.open?-16:-12,12],[0,128]],ca=Math.cos(c.yaw),sa=Math.sin(c.yaw),ce=Math.cos(c.elev),se=Math.sin(c.elev);
+  by('wires').checked=state.wires;by('open').checked=state.open;by('open').disabled=state.detailMode==='sensor';by('topcut').checked=state.cutTop;by('detail-mode').value=state.detailMode;by('view').value=state.view;by('auto').checked=state.auto;by('play').textContent=state.playing?'暂停动画':'播放动画';by('hold').setAttribute('aria-pressed',String(!state.auto&&controller.state.raw>0&&controller.state.tapUntil<0));by('period').textContent=base().toFixed(1)+' s';by('detail-caption').textContent=state.detailMode==='sensor'?'顶板中央局部剖面 · 测力元件内藏':'第'+(state.selected+1)+'腔 · '+state.beadCount+'颗 · 与整机统一触发';by('detail').setAttribute('aria-label',state.detailMode==='sensor'?'平整顶板下方依次为传力压头、内藏应变式测力元件和固定承压座；剖开仅供观察。':'所选弧底透明薄腔，端部线圈随统一信号接力吸附，全部断电后铁珠落回。');}
+ function projection(i){const {w,h}=sizes[i],original=state.cameras[i],sensor=i===1&&state.detailMode==='sensor',c=sensor?{...original,elev:.38}:original,bounds=i===0?[[-150,150],[-140,140],[0,301]]:sensor?[[-48,48],[-34,34],[246,277]]:[[-50,62],[state.open?-16:-12,12],[0,128]],ca=Math.cos(c.yaw),sa=Math.sin(c.yaw),ce=Math.cos(c.elev),se=Math.sin(c.elev);
   function rotate(p){return{x:p[0]*ca+p[1]*sa,y:-p[0]*sa*se+p[1]*ca*se+p[2]*ce,d:p[0]*sa*ce-p[1]*ca*ce+p[2]*se};}
   const pts=[];for(const x of bounds[0])for(const y of bounds[1])for(const z of bounds[2])pts.push(rotate([x,y,z]));const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),lx=Math.min(...xs),hx=Math.max(...xs),ly=Math.min(...ys),hy=Math.max(...ys),scale=Math.min((w-2*Math.min(w*.12,46))/(hx-lx),(h-2*Math.min(h*.13,48))/(hy-ly))*c.zoom;
   return{scale,project(p){const v=rotate(p);return{x:w/2+(v.x-(lx+hx)/2)*scale,y:h/2-6-(v.y-(ly+hy)/2)*scale,d:v.d};}};
  }
  const meshes=[[],[]];
- function scene(detail){const i=detail?1:0,P=projection(i),sceneState={selected:state.selected,beadCount:state.beadCount,open:true,explode:state.open,view:state.view};return window.RelayReferenceScene(i,P,sceneState,proxy,scenePalette,controller.state.raw,state.wires);}
- function labels(i){if(i===1)return[{p:[-19,-5,77],text:'弧底 R126'},{p:[E.SMALL_RADIUS-E.RIN-E.W/2,0,124],text:'端部小线圈 S'+(state.selected+1)},{p:[0,-6,12],text:'净宽96 · 净隙2.8 mm'}];
-  const a=[{p:[0,0,270],text:'A 上部测力点'},{p:[24,0,239],text:'M0 中央大线圈'},{p:[-100,-102,26],text:'B HX711'},{p:[-43,-106,26],text:'C 控制器'},{p:[32,-100,26],text:'D 两组驱动'},{p:[100,-106,26],text:'E 5V降压'}];
+ function scene(detail){const i=detail?1:0,P=projection(i),sceneState={selected:state.selected,beadCount:state.beadCount,open:true,explode:state.open,cutTop:state.cutTop,view:state.view};return window.RelayReferenceScene(detail&&state.detailMode==='sensor'?2:i,P,sceneState,proxy,scenePalette,controller.state.raw,state.wires);}
+ function labels(i){if(i===1&&state.detailMode==='sensor')return[{p:[23,12,266],text:'连续平顶面'},{p:[0,0,259],text:'传力压头'},{p:[0,-12,255],text:'内藏测力元件'},{p:[0,-17,251],text:'固定承压座'},{p:[-27,-26,249],text:'桥线 → HX711'}];
+  if(i===1)return[{p:[-19,-5,77],text:'弧底 R126'},{p:[E.SMALL_RADIUS-E.RIN-E.W/2,0,124],text:'端部小线圈 S'+(state.selected+1)},{p:[0,-6,12],text:'净宽96 · 净隙2.8 mm'}];
+  const a=[{p:[0,0,255],text:'A 内藏测力点'},{p:[90,60,266],text:'连续平顶面'},{p:[24,0,239],text:'M0 中央大线圈'},{p:[-100,-102,26],text:'B HX711'},{p:[-43,-106,26],text:'C 控制器'},{p:[32,-100,26],text:'D 两组驱动'},{p:[100,-106,26],text:'E 5V降压'}];
   for(let l=0;l<8;l++){const t=(l+.5)*Math.PI/4;a.push({p:[124*Math.cos(t),124*Math.sin(t),218],text:'S'+(l+1)});}return a;
  }
  function paint(i){const ctx=contexts[i],{w,h}=sizes[i];ctx.clearRect(0,0,w,h);const built=scene(i===1);meshes[i]=built.commands;
@@ -1916,7 +1946,8 @@ return buildScene(index,projector);
  function manual(){state.auto=false;autoWas=-1;by('auto').checked=false;}
  by('tap').addEventListener('click',()=>{manual();controller.tap();sync();render();});by('hold').addEventListener('click',()=>{manual();if(!state.force)state.force=10;controller.hold(state.force);sync();render();});by('release').addEventListener('click',()=>{manual();controller.release();sync();render();});
  by('force').addEventListener('input',()=>{manual();state.force=Number(by('force').value)*.15;controller.hold(state.force);sync();save();render();});
- by('selected').addEventListener('change',()=>{state.selected=Number(by('selected').value);sync();save();render();});
+ by('selected').addEventListener('change',()=>{state.selected=Number(by('selected').value);state.detailMode='chamber';sync();save();render();});
+ by('detail-mode').addEventListener('change',()=>{state.detailMode=by('detail-mode').value;sync();save();render();});by('topcut').addEventListener('change',()=>{state.cutTop=by('topcut').checked;save();render();});
  by('count').addEventListener('input',()=>{const n=Number(by('count').value);if(!Number.isInteger(n)||n<50||n>400)return;state.beadCount=n;resetParticles();sync();save();render();});
  for(const k of Object.keys(limits))by(k).addEventListener('input',()=>{const n=Number(by(k).value);if(n<limits[k][0]||n>limits[k][1])return;state.durations[k]=n;reset();sync();save();render();});
  for(const k of ['big','small'])by('current-'+k).addEventListener('input',()=>{state.currents[k]=Number(by('current-'+k).value);particles.currents={...state.currents};sync();save();render();});

@@ -191,13 +191,39 @@
      if(state.explode)for(const x of [0,W])for(const z of [E.floor(x),H])addLine([[x,-1.4,z],[x,front+1.5,z]].map(tr),palette.muted,.7,.4,true);
     }
    }
+
+   function flatTop(cut,local){
+    const tag=(start,name,z0,z1)=>{for(let j=start;j<commands.length;j++){commands[j].mechanical=name;commands[j].zRange=[z0,z1];}};
+    let start=commands.length;
+    if(local){box(-34,-22,248,34,22,250,neutral,.65);tag(start,'bearing-support',248,250);start=commands.length;}
+    ring(18,0,250,252,neutral,[0,0,0],{segments:24,alpha:.85});tag(start,'bearing-seat',250,252);start=commands.length;
+    // Functional envelope only, not a selected commercial sensor or rated bearing node.
+    ring(13,0,252,258,palette.particle,[0,0,0],{segments:28,alpha:.85});tag(start,'embedded-force-sensor',252,258);start=commands.length;
+    ring(5,0,258,260,neutral,[0,0,0],{segments:20,alpha:.95});tag(start,'load-button',258,260);start=commands.length;
+    const r=local?42:135,front=local?-28:-135,back=local?28:135;
+    if(cut){
+      box(-r,0,260,r,back,266,neutral,.54);
+      box(-r,front,260,-16,0,266,neutral,.54);box(16,front,260,r,0,266,neutral,.54);
+    }else box(-r,front,260,r,back,266,neutral,.66);
+    tag(start,'flat-cover',260,266);
+    if(!local){start=commands.length;
+      box(-135,-135,250,135,-132,259.8,neutral,.35);box(-135,132,250,135,135,259.8,neutral,.35);
+      box(-135,-132,250,-132,132,259.8,neutral,.35);box(132,-132,250,135,132,259.8,neutral,.35);
+      tag(start,'cover-frame',250,259.8);
+    }
+    if(local){
+      addLine([[-7,-14,255],[-30,-27,249]],palette.particle,1.1,.9);
+      for(const x of [-22,0,22]){addLine([[x,8,275],[x,8,267],[x-1.5,8,269]],palette.particle,1.7,.8);addLine([[x,8,267],[x+1.5,8,269]],palette.particle,1.7,.8);}
+    }
+   }
+   if(index===2){flatTop(true,true);commands.sort((a,b)=>a.depth-b.depth);return{commands,drive};}
    if(index===0){
     if(state.view!=='top'){
      box(-150,-140,0,150,140,14,neutral);ring(16,0,14,120,neutral,[0,0,0],{segments:24});
      for(const x of [-6,6])addLine([[x,0,20],[x,0,121],[x,0,239]],drive.big>.05?palette.coil:palette.muted,1,.7);
 
     }
-    box(-135,-135,250,135,135,258,neutral,state.open?.045:.42);
+    flatTop(state.cutTop,false);
     for(let j=0;j<16;j++){const a=j*Math.PI/8,pts=[];for(let k=0;k<=24;k++){const t=k*Math.PI/48;pts.push([130*Math.sin(t)*Math.cos(a),130*Math.sin(t)*Math.sin(a),250-130*Math.cos(t)]);}addLine(pts,palette.muted,.8,state.open?.12:.48);}
     for(const z of [168,205,250]){const r=Math.sqrt(130**2-(250-z)**2),pts=[];for(let k=0;k<=64;k++){const t=k*Math.PI/32;pts.push([r*Math.cos(t),r*Math.sin(t),z]);}addLine(pts,palette.muted,.7,state.open?.14:.34);}
     // A single central winding with shared upper pole arms: conceptual magnetic circuit.
@@ -215,13 +241,12 @@
      branchCoil(l);
     }
 
-    // A shallow upper load-sensing placeholder, retaining the reference capital outline.
-    ring(13,0,258,264,palette.particle,[0,0,0],{segments:20,alpha:.6});
+    // The force sensor is enclosed below the continuous plane z=266.
     if(load>0)for(const x of [-65,0,65]){addLine([[x,0,293],[x,0,269],[x-3,0,274]],palette.particle,2,.9);addLine([[x,0,269],[x+3,0,274]],palette.particle,2,.9);}
     const boards=[[-115,-116,-84,-90],[-65,-116,-20,-98],[0,-116,65,-86],[83,-116,113,-96]];
     for(const b of boards){box(b[0],b[1],14,b[2],b[3],19,palette.surface);box(b[0]+5,b[1]+4,19,b[2]-5,b[3]-4,21,steel,.65);}
     if(wires){
-      for(let k=0;k<4;k++)addLine([[-7+k*3,0,264],[-7+k*3,0,25],[-110+k*3,-90,21]],palette.particle,.9,.8);
+      for(let k=0;k<4;k++)addLine([[-7+k*3,-14,255],[-7+k*3,-16,25],[-110+k*3,-90,21]],palette.particle,.9,.8);
       addLine([[-84,-103,21],[-65,-103,21]],palette.particle,1.5,.9);
       addLine([[-20,-104,21],[0,-104,21]],palette.particle,1.5,.9);
       addLine([[65,-105,21],[83,-105,21]],palette.spacer,1.4,.85);

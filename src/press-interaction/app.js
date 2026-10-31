@@ -3,7 +3,7 @@
  const root=document.getElementById('press-prototype'),by=id=>root.querySelector('#press-'+id),clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
  const E=window.VerticalGranular,reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const defaults={lead:.8,overlap:.3,hold:.3,allOff:1.4};
- const state={playing:!reduced.matches,auto:true,force:10,selected:6,beadCount:200,wires:true,open:false,view:'perspective',durations:{...defaults},currents:{big:1.8,small:1.6},cameras:[{yaw:-.48,elev:.29,zoom:1},{yaw:-.20,elev:.10,zoom:1}]};
+ const state={playing:!reduced.matches,auto:true,force:10,selected:6,beadCount:200,wires:true,open:false,cutTop:false,detailMode:'sensor',view:'perspective',durations:{...defaults},currents:{big:1.8,small:1.6},cameras:[{yaw:-.48,elev:.29,zoom:1},{yaw:-.20,elev:.10,zoom:1}]};
  let controller,particles,initialMean,last=0,lastDraw=0,accumulator=0,autoWas=-1,palette,scenePalette,disposed=false;
  const canvases=[by('whole'),by('detail')],contexts=canvases.map(c=>c.getContext('2d')),sizes=[{},{}],labelBounds=[[],[]],drag=[null,null];
    function rgbToken(name) {
@@ -42,10 +42,10 @@
   if(Number.isInteger(s.beadCount)&&s.beadCount>=50&&s.beadCount<=400)state.beadCount=s.beadCount;
   if(validDurations(s.durations))state.durations={...s.durations};
   if(s.currents&&['big','small'].every(k=>Number.isFinite(s.currents[k])&&s.currents[k]>=.5&&s.currents[k]<=2.5))state.currents={...s.currents};
-  for(const k of ['wires','open'])if(typeof s[k]==='boolean')state[k]=s[k];if(['perspective','front','top'].includes(s.view))setView(s.view);
+  for(const k of ['wires','open','cutTop'])if(typeof s[k]==='boolean')state[k]=s[k];if(['sensor','chamber'].includes(s.detailMode))state.detailMode=s.detailMode;if(['perspective','front','top'].includes(s.view))setView(s.view);
  }
  try{applySaved(window.openai?.widgetState||JSON.parse(localStorage.getItem('capital-central-relay-v1')||'null'));}catch(_){}
- function save(){const s={kind:'capital-central-relay-v1',force:state.force,selected:state.selected,beadCount:state.beadCount,durations:{...state.durations},currents:{...state.currents},wires:state.wires,open:state.open,view:state.view};try{window.openai?.setWidgetState({modelContent:{structure:'central coil + 8 outer-end coils, all axes Z',pressureIncrement_percent:state.force/15*100,beads:state.beadCount*8,timing:state.durations},privateContent:s})?.catch(()=>{});localStorage.setItem(s.kind,JSON.stringify({privateContent:s}));}catch(_){} }
+ function save(){const s={kind:'capital-central-relay-v1',force:state.force,selected:state.selected,beadCount:state.beadCount,durations:{...state.durations},currents:{...state.currents},wires:state.wires,open:state.open,cutTop:state.cutTop,detailMode:state.detailMode,view:state.view};try{window.openai?.setWidgetState({modelContent:{structure:'flat top with concealed sensor; central + 8 end coils, all axes Z',pressureIncrement_percent:state.force/15*100,beads:state.beadCount*8,timing:state.durations},privateContent:s})?.catch(()=>{});localStorage.setItem(s.kind,JSON.stringify({privateContent:s}));}catch(_){} }
  const proxy={scenario:'normal',get layers(){return Array(8).fill(particles.layers[0]);},drive:()=>controller.drive(),stats:()=>particles.stats(0)};
  function resetParticles(){particles=E.createWorld({layerCount:1,beadCount:state.beadCount,currents:state.currents});particles.drive=()=>controller.drive();initialMean=particles.stats(0).meanHeight;}
  function reset(){controller=LoadRelay.create(()=>state.durations);resetParticles();autoWas=-1;accumulator=0;}
@@ -54,16 +54,17 @@
  function sync(){by('force').value=Math.round(state.force/15*100);by('force-value').textContent=Math.round(state.force/15*100)+'%';by('selected').value=state.selected;by('count').value=state.beadCount;by('count-value').textContent=state.beadCount+' / 腔 · 共'+state.beadCount*8+'颗';
   for(const k of Object.keys(limits)){by(k).value=state.durations[k];by(k+'-value').textContent=Number(state.durations[k].toFixed(1))+' s';}
   for(const k of ['big','small']){by('current-'+k).value=state.currents[k];by('current-'+k+'-value').textContent=state.currents[k].toFixed(1)+'×';}
-  by('wires').checked=state.wires;by('open').checked=state.open;by('view').value=state.view;by('auto').checked=state.auto;by('play').textContent=state.playing?'暂停动画':'播放动画';by('hold').setAttribute('aria-pressed',String(!state.auto&&controller.state.raw>0&&controller.state.tapUntil<0));by('period').textContent=base().toFixed(1)+' s';by('detail-caption').textContent='第'+(state.selected+1)+'腔 · '+state.beadCount+'颗 · 与整机统一触发';}
- function projection(i){const {w,h}=sizes[i],c=state.cameras[i],bounds=i===0?[[-150,150],[-140,140],[0,301]]:[[-50,62],[state.open?-16:-12,12],[0,128]],ca=Math.cos(c.yaw),sa=Math.sin(c.yaw),ce=Math.cos(c.elev),se=Math.sin(c.elev);
+  by('wires').checked=state.wires;by('open').checked=state.open;by('open').disabled=state.detailMode==='sensor';by('topcut').checked=state.cutTop;by('detail-mode').value=state.detailMode;by('view').value=state.view;by('auto').checked=state.auto;by('play').textContent=state.playing?'暂停动画':'播放动画';by('hold').setAttribute('aria-pressed',String(!state.auto&&controller.state.raw>0&&controller.state.tapUntil<0));by('period').textContent=base().toFixed(1)+' s';by('detail-caption').textContent=state.detailMode==='sensor'?'顶板中央局部剖面 · 测力元件内藏':'第'+(state.selected+1)+'腔 · '+state.beadCount+'颗 · 与整机统一触发';by('detail').setAttribute('aria-label',state.detailMode==='sensor'?'平整顶板下方依次为传力压头、内藏应变式测力元件和固定承压座；剖开仅供观察。':'所选弧底透明薄腔，端部线圈随统一信号接力吸附，全部断电后铁珠落回。');}
+ function projection(i){const {w,h}=sizes[i],original=state.cameras[i],sensor=i===1&&state.detailMode==='sensor',c=sensor?{...original,elev:.38}:original,bounds=i===0?[[-150,150],[-140,140],[0,301]]:sensor?[[-48,48],[-34,34],[246,277]]:[[-50,62],[state.open?-16:-12,12],[0,128]],ca=Math.cos(c.yaw),sa=Math.sin(c.yaw),ce=Math.cos(c.elev),se=Math.sin(c.elev);
   function rotate(p){return{x:p[0]*ca+p[1]*sa,y:-p[0]*sa*se+p[1]*ca*se+p[2]*ce,d:p[0]*sa*ce-p[1]*ca*ce+p[2]*se};}
   const pts=[];for(const x of bounds[0])for(const y of bounds[1])for(const z of bounds[2])pts.push(rotate([x,y,z]));const xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),lx=Math.min(...xs),hx=Math.max(...xs),ly=Math.min(...ys),hy=Math.max(...ys),scale=Math.min((w-2*Math.min(w*.12,46))/(hx-lx),(h-2*Math.min(h*.13,48))/(hy-ly))*c.zoom;
   return{scale,project(p){const v=rotate(p);return{x:w/2+(v.x-(lx+hx)/2)*scale,y:h/2-6-(v.y-(ly+hy)/2)*scale,d:v.d};}};
  }
  const meshes=[[],[]];
- function scene(detail){const i=detail?1:0,P=projection(i),sceneState={selected:state.selected,beadCount:state.beadCount,open:true,explode:state.open,view:state.view};return window.RelayReferenceScene(i,P,sceneState,proxy,scenePalette,controller.state.raw,state.wires);}
- function labels(i){if(i===1)return[{p:[-19,-5,77],text:'弧底 R126'},{p:[E.SMALL_RADIUS-E.RIN-E.W/2,0,124],text:'端部小线圈 S'+(state.selected+1)},{p:[0,-6,12],text:'净宽96 · 净隙2.8 mm'}];
-  const a=[{p:[0,0,270],text:'A 上部测力点'},{p:[24,0,239],text:'M0 中央大线圈'},{p:[-100,-102,26],text:'B HX711'},{p:[-43,-106,26],text:'C 控制器'},{p:[32,-100,26],text:'D 两组驱动'},{p:[100,-106,26],text:'E 5V降压'}];
+ function scene(detail){const i=detail?1:0,P=projection(i),sceneState={selected:state.selected,beadCount:state.beadCount,open:true,explode:state.open,cutTop:state.cutTop,view:state.view};return window.RelayReferenceScene(detail&&state.detailMode==='sensor'?2:i,P,sceneState,proxy,scenePalette,controller.state.raw,state.wires);}
+ function labels(i){if(i===1&&state.detailMode==='sensor')return[{p:[23,12,266],text:'连续平顶面'},{p:[0,0,259],text:'传力压头'},{p:[0,-12,255],text:'内藏测力元件'},{p:[0,-17,251],text:'固定承压座'},{p:[-27,-26,249],text:'桥线 → HX711'}];
+  if(i===1)return[{p:[-19,-5,77],text:'弧底 R126'},{p:[E.SMALL_RADIUS-E.RIN-E.W/2,0,124],text:'端部小线圈 S'+(state.selected+1)},{p:[0,-6,12],text:'净宽96 · 净隙2.8 mm'}];
+  const a=[{p:[0,0,255],text:'A 内藏测力点'},{p:[90,60,266],text:'连续平顶面'},{p:[24,0,239],text:'M0 中央大线圈'},{p:[-100,-102,26],text:'B HX711'},{p:[-43,-106,26],text:'C 控制器'},{p:[32,-100,26],text:'D 两组驱动'},{p:[100,-106,26],text:'E 5V降压'}];
   for(let l=0;l<8;l++){const t=(l+.5)*Math.PI/4;a.push({p:[124*Math.cos(t),124*Math.sin(t),218],text:'S'+(l+1)});}return a;
  }
  function paint(i){const ctx=contexts[i],{w,h}=sizes[i];ctx.clearRect(0,0,w,h);const built=scene(i===1);meshes[i]=built.commands;
@@ -81,7 +82,8 @@
  function manual(){state.auto=false;autoWas=-1;by('auto').checked=false;}
  by('tap').addEventListener('click',()=>{manual();controller.tap();sync();render();});by('hold').addEventListener('click',()=>{manual();if(!state.force)state.force=10;controller.hold(state.force);sync();render();});by('release').addEventListener('click',()=>{manual();controller.release();sync();render();});
  by('force').addEventListener('input',()=>{manual();state.force=Number(by('force').value)*.15;controller.hold(state.force);sync();save();render();});
- by('selected').addEventListener('change',()=>{state.selected=Number(by('selected').value);sync();save();render();});
+ by('selected').addEventListener('change',()=>{state.selected=Number(by('selected').value);state.detailMode='chamber';sync();save();render();});
+ by('detail-mode').addEventListener('change',()=>{state.detailMode=by('detail-mode').value;sync();save();render();});by('topcut').addEventListener('change',()=>{state.cutTop=by('topcut').checked;save();render();});
  by('count').addEventListener('input',()=>{const n=Number(by('count').value);if(!Number.isInteger(n)||n<50||n>400)return;state.beadCount=n;resetParticles();sync();save();render();});
  for(const k of Object.keys(limits))by(k).addEventListener('input',()=>{const n=Number(by(k).value);if(n<limits[k][0]||n>limits[k][1])return;state.durations[k]=n;reset();sync();save();render();});
  for(const k of ['big','small'])by('current-'+k).addEventListener('input',()=>{state.currents[k]=Number(by('current-'+k).value);particles.currents={...state.currents};sync();save();render();});

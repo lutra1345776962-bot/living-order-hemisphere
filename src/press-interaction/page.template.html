@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>按压交互 · 单腔铁珠升降小样</title>
+<title>上部受压 · 八分支统一启动</title>
 <style>
 
 :root {
@@ -1542,21 +1542,23 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 @media(max-width:400px){#press-prototype .press-heading{padding-right:0;}#press-prototype canvas{height:330px;}}
 </style>
 <header class="press-heading">
-<h1>按下，让铁珠上涌</h1>
-<p>单腔16珠 · 一个线圈 · 按压交互小样</p>
-<p class="text-small text-muted">模拟输入，未连接硬件。几何与接线用于构造讨论；运动幅度和时间尚未经过实体验证。</p>
+<h1>柱头受压，八个分支一起启动</h1>
+<p>上部荷载增量 → 统一控制 → 8支路同步升降</p>
+<p>按最新低功耗单腔模块扩展：每支路16珠、1只线圈，共128珠、8路驱动。上部测力点是功能布置示意，未连接硬件。</p>
 </header>
 <div class="viz-controls" aria-label="按压演示">
-<button type="button" class="btn btn-primary" id="press-tap">轻按一次</button>
-<button type="button" class="btn" id="press-hold" aria-pressed="false">持续按压</button>
-<button type="button" class="btn" id="press-release">松手</button>
+<button type="button" class="btn btn-primary" id="press-tap">短时加载</button>
+<button type="button" class="btn" id="press-hold" aria-pressed="false">持续受压</button>
+<button type="button" class="btn" id="press-release">卸载</button>
 <button type="button" class="btn" id="press-play">暂停动画</button>
 <label class="form-check"><input id="press-auto" type="checkbox" class="form-check-input" checked><span class="form-check-label">自动演示三种动作</span></label>
 </div>
 <div class="viz-controls">
-<label class="form-label" for="press-force">模拟按压力 <output id="press-force-value" class="tabular-nums">10.0 N</output><input type="range" class="form-range" id="press-force" min="0" max="15" step="0.5" value="10"></label>
+<label class="form-label" for="press-force">模拟上部压力增量 <output id="press-force-value" class="tabular-nums">67%</output><input type="range" class="form-range" id="press-force" min="0" max="100" step="1" value="67" aria-describedby="press-baseline"></label>
 <label class="form-label" for="press-view">观察角度<select class="form-select" id="press-view"><option value="perspective">斜视构造</option><option value="front">正视磁路</option><option value="top">俯视接线</option></select></label>
+<label class="form-label" for="press-selected">放大分支<select class="form-select" id="press-selected"><option value="0">第1分支</option><option value="1">第2分支</option><option value="2">第3分支</option><option value="3">第4分支</option><option value="4">第5分支</option><option value="5">第6分支</option><option value="6">第7分支</option><option value="7">第8分支</option></select></label>
 </div>
+<p id="press-baseline">0%表示回到原有荷载基线，100%是本演示的相对增量上限，不是柱子的承载能力或传感器量程。一个压力信号统一触发所有分支。</p>
 <div class="viz-controls">
 <button type="button" class="btn" id="press-fit">复位视角</button>
 <label class="form-check"><input type="checkbox" id="press-wires" class="form-check-input" checked><span class="form-check-label">显示三维接线</span></label>
@@ -1564,18 +1566,19 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 </div>
 <p id="press-status" class="press-status" aria-live="polite">正在准备三维示意…</p>
 <div class="press-readout tabular-nums">
-<span>滤波压力 <output id="press-pressure">0.0 N</output></span>
-<span>电流设定 <output id="press-current">0.00 A</output></span>
+<span>滤波荷载增量 <output id="press-pressure">0%</output></span>
+<span>当前通电 <output id="press-active">0 / 8 路</output></span>
+<span>每路试验电流 <output id="press-current">0.00 A / 路</output></span>
 <span>珠群中心上移 <output id="press-rise">0.0 mm</output></span>
 </div>
 <div class="press-views">
-<figure><figcaption>整机布置 · 按压面与磁组件分别支承</figcaption><canvas id="press-whole" role="img" aria-label="可旋转的三维台架：左侧按压面下为测力传感器，后方为磁轭和线圈，前方为HX711、Nano、恒流驱动和降压模块。">三维台架示意需要启用JavaScript；下方表格包含全部接线信息。</canvas><p class="text-small text-muted">拖动横向旋转，按住Ctrl或Shift滚轮缩放；手机可上下滚动页面。</p></figure>
-<figure><figcaption>磁组件近看 · 工作段40 mm</figcaption><canvas id="press-detail" role="img" aria-label="窄梯形透明薄腔内16颗铁珠；左右极靴上窄下宽，单线圈绕在下回磁横梁。通电向上聚集，断电重力回落。">左右极面下口12毫米、上口6毫米；透明腔净深2.6毫米，铁珠直径2毫米。</canvas><p class="text-small text-muted">磁场横向穿过磁隙，强度向上增加；图中上箭头表示受力方向。</p></figure>
+<figure><figcaption>整机 · 上部测力，8个放射状分支同步响应</figcaption><canvas id="press-whole" role="img" aria-label="三维柱头上方加载板通过测力点传至承力柱身，下方悬挂8个放射状磁组件；同一控制器驱动8路，铁珠同时吸起和回落。">上部加载点、测力桥、采样器、控制器、八路驱动和八个磁组件的三维位置与接线。</canvas><p class="text-small text-muted">拖动横向旋转，按住Ctrl或Shift滚轮缩放；手机可上下滚动页面。</p></figure>
+<figure><figcaption id="press-detail-caption">第1分支放大 · 与其余7路同一时钟</figcaption><canvas id="press-detail" role="img" aria-label="所选分支的透明薄腔：16颗铁珠随全局信号通电上涌、断电回落；其余七路在同一时刻执行相同指令。">左右极面下口12毫米、上口6毫米；工作段40毫米、净深2.6毫米，铁珠直径2毫米。</canvas><p class="text-small text-muted">磁场横向穿过磁隙，强度向上增加；图中上箭头表示受力方向。</p></figure>
 </div>
 <section class="press-section" aria-labelledby="press-behavior-title">
-<h2 id="press-behavior-title">三个动作，一条控制规则</h2>
-<div class="press-flow"><span>轻按：吸起一轮</span><span aria-hidden="true">→</span><span>持续：重复升降</span><span aria-hidden="true">→</span><span>松手：两轮间歇余波，随后静止</span></div>
-<p>每轮先1.3 A吸起0.6 s，再0.45 A短停0.4 s，随后断电至少1.8 s。持续按压越重，轮间隔从约5.5 s缩短至2.8 s；松手余波间隔逐渐拉长。实体先用4 s以上周期调试，验证可靠回落后再尝试2.8 s。</p>
+<h2 id="press-behavior-title">一个荷载信号，八路同一节奏</h2>
+<div class="press-flow"><span>荷载增加：8路同时启动</span><span aria-hidden="true">→</span><span>持续受压：8路共同循环</span><span aria-hidden="true">→</span><span>卸载：共同完成余波，随后静止</span></div>
+<p>所有分支执行同一时序：每路先1.3 A吸起0.6 s，再0.45 A短停0.4 s，随后断电至少1.8 s。荷载增量越大，轮间隔从约5.5 s缩短至2.8 s；卸载后共同接两轮逐渐放慢的余波。以上是小样试验参数，整机升程、供电与散热需验证。</p>
 </section>
 <section class="press-section" aria-labelledby="press-wiring-title">
 <h2 id="press-wiring-title">接线 · 电源与信号各走一条支路</h2>
@@ -1584,27 +1587,28 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 <tr><td>测力桥 E+ / E−</td><td>HX711 E+ / E−</td><td>桥路激励</td></tr>
 <tr><td>测力桥 S+ / S−</td><td>HX711 A+ / A−</td><td>差分测力信号</td></tr>
 <tr><td>HX711 DT / SCK</td><td>Nano D3 / D2</td><td>采样与时钟</td></tr>
-<tr><td>Nano D9</td><td>恒流驱动 EN</td><td>吸起/短停/关断触发</td></tr>
+<tr><td>Nano D9统一指令</td><td>兼容逻辑分配级 → 8路恒流驱动 EN</td><td>全支路共同启动；不由GPIO供线圈电流</td></tr>
 <tr><td>24 V电源 + / 0 V</td><td>驱动电源 + / GND；降压 IN+ / IN−</td><td>低压动力支路</td></tr>
 <tr><td>降压 OUT+（5 V）</td><td>Nano 5V；HX711供电</td><td>逻辑电源，不能接24 V</td></tr>
 <tr><td>降压 OUT−（0 V）</td><td>Nano GND；HX711 GND</td><td>共地参考</td></tr>
-<tr><td>驱动 OUT+ / OUT−</td><td>绕组两端</td><td>1.3 / 0.45 A恒流，快速关断</td></tr>
+<tr><td>驱动1至8 OUT+ / OUT−</td><td>分别接S1至S8绕组两端</td><td>每路独立限流，时序统一，快速关断</td></tr>
 </tbody></table>
-<p>图示驱动器是“峰值/保持恒流＋快速关断”的功能块，不是已选定商品的针脚图。需核对EN的5 V兼容性及关断能量处理；普通恒压MOS模块不能直接替代。传感/逻辑与线圈分支布线、在电源回路处共地。外部5 V与USB供电不能未经核对直接并联。</p>
+<p>图示D为“逻辑分配＋8路峰值/保持恒流＋快速关断”的功能块，不是商品针脚图。需核对8个EN输入的总负载、电平兼容性及关断能量处理。电源按8路同时吸起选择，不能沿用单腔24 V/2 A的能力假设；容量待整机峰值与温升测试。传感/逻辑与线圈分支布线、在电源回路处共地。外部5 V与USB供电不能未经核对直接并联。</p>
 </section>
 <details><summary>尺寸、材料与实体调试边界</summary>
 <table class="table table-sm"><thead><tr><th scope="col">部件</th><th scope="col">数量与参考尺寸</th></tr></thead><tbody>
-<tr><td>单腔与铁珠</td><td>1腔；高40、净深2.6、下/上净宽11/5 mm；透明前后板各1 mm；Ø2 mm珠16颗</td></tr>
-<tr><td>磁极/回磁横梁</td><td>2块收口软磁极靴＋1根62×12×12 mm横梁；上方不加钢桥</td></tr>
-<tr><td>唯一线圈</td><td>800匝，铜径0.45 mm，约75 m备料；轴向35、外截面约28×30 mm；冷阻估7.75 Ω</td></tr>
-<tr><td>独立按压面</td><td>约46×45 mm面板＋5 kg四线全桥测力元件1个＋机械过载限位</td></tr>
+<tr><td>8腔与铁珠</td><td>每腔高40、净深2.6、下/上净宽11/5 mm；透明前后板各1 mm；Ø2 mm珠16颗，共128颗</td></tr>
+<tr><td>每支路磁组件</td><td>2块收口软磁极靴＋1根62×12×12 mm横梁，共8套；上方不加钢桥</td></tr>
+<tr><td>每支路线圈</td><td>各800匝，共8只；铜径0.45 mm，轴向35、外截面约28×30 mm；每只冷阻估7.75 Ω</td></tr>
+<tr><td>上部测力点</td><td>位于上部加载板与柱头承力构件的传力连接处；图示为示意占位，量程与连接由实际模型/结构荷载确定</td></tr>
 <tr><td>采样与控制</td><td>HX711 1块；经典5 V Arduino Nano 1块，约45×18 mm</td></tr>
-<tr><td>驱动与电源</td><td>峰值/保持恒流驱动1路；24→5 V降压1块；24 V/2 A低压电源1台</td></tr>
-<tr><td>台架与夹具</td><td>约270×190 mm非磁底板，独立支承、非磁夹具、0.5 mm侧衬、可换R126浅弧底片</td></tr>
+<tr><td>驱动与电源</td><td>峰值/保持恒流驱动8路＋逻辑分配；24→5 V降压1块；动力电源容量按整机实测选定</td></tr>
+<tr><td>总体示意尺寸</td><td>底板330×320 mm，分支中心R72、间隔45°；外包络参考R145。整体尺寸只作布置，不是承重节点加工图</td></tr>
 </tbody></table>
-<p>按压力是独立面板的局部接触力，不代表真实柱子的结构内力。5 kg是测力元件量程，本演示只用0–15 N。装配、标定、去皮及过载限位仍需落实；压力面变形在图中夸大，实际应很小。HX711靠近测力桥，远离线圈，桥线短且成对布线。</p>
-<p>动画以孤立球的磁场梯度近似＋二维碰撞展示可能的运动方向，采用假定场系数0.7及放慢的动力学时间。未求解真实磁路、珠间磁作用、粘壁、摩擦和剩磁；画面上移量与2.8 s节奏不能用作实体性能保证。先单珠，再5颗，再16颗，确认通电上移、断电无需摇动可回落，再加入交互。</p>
-<p>控制示例：滤波80 ms，触发高于1.2 N约100 ms，释放低于0.5 N约150 ms；阈值需要按实际噪声标定。软件限定电流与最短断电间隔；实体还应有独立限流及过温关断。24 V/2 A是电源能力，并非持续48 W消耗。</p>
+<p>上部荷载先由承力构件传到柱身，磁组件悬挂于其下。测力点示意的是这一上部传力位置：台架模型可用相应量程的压式测力元件；真实建筑需要与结构工程师确定传感与承载节点，不能把小称重片直接当承重连接。画面变形被夸大以显示加载。</p>
+<p>本演示先把原有稳定荷载记为基线F₀，以ΔF=F−F₀触发。持续增载会维持共同循环，卸载回基线后收尾；需要重新设定基线时由操作员在稳定状态校准，不能在持续受压期间不断自动归零。</p>
+<p>动画沿用单腔孤立球梯度力＋二维碰撞近似，场系数假定0.7，动力学时间放慢；8个分支复制同一轨迹，专门展示统一触发。真实分支会有差异；图中升程、同步程度和2.8 s节奏均非实测。先验证一个分支，再逐步增加，不将单腔效果直接承诺为整机效果。</p>
+<p>控制示例：滤波80 ms，荷载增量高于相对刻度8%约100 ms时启动，低于约3.3%约150 ms时释放。刻度只供演示，实体阈值按噪声、基线漂移和实际荷载标定；各路需独立限流、过温关断。统一启动是8路共用触发时刻，不能靠把8只绕组直接并在一个未定额驱动上实现。</p>
 <p class="text-small">接口依据：<a href="https://docs.arduino.cc/hardware/nano/">Arduino Nano</a>、<a href="https://github.com/sparkfun/HX711-Load-Cell-Amplifier">SparkFun HX711</a>；驱动原理：<a href="https://www.ti.com/product/DRV110">TI峰值/保持</a>、<a href="https://www.ti.com/lit/an/slvae59a/slvae59a.pdf">TI关断电流衰减</a>。</p>
 </details>
 <noscript><p>请启用JavaScript查看动画。上方接线、尺寸和控制规则仍可阅读。</p></noscript>

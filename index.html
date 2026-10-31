@@ -1539,20 +1539,20 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
   <span id="vr-phase">断电 · 底部堆积</span>
  </div>
  <div class="vr-count-controls">
-  <label class="form-label" for="vr-count">铁珠数量：每腔 <output class="tabular-nums" for="vr-count" data-bead-count>100</output> 颗 · 整机 <span class="tabular-nums" data-bead-total>800</span> 颗</label>
-  <input class="form-range" type="range" id="vr-count" min="25" max="200" step="5" value="100" aria-describedby="vr-count-help">
-  <div class="vr-note" id="vr-count-help">每腔25至200颗，8腔同步调整；调节后重新起动，时序设置保留。高数量时优先保持操作响应，模型播放可能变慢。</div>
+  <label class="form-label" for="vr-count">铁珠数量：每腔 <output class="tabular-nums" for="vr-count" data-bead-count>200</output> 颗 · 整机 <span class="tabular-nums" data-bead-total>1600</span> 颗</label>
+  <input class="form-range" type="range" id="vr-count" min="50" max="400" step="10" value="200" aria-describedby="vr-count-help">
+  <div class="vr-note" id="vr-count-help">每腔50至400颗，8腔同步调整；调节后重新起动，时序设置保留。高数量时优先保持操作响应，模型播放可能变慢。</div>
  </div>
  <div class="vr-scenes">
   <section>
-   <div class="viz-row"><span>8腔／<span data-bead-total>800</span>珠 · 1大＋8小线圈</span><span class="text-small">8只小线圈在外端，轴均竖直</span></div>
+   <div class="viz-row"><span>8腔／<span data-bead-total>1600</span>珠 · 1大＋8小线圈</span><span class="text-small">8只小线圈在外端，轴均竖直</span></div>
    <div class="vr-stage">
     <canvas id="vr-whole" role="img" aria-label="八个竖向透明薄腔以四十五度等分放射布置，每个薄腔的下缘沿半球柱头圆弧随形，上缘水平；每腔铁珠数量可调，分支外端各加一只水平环形小线圈，与中央大线圈平行且轴线均竖直，按大开、小开、大关、小关的顺序演示接力保持及落回"></canvas>
     <div id="vr-poster-whole" class="vr-poster"><svg viewBox="0 0 400 400" role="img" aria-label="固定半球柱头和随形弧底薄腔的静态加载预览"><g fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M65 62H335M65 62Q65 250 200 250Q335 250 335 62M188 250V360H212V250M55 365H345"/><ellipse cx="200" cy="98" rx="26" ry="10"/><path d="M200 110L85 130V155Q120 230 200 245ZM200 110L315 130V155Q280 230 200 245ZM200 110L145 150V210Q165 242 200 245ZM200 110L255 150V210Q235 242 200 245Z"/></g></svg></div>
    </div>
   </section>
   <section>
-   <div class="viz-row"><span id="vr-detail-title">第7腔 · 100颗铁珠</span><label class="form-label" for="vr-select">放大<select class="form-select" id="vr-select"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label></div>
+   <div class="viz-row"><span id="vr-detail-title">第7腔 · 200颗铁珠</span><label class="form-label" for="vr-select">放大<select class="form-select" id="vr-select"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label></div>
    <div class="vr-stage">
     <canvas id="vr-detail" role="img" aria-label="单个弧底薄腔放大，展示铁珠在磁吸作用下向上移动和聚集，撤去磁作用后在重力下沿曲面下缘滑向低处；虚线表示原柱头外壳圆弧；与整机使用同一组位置"></canvas>
     <div id="vr-poster-detail" class="vr-poster"><svg viewBox="0 0 400 400" role="img" aria-label="下缘随柱头圆弧上扬的透明薄腔"><g fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M65 55H325V125Q260 310 65 335ZM75 45H335V115Q270 300 75 325M65 55L75 45M325 55L335 45M65 335L75 325"/><path d="M55 40H345V49H55Z"/><circle cx="77" cy="322" r="5"/><circle cx="90" cy="320" r="5"/><circle cx="102" cy="317" r="5"/><circle cx="115" cy="314" r="5"/></g></svg></div>
@@ -1612,7 +1612,7 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
  'use strict';
  const M=Math,Vec=Float64Array;
  const COUNT=50,CHAMBERS=8,W=96,H=105,R=1,STEP=1/120,SLOW=.16,PERIOD=12;
- const MIN_COUNT=25,MAX_COUNT=200,DEFAULT_COUNT=100;
+ const MIN_COUNT=50,MAX_COUNT=400,DEFAULT_COUNT=200;
  const BASE=120,RIN=22,ARC=126,CZ=130;
  const SMALL_RADIUS=118,SMALL_POLE_Z=227,COIL_AXIS=[0,0,1];
  const BASE_TIMING={bigOn:1,smallOn:4,bigOff:6,smallOff:9,period:12};
@@ -1687,7 +1687,7 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
   try{
   const el=id=>root.querySelector('#'+id),reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const defaults=[{az:-.48,el:.29,zoom:1},{az:-.20,el:.10,zoom:1}];
-  const state={playing:!reduced,speed:1,open:true,explode:false,selected:6,view:'perspective',timingPreset:'fast',beadCount:100,cameras:defaults.map(c=>({...c}))};
+  const state={playing:!reduced,speed:1,open:true,explode:false,selected:6,view:'perspective',timingPreset:'fast',beadCount:window.VerticalGranular.DEFAULT_COUNT,cameras:defaults.map(c=>({...c}))};
   let world=window.VerticalGranular.createWorld({timing:window.RelayTimingData.fast.timing,beadCount:state.beadCount});world.advance(.1);
   const E=window.VerticalGranular,{W,H,BASE,RIN}=E;
   const canvases=[el('vr-whole'),el('vr-detail')],contexts=canvases.map(c=>c.getContext('2d'));
@@ -1739,8 +1739,8 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
   function timingFromDurations(d){const bigOn=.2,smallOn=bigOn+d.lead,bigOff=smallOn+d.overlap,smallOff=bigOff+d.hold;return{bigOn,smallOn,bigOff,smallOff,period:d.lead+d.overlap+d.hold+d.allOff};}
   function setDurations(d){if(!validDurations(d))return false;world.timing=timingFromDurations(d);state.timingPreset='custom';seek(.1);save();return true;}
   function syncScheduleText(){const t=world.timing,fmt=v=>String(Number(v.toFixed(1))),notes=document.getElementById('relay-notes');const fields={...t,...getDurations()};for(const scope of [root,notes].filter(Boolean))for(const n of scope.querySelectorAll('[data-time-key]'))n.textContent=fmt(fields[n.dataset.timeKey]);for(const key of Object.keys(durationLimits)){const slider=el('vr-duration-'+key);slider.value=fmt(fields[key]);slider.setAttribute('aria-valuetext',fmt(fields[key])+'秒');}const label=notes?.querySelector('#timing-preset-label');if(label)label.textContent={fast:'短周期：5.3秒（模型）',recommended:'对照：大行程时序（模型）',previous:'对照：更早的12秒时序（模型）',custom:'自定义时序（模型）'}[state.timingPreset];}
-  function save(){const p={kind:'branch-relay-v4',timingPreset:state.timingPreset,beadCount:state.beadCount,durations:getDurations(),scenario:world.scenario,selected:state.selected,open:state.open,explode:state.explode,view:state.view,speed:state.speed,cameras:state.cameras};window.openai?.setWidgetState?.({modelContent:{kind:'branch-relay-v4',chambers:8,beads:state.beadCount*8,beadsPerChamber:state.beadCount,coils:9,placement:'outer-end',coilAxis:'Z',smallCoilRadius:118,timingPreset:state.timingPreset,timing:world.timing,sequence:'big on > small on > big off > small off',scenario:world.scenario,selectedChamber:state.selected+1,qualitativeModel:true},privateContent:p}).catch(()=>{});}
-  function applySaved(saved){const p=saved?.privateContent;if(p?.kind!=='branch-relay-v4')return;if(Number.isInteger(p.beadCount)&&p.beadCount>=E.MIN_COUNT&&p.beadCount<=E.MAX_COUNT){state.beadCount=p.beadCount;world=E.createWorld({timing:world.timing,beadCount:state.beadCount});}if(['fast','recommended','previous'].includes(p.timingPreset)){state.timingPreset=p.timingPreset;world.timing={...window.RelayTimingData[state.timingPreset].timing};}else if(p.timingPreset==='custom'&&validDurations(p.durations)){state.timingPreset='custom';world.timing=timingFromDurations(p.durations);}if(['normal','weak','startweak'].includes(p.scenario))world.scenario=p.scenario;for(const k of ['open','explode'])if(typeof p[k]==='boolean')state[k]=p[k];if(Number.isInteger(p.selected))state.selected=clamp(p.selected,0,7);if(['perspective','top','front'].includes(p.view))state.view=p.view;if([.5,1,2].includes(p.speed))state.speed=p.speed;if(Array.isArray(p.cameras))p.cameras.slice(0,2).forEach((c,i)=>{if(c&&[c.az,c.el,c.zoom].every(Number.isFinite))state.cameras[i]={az:c.az,el:clamp(c.el,-.15,1.5),zoom:clamp(c.zoom,.65,1.6)};});seek(.1);dirty=true;}
+  function save(){const p={kind:'branch-relay-v4',timingPreset:state.timingPreset,beadCount:state.beadCount,countRevision:2,durations:getDurations(),scenario:world.scenario,selected:state.selected,open:state.open,explode:state.explode,view:state.view,speed:state.speed,cameras:state.cameras};window.openai?.setWidgetState?.({modelContent:{kind:'branch-relay-v4',chambers:8,beads:state.beadCount*8,beadsPerChamber:state.beadCount,coils:9,placement:'outer-end',coilAxis:'Z',smallCoilRadius:118,timingPreset:state.timingPreset,timing:world.timing,sequence:'big on > small on > big off > small off',scenario:world.scenario,selectedChamber:state.selected+1,qualitativeModel:true},privateContent:p}).catch(()=>{});}
+  function applySaved(saved){const p=saved?.privateContent;if(p?.kind!=='branch-relay-v4')return;const restoredCount=p.countRevision===2?p.beadCount:p.beadCount*2;if(Number.isInteger(restoredCount)&&restoredCount>=E.MIN_COUNT&&restoredCount<=E.MAX_COUNT){state.beadCount=restoredCount;world=E.createWorld({timing:world.timing,beadCount:state.beadCount});}if(['fast','recommended','previous'].includes(p.timingPreset)){state.timingPreset=p.timingPreset;world.timing={...window.RelayTimingData[state.timingPreset].timing};}else if(p.timingPreset==='custom'&&validDurations(p.durations)){state.timingPreset='custom';world.timing=timingFromDurations(p.durations);}if(['normal','weak','startweak'].includes(p.scenario))world.scenario=p.scenario;for(const k of ['open','explode'])if(typeof p[k]==='boolean')state[k]=p[k];if(Number.isInteger(p.selected))state.selected=clamp(p.selected,0,7);if(['perspective','top','front'].includes(p.view))state.view=p.view;if([.5,1,2].includes(p.speed))state.speed=p.speed;if(Array.isArray(p.cameras))p.cameras.slice(0,2).forEach((c,i)=>{if(c&&[c.az,c.el,c.zoom].every(Number.isFinite))state.cameras[i]={az:c.az,el:clamp(c.el,-.15,1.5),zoom:clamp(c.zoom,.65,1.6)};});seek(.1);dirty=true;}
   function resize(){canvases.forEach((c,i)=>{const r=c.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);sizes[i]={w:Math.max(1,r.width),h:Math.max(1,r.height),dpr};c.width=Math.round(sizes[i].w*dpr);c.height=Math.round(sizes[i].h*dpr);contexts[i].setTransform(dpr,0,0,dpr,0,0);});dirty=true;}
     function camera(index,bounds) {
     const c=state.cameras[index],w=sizes[index].w,h=sizes[index].h;
@@ -1970,7 +1970,7 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
 </script>
 
 <section id="relay-notes" style="margin-top:28px">
- <p>数量可调：每腔<span data-bead-count>100</span>颗，整机<span data-bead-total>800</span>颗；默认比原400颗增加一倍。数量变化会改变堆积与响应，线圈作用代理没有随数量自动增强，不能据此推断实体能带动更多铁珠。</p>
+ <p>数量可调：每腔<span data-bead-count>200</span>颗，整机<span data-bead-total>1600</span>颗；默认比上一版800颗增加一倍。数量变化会改变堆积与响应，线圈作用代理没有随数量自动增强，不能据此推断实体能带动更多铁珠。</p>
  <h2>可调时序：缩短周期，观察升起与落回</h2>
  <p id="timing-preset-label">短周期：5.3秒（模型）</p>
  <table class="table"><caption class="sr-only">大小线圈通断时序与条件响应</caption><thead><tr><th scope="col">演示阶段</th><th scope="col">大线圈M0</th><th scope="col">小线圈S1至S8</th><th scope="col">接力足够时的示意</th></tr></thead><tbody>
@@ -1990,7 +1990,7 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
  <p><strong>方向已按几何朝向修正：</strong>中央大线圈和8只小线圈的绕组平面都水平，轴线均沿竖直Z方向；小线圈在各分支外端，不再沿径向铁条横向绕制。图中的轴线箭头表示几何方向，不是实测磁场线。</p>
  <p>小线圈采用竖向短极芯作安装占位，下部接近径向分支。实际磁通仍可能经过整套铁芯及气隙，不能把9只线圈当成互不影响的理想磁铁。磁饱和、剩磁、通电温升和断电瞬态需要验证。</p>
  <details><summary>查看模型范围与安装尺寸</summary>
-  <p>沿用R130固定半球外壳、R126随形弧底、8腔×50颗Ø2铁珠。薄腔径向R22至R118、净隙2.8，上缘标高225 mm；上方径向铁芯高227至230 mm。</p>
+  <p>沿用R130固定半球外壳、R126随形弧底、8腔，每腔<span data-bead-count>200</span>颗Ø2铁珠。薄腔径向R22至R118、净隙2.8，上缘标高225 mm；上方径向铁芯高227至230 mm。</p>
   <p>各小线圈中心在R118 mm，径向分支端部在R120 mm，即中心距外端约2 mm。绕组外径18、内径8、高8 mm，标高232至240；法兰外径20、标高231至232及240至241。短极芯Ø6、标高227至242。尺寸仅为占位，实际骨架、绝缘、线径、匝数、电流、接头及散热未确定。</p>
   <p>外圈竖支杆移到相邻分支之间，给端部绕组让位。薄腔下缘和通断时序沿用原方案。</p>
   <p>动画将全域与局部的归一化标量场代理先叠合，再按其平方的梯度形成示意作用；不是把两份独立吸力直接相加。局部作用中心同步移至R118，并以227 mm极面标高作参考。参数人为选择，只用于比较端部局部保持、小线圈偏弱、大线圈不起动三种条件，没有求解真实三维磁场、共享铁芯磁通或实际电流。</p>

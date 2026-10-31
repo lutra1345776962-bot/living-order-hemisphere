@@ -1,22 +1,71 @@
-/* Illustrative scalar wave on a fixed hemispherical neighbour graph. Not a magnetic-force model. */
-var HemiWave=(()=>{
- const TAU=2*Math.PI,R=.84,Z0=-.155,LIMIT=.14;
- function create(){const nx=20,ny=20,n=nx*ny,x=new Float64Array(n),y=new Float64Array(n),z=new Float64Array(n),phi=new Float64Array(n),edges=[];
-  for(let r=0;r<ny;r++)for(let c=0;c<nx;c++){const i=r*nx+c,u=(r+.5)/ny,a=TAU*c/nx,rr=R*Math.sqrt(1-u*u);phi[i]=a;x[i]=rr*Math.cos(a);y[i]=rr*Math.sin(a);z[i]=Z0-R*u}
-  const edge=(i,j)=>{const d=Math.hypot(x[i]-x[j],y[i]-y[j],z[i]-z[j]),weight=Math.min(12,(.065/d)**2);edges.push({i,j,weight})};
-  for(let r=0;r<ny;r++)for(let c=0;c<nx;c++){const i=r*nx+c;edge(i,r*nx+(c+1)%nx);if(r<ny-1)edge(i,(r+1)*nx+c)}
-  const entrySource=(ny-1)*nx+Math.floor(nx*.75);
-  return{nx,ny,n,x,y,z,phi,edges,q:new Float64Array(n),v:new Float64Array(n),a:new Float64Array(n),time:0,events:[],nextID:1,source:entrySource,entrySource};
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.VerticalGranular=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
+ 'use strict';
+ const M=Math,Vec=Float64Array;
+ const COUNT=50,CHAMBERS=8,W=96,H=105,R=1,STEP=1/120,SLOW=.16,PERIOD=12;
+ const MIN_COUNT=25,MAX_COUNT=200,DEFAULT_COUNT=100;
+ const BASE=120,RIN=22,ARC=126,CZ=130;
+ const SMALL_RADIUS=118,SMALL_POLE_Z=227,COIL_AXIS=[0,0,1];
+ const BASE_TIMING={bigOn:1,smallOn:4,bigOff:6,smallOff:9,period:12};
+ function floor(x,y=0){return CZ-M.sqrt(ARC*ARC-(RIN+x)**2-y*y);}
+ function centerFloor(x){return CZ-M.sqrt((ARC-R)**2-(RIN+x)**2);}
+ const clamp=(v,a,b)=>M.max(a,M.min(b,v));
+ function input(t,timing=BASE_TIMING){const {bigOn,smallOn,bigOff,smallOff,period}=timing,q=((t%period)+period)%period,big=q>=bigOn&&q<bigOff?1:0,small=q>=smallOn&&q<smallOff?1:0,stage=q<bigOn?0:q<smallOn?1:q<bigOff?2:q<smallOff?3:4;
+  const names=['初始 · 全部断电','① 大开 · 全域起动条件','② 大＋小开 · 局部增强','③ 大关／小开 · 接力观察','④ 小关 · 重力落回'];
+  return{big,small,level:Math.max(big,small),stage,phase:names[stage],progress:q/period};
  }
- function drop(w,strength=2.8){w.source=w.entrySource;const e={id:w.nextID++,source:w.entrySource,strength,born:w.time,hit:false,rebound:false};w.events.push(e);if(w.events.length>10)w.events.shift();return e}
- function kick(w,e,amplitude,width){const pole=Z0-R;for(let i=(w.ny-3)*w.nx;i<w.n;i++){const d2=w.x[i]**2+w.y[i]**2+(w.z[i]-pole)**2,ex=d2/(2*width*width);if(ex<10)w.v[i]+=amplitude*Math.exp(-ex)}}
- function step(w,dt,p){for(const e of w.events){const age=w.time-e.born;if(!e.hit&&age>=.95){kick(w,e,4.2*e.strength,.22);e.hit=true}if(e.hit&&!e.rebound&&age>=1.13){kick(w,e,-3.3*e.strength,.24);e.rebound=true}}
-  for(let i=0;i<w.n;i++)w.a[i]=-7*w.q[i]-.7*p.damping*w.v[i];
-  if(p.coupled)for(const e of w.edges){const f=34*e.weight*(w.q[e.j]-w.q[e.i]);w.a[e.i]+=f;w.a[e.j]-=f}
-  for(let i=0;i<w.n;i++){w.v[i]+=w.a[i]*dt;w.q[i]+=w.v[i]*dt;if(w.q[i]>LIMIT){w.q[i]=LIMIT;w.v[i]=Math.min(0,w.v[i])*.15}else if(w.q[i]<-LIMIT){w.q[i]=-LIMIT;w.v[i]=Math.max(0,w.v[i])*.15}}
-  w.time+=dt;
+ function createWorld({layerCount=CHAMBERS,timing=BASE_TIMING,beadCount=COUNT}={}){
+  const count=Number.isInteger(beadCount)&&beadCount>=1&&beadCount<=MAX_COUNT?beadCount:COUNT;
+  const layers=Array.from({length:layerCount},(_,l)=>Array.from({length:count},(_,i)=>{const x=4+(i%13)*2.04+((M.floor(i/13)%2)*1.02)+.025*M.sin(i*3+l);return{id:l*count+i,x,z:centerFloor(x)+M.floor(i/13)*2.3,vx:0,vz:0};}));
+  const world={layers,beadCount:count,time:0,mode:'auto',scenario:'normal',pending:0,timing:{...timing},
+   drive(){const d=input(this.time,this.timing);if(this.mode==='auto')return d;const big=['big','both'].includes(this.mode)?1:0,small=['small','both'].includes(this.mode)?1:0;return{...d,big,small,level:Math.max(big,small),phase:{big:'手动 · 仅大线圈',both:'手动 · 大小同时',small:'手动 · 仅小线圈',off:'手动 · 全部断电'}[this.mode]||d.phase};},
+   step(){
+    this.time+=STEP;const dt=STEP*SLOW,drive=this.drive(),big=drive.big*(this.scenario==='startweak'?.35:1),small=drive.small*(this.scenario==='weak'?.12:.8),mag=drive.level;
+    for(let l=0;l<layers.length;l++){
+     const a=layers[l],ax=new Vec(count),az=new Vec(count);
+     for(let i=0;i<count;i++){
+      const p=a[i];ax[i]=-p.vx*12;az[i]=-9810-p.vz*13;
+      // Qualitative scalar field proxy, not a Maxwell/iron-core solution.
+      // Forces derive from the gradient of the SQUARED combined proxy, not Fbig+Fsmall.
+      // Vertical local axis at the OUTER END, shared by geometry and field proxy.
+      const dx=p.x-(SMALL_RADIUS-RIN),dz=SMALL_POLE_Z-BASE-p.z,local=M.exp(-dx*dx/(2*25**2)-dz*dz/(2*12**2));
+      const b=big*(.7+.8*p.z/H)+small*local;
+      const gx=-small*local*dx/(25**2),gz=big*.8/H+small*local*dz/(12**2);
+      ax[i]+=clamp(9810*250*b*gx,-9810*2,9810*2);
+      az[i]+=clamp(9810*250*b*gz,0,9810*4);
+     }
+     if(mag>.001)for(let i=0;i<count;i++)for(let j=0;j<i;j++){
+      const x=a[i].x-a[j].x,z=a[i].z-a[j].z,rr=x*x+z*z;if(rr>100)continue;
+      const r2=M.max(3.92,rr),r=M.sqrt(r2),k=3*18000*mag/(r2*r2*r2*r);
+      // Parallel induced vertical dipoles: side-by-side repulsion, end-to-end attraction.
+      const fx=clamp(k*x*(x*x-4*z*z),-16000,16000),fz=clamp(k*z*(3*x*x-2*z*z),-16000,16000);
+      ax[i]+=fx;ax[j]-=fx;az[i]+=fz;az[j]-=fz;
+     }
+     for(let i=0;i<count;i++){const p=a[i];p.vx+=ax[i]*dt;p.vz+=az[i]*dt;p.x+=p.vx*dt;p.z+=p.vz*dt;}
+     const contacts=[];for(let i=0;i<count;i++)for(let j=0;j<i;j++)if(M.abs(a[i].x-a[j].x)<4.2&&M.abs(a[i].z-a[j].z)<4.2)contacts.push([i,j]);
+     for(let pass=0;pass<220;pass++){
+      let maxPen=0;
+      for(let k=0;k<contacts.length;k++){
+       const pair=contacts[pass%2?k:contacts.length-1-k],p=a[pair[0]],q=a[pair[1]],dx=p.x-q.x,dz=p.z-q.z;if(M.abs(dx)>=2||M.abs(dz)>=2)continue;const d2=dx*dx+dz*dz;if(d2>=4)continue;const d=M.sqrt(d2);
+       if(d>=2)continue;const nx=d>1e-8?dx/d:1,nz=d>1e-8?dz/d:0,over=(2-d)*.5;
+       maxPen=M.max(maxPen,2-d);
+       p.x+=nx*over;p.z+=nz*over;q.x-=nx*over;q.z-=nz*over;
+       const rel=(p.vx-q.vx)*nx+(p.vz-q.vz)*nz;if(rel<0){const impulse=-rel*.52;p.vx+=nx*impulse;p.vz+=nz*impulse;q.vx-=nx*impulse;q.vz-=nz*impulse;}
+      }
+      for(const p of a){
+       if(p.x<R){maxPen=M.max(maxPen,R-p.x);p.x=R;if(p.vx<0)p.vx*=-.08;}if(p.x>W-R){maxPen=M.max(maxPen,p.x-W+R);p.x=W-R;if(p.vx>0)p.vx*=-.08;}
+       // Keep the entire bead inside the R126 arc: center lies inside R125.
+       const rr=RIN+p.x,zz=p.z-CZ,len=M.sqrt(rr*rr+zz*zz),allowed=ARC-R;
+       if(len>allowed){const nx=-rr/len,nz=-zz/len,penetration=len-allowed;maxPen=M.max(maxPen,penetration);p.x+=nx*penetration;p.z+=nz*penetration;const vn=p.vx*nx+p.vz*nz;if(vn<0){p.vx-=1.04*vn*nx;p.vz-=1.04*vn*nz;}}
+       if(p.x<R){p.x=R;if(p.vx<0)p.vx*=-.08;}
+       if(p.z>H-R){maxPen=M.max(maxPen,p.z-H+R);p.z=H-R;if(p.vz>0)p.vz*=-.04;}
+      }
+      if(pass>=5&&maxPen<.006)break;
+     }
+    }
+   },
+   advance(t){this.pending+=t;while(this.pending>=STEP-1e-10){this.step();this.pending-=STEP;}},
+   stats(l=0){const a=layers[l];return{meanHeight:a.reduce((s,p)=>s+p.z,0)/a.length,minHeight:M.min(...a.map(p=>p.z)),maxHeight:M.max(...a.map(p=>p.z)),up:a.filter(p=>p.z>H/2).length};}
+  };return world;
  }
- function stats(w){let up=0,down=0,moving=0,remote=0,energy=0;const s=w.source;for(let i=0;i<w.n;i++){up=Math.max(up,w.q[i]);down=Math.min(down,w.q[i]);if(Math.abs(w.q[i])>.004)moving++;const d=Math.hypot(w.x[i]-w.x[s],w.y[i]-w.y[s],w.z[i]-w.z[s]);if(d>.65)remote+=w.q[i]**2;energy+=w.v[i]**2+7*w.q[i]**2}return{up,down,moving,remote,energy}}
- return{create,drop,step,stats,R,Z0,LIMIT};
-})();
-if(typeof module!=='undefined'&&module.exports)module.exports=HemiWave;
+ return{createWorld,input,COUNT,MIN_COUNT,MAX_COUNT,DEFAULT_COUNT,CHAMBERS,W,H,R,STEP,SLOW,PERIOD,BASE,RIN,ARC,CZ,floor,centerFloor,SMALL_RADIUS,SMALL_POLE_Z,COIL_AXIS,BASE_TIMING};
+});

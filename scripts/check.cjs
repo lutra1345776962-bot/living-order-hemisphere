@@ -1,40 +1,30 @@
 const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const path=require('node:path');
-const vm=require('node:vm');
-const root=path.resolve(__dirname,'..');
-const Model=require('../src/engine.js');
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
+const root=path.resolve(__dirname,'..'),Model=require('../src/engine.js');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
-const js=html.match(/<script>([\s\S]*?)<\/script>/)[1];
-new vm.Script(js);
-assert(html.includes('setInterval'),'Animation clock is missing');
-assert(!html.includes('127.0.0.1'),'Local preview URL must not ship');
-for(const file of [path.join(root,'index.html'),...fs.readdirSync(path.join(root,'archive')).map(n=>path.join(root,'archive',n))]){
-  const content=fs.readFileSync(file,'utf8');
-  const ids=[...content.split('<script>')[0].matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
-  assert.equal(ids.length,new Set(ids).size,'Duplicate IDs: '+file);
-  const source=content.match(/<script>([\s\S]*?)<\/script>/)?.[1];
-  if(source)new vm.Script(source);
-  for(const match of content.matchAll(/href="([^"]+)"/g)){
-    const href=match[1];if(/^(https?:|#|mailto:)/.test(href))continue;
-    assert(fs.existsSync(path.resolve(path.dirname(file),decodeURIComponent(href.split('#')[0]))),'Missing link: '+href);
-  }
+assert(!html.includes('/*__')&&!html.includes('127.0.0.1')&&!html.includes('<iframe'));
+assert(html.includes('requestAnimationFrame')&&html.includes('id="vr-count"'));
+assert(html.includes('min="25" max="200" step="5" value="100"'));
+for(const file of [path.join(root,'index.html'),path.join(root,'v6-bottom-up.html'),...fs.readdirSync(path.join(root,'archive')).map(n=>path.join(root,'archive',n))]){
+ const content=fs.readFileSync(file,'utf8');
+ const ids=[...content.split('<script>')[0].matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
+ assert.equal(ids.length,new Set(ids).size,'Duplicate IDs: '+file);
+ for(const m of content.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g))new vm.Script(m[1]);
+ for(const match of content.matchAll(/href="([^"]+)"/g)){
+  const href=match[1];if(/^(https?:|#|mailto:)/.test(href))continue;
+  assert(fs.existsSync(path.resolve(path.dirname(file),decodeURIComponent(href.split('#')[0]))),'Missing link: '+href);
+ }
 }
-function run(coupled){
-  const world=Model.create();assert.equal(world.nx,20);assert.equal(world.ny,20);assert.equal(world.n,400);
-  const xy=JSON.stringify([Array.from(world.x),Array.from(world.y)]);
-  Model.drop(world,2.8);assert.equal(Math.floor(world.events[0].source/20),19);
-  let firstUp=false,rebound=false;
-  for(let i=0;i<1440;i++){
-    Model.step(world,1/180,{coupled,damping:1});
-    if(i===89)assert(world.q.every(q=>q===0));
-    if(i===185)firstUp=world.q.slice(340).some(q=>q>.1);
-    if(i>220&&i<360)rebound ||= world.q.slice(340).some(q=>q<-.04);
-    if(i%90===0)for(const q of world.q){assert(Number.isFinite(q));assert(Math.abs(q)<=Model.LIMIT+1e-12);}
-  }
-  assert(firstUp);assert(rebound);assert.equal(JSON.stringify([Array.from(world.x),Array.from(world.y)]),xy);
-  if(coupled)assert(world.q.slice(0,200).some(q=>Math.abs(q)>.001));
-  else assert(world.q.slice(0,340).every(q=>q===0));
+for(const n of [25,50,100,200]){
+ const world=Model.createWorld({beadCount:n});
+ assert.equal(world.layers.length,8);assert(world.layers.every(a=>a.length===n));
+ assert.equal(new Set(world.layers.flat().map(p=>p.id)).size,n*8);
+ world.advance(.1);
+ for(const a of world.layers)for(const p of a)assert(Number.isFinite(p.x+p.z)&&p.x>=.99&&p.x<=95.01&&p.z<=104.01);
+ for(let l=0;l<8;l++)assert.equal(world.stats(l).meanHeight,world.layers[l].reduce((s,p)=>s+p.z,0)/n);
 }
-run(true);run(false);
-console.log('PASS: 20×20 grid, fixed x/y, bottom-up input, rebound, neighbour propagation, animation source, JavaScript syntax and internal links.');
+const t={bigOn:.2,smallOn:2,bigOff:2.6,smallOff:3,period:5.3};
+for(const [time,big,small]of [[.1,0,0],[1,1,0],[2.3,1,1],[2.8,0,1],[4,0,0]]){
+ const d=Model.input(time,t);assert.equal(d.big,big);assert.equal(d.small,small);
+}
+console.log('PASS: 200..1600 beads, finite motion, statistics, switching sequence, self-contained scripts and all current/history links.');

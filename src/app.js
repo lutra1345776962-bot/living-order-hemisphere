@@ -1,63 +1,287 @@
-(()=>{'use strict';
- const $=id=>document.getElementById(id),PI=Math.PI,C={ink:'#2b403d',muted:'#697b72',gold:'#dfb36b',blue:'#5a91c8'},sensors={force:{name:'力学',lo:0,hi:100,unit:'N',digits:1},light:{name:'照度',lo:0,hi:1000,unit:'lx',digits:0},temperature:{name:'温度',lo:15,hi:35,unit:'°C',digits:1},humidity:{name:'相对湿度',lo:30,hi:80,unit:'%RH',digits:1}};
- const p={strength:2.8,damping:1,coupled:true,speed:.5,source:'force',reading:.75,trigger:'manual',threshold:.6},state={view:'front',orientation:'down',playing:true,seeking:false,token:0,armed:true,lastTrigger:-Infinity};
- let world=HemiWave.create(),clockID=null,lastStamp=0,acc=0,projected=[],phaseLast=-1;
- const palette=['#376da1','#4d8ac0','#7ab4d8','#a0c8d9','#91b3b6','#c1c9a2','#dfc48d','#edc177','#f8dba6'];
- function canvas(id){const c=$(id),r=c.getBoundingClientRect(),w=Math.max(1,r.width),h=Math.max(1,r.height),d=Math.min(2,window.devicePixelRatio||1);if(c.width!==Math.round(w*d)||c.height!==Math.round(h*d)){c.width=Math.round(w*d);c.height=Math.round(h*d)}const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,w,h);return{ctx,w,h}}
- function text(ctx,t,x,y,color='#abc2be',size=11,align='left'){ctx.font=`${size}px "Segoe UI","Microsoft YaHei",sans-serif`;ctx.textAlign=align;ctx.fillStyle=color;ctx.fillText(t,x,y)}
- function line(ctx,a,b,color,width=1,dash=[]){ctx.beginPath();ctx.setLineDash(dash);ctx.moveTo(...a);ctx.lineTo(...b);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();ctx.setLineDash([])}
- function circle(ctx,x,y,r,fill,stroke){ctx.beginPath();ctx.arc(x,y,Math.max(.1,r),0,2*PI);if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
- function polygon(ctx,ps,fill,stroke){ctx.beginPath();ps.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q));ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke()}}
- function arrow(ctx,x,y1,y2,color){line(ctx,[x,y1],[x,y2],color,2);const dir=y2>y1?1:-1;polygon(ctx,[[x,y2],[x-5,y2-dir*8],[x+5,y2-dir*8]],color)}
- function color(q){return palette[Math.max(0,Math.min(8,Math.round(4+q/HemiWave.LIMIT*4)))]}
- function sensorText(){const s=sensors[p.source],raw=s.lo+(s.hi-s.lo)*p.reading;$('reading-label').textContent='模拟'+s.name+'传感器读数';$('reading-value').textContent=raw.toFixed(s.digits)+' '+s.unit;$('reading-range').textContent=`映射示例 ${s.lo}–${s.hi} ${s.unit}；阈值 ${(s.lo+(s.hi-s.lo)*p.threshold).toFixed(s.digits)} ${s.unit}，未连接硬件。`;$('strength').disabled=p.trigger==='threshold';$('strength-value').textContent=eventStrength().toFixed(2)+'×'}
- function eventStrength(){return p.trigger==='threshold'?1.5+3.5*p.reading:p.strength}
- function addImpact(source=world.source,reason='柱身连接处滴入'){HemiWave.drop(world,eventStrength(),source);state.playing=true;lastStamp=0;$('status').textContent=reason+'：局部输入 '+eventStrength().toFixed(2)+'×；脉冲从柱身向柱头输入；半球固定，颗粒只沿竖向移动。';render()}
- function reset(playing=true,withEvent=true){state.token++;state.seeking=false;state.playing=playing;state.armed=!withEvent||p.trigger==='manual';state.lastTrigger=-Infinity;world=HemiWave.create();lastStamp=0;acc=0;phaseLast=-1;busy(false);if(withEvent)HemiWave.drop(world,eventStrength());render()}
- function sensorCheck(){sensorText();if(p.trigger!=='threshold')return;if(p.reading<p.threshold-.05)state.armed=true;if(p.reading>=p.threshold&&state.armed&&world.time-state.lastTrigger>1){state.armed=false;state.lastTrigger=world.time;$('loop').checked=false;addImpact(world.source,'模拟传感器越阈值')}}
- function phase(){const e=world.events[world.events.length-1];if(!e)return -1;const a=world.time-e.born;return a<.95?0:a<1.13?1:a<1.65?2:a<4.4?3:4}
- function drawMain(){const {ctx,w,h}=canvas('main-view'),up=state.orientation==='up',sign=up?-1:1,iso=state.view==='iso',side=state.view==='side',scale=iso?Math.min(w*.27,h*.29):Math.min(w*.31,h*.34),cx=w*.5,oy=h*(iso?(up?.61:.32):(up?.60:.21)),P=(x,y,z)=>iso?[cx+scale*(.82*x-.55*y),oy+scale*(.25*x+.30*y-.90*z)]:[cx+scale*(side?y:x),oy-scale*z];
-  const bg=ctx.createRadialGradient(cx,h*.4,0,cx,h*.5,w*.7);bg.addColorStop(0,'#22444b');bg.addColorStop(1,'#102932');ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
-  const topZ=up?1.30:.15,shaftTop=up?-.05:-1.16,shaftBottom=up?-.95:-1.97;
-  const box=(z,half,height,fill)=>{const a=[[-half,-half],[half,-half],[half,half],[-half,half]];for(let i=0;i<4;i++)polygon(ctx,[P(...a[i],z),P(...a[(i+1)%4],z),P(...a[(i+1)%4],z+height),P(...a[i],z+height)],fill,'#73918e');polygon(ctx,a.map(q=>P(...q,z+height)),fill,'#8ca39b')};
-  box(shaftBottom,.25,shaftTop-shaftBottom,'#66837d');box(shaftBottom-.05,.32,.05,'#526f6b');
-  if(!iso){ctx.beginPath();ctx.moveTo(cx-1.16*scale,oy);ctx.arc(cx,oy,1.16*scale,up?PI:0,up?2*PI:PI);ctx.closePath();ctx.fillStyle='rgba(91,136,131,.12)';ctx.fill();ctx.strokeStyle='#86a79b';ctx.lineWidth=1.4;ctx.stroke()}
-  // Fixed shell ribs and ring baselines; no dependence on input or displacement.
-  ctx.beginPath();for(let j=0;j<9;j++){const phi=j/8*2*PI;for(let k=0;k<=32;k++){const a=k/32*PI/2,rr=1.16*Math.cos(a),z=-sign*1.16*Math.sin(a),q=P(rr*Math.cos(phi),rr*Math.sin(phi),z);k===0?ctx.moveTo(...q):ctx.lineTo(...q)}ctx.moveTo(...P(1.16*Math.cos(phi),1.16*Math.sin(phi),0));ctx.lineTo(...P(1.16*Math.cos(phi),1.16*Math.sin(phi),topZ))}for(let band=1;band<6;band++){const u=band/6,rr=1.16*Math.sqrt(1-u*u),z=-sign*1.16*u;for(let j=0;j<=96;j++){const a=j/96*2*PI,q=P(rr*Math.cos(a),rr*Math.sin(a),z);j===0?ctx.moveTo(...q):ctx.lineTo(...q)}}ctx.strokeStyle='rgba(132,170,159,.27)';ctx.lineWidth=.65;ctx.stroke();
-  projected=[];for(let i=0;i<world.n;i++){const visible=iso?(world.y[i]<.22):(side?world.x[i]>-.012:world.y[i]<.012);if(!visible)continue;const rest=P(world.x[i],world.y[i],sign*world.z[i]),pos=P(world.x[i],world.y[i],sign*world.z[i]+world.q[i]);projected.push({i,rest,pos})}
-  // Static dots and the lines from them make the strictly vertical degree of freedom legible.
-  ctx.beginPath();for(const o of projected){ctx.moveTo(o.rest[0]+.7,o.rest[1]);ctx.arc(o.rest[0],o.rest[1],.7,0,2*PI)}ctx.fillStyle='#566f70';ctx.fill();
-  for(const positive of [false,true]){ctx.beginPath();for(const o of projected){if((world.q[o.i]>=0)!==positive)continue;ctx.moveTo(...o.rest);ctx.lineTo(...o.pos)}ctx.strokeStyle=positive?'rgba(228,185,110,.45)':'rgba(88,155,207,.47)';ctx.lineWidth=.75;ctx.stroke()}
-  const radius=Math.max(1.6,Math.min(4.8,scale*.020));for(let k=0;k<9;k++){ctx.beginPath();for(const o of projected){if(Math.max(0,Math.min(8,Math.round(4+world.q[o.i]/HemiWave.LIMIT*4)))!==k)continue;ctx.moveTo(o.pos[0]+radius,o.pos[1]);ctx.arc(o.pos[0],o.pos[1],radius,0,2*PI)}ctx.fillStyle=palette[k];ctx.fill()}
-  box(topZ,1.24,.075,'rgba(112,147,137,.26)');
-  const src=world.source,base=P(world.x[src],world.y[src],sign*world.z[src]),active=P(world.x[src],world.y[src],sign*world.z[src]+world.q[src]),row=Math.floor(src/world.nx),col=src%world.nx;
-  for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const r=row+dr;if(r<0||r>=world.ny)continue;const i=r*world.nx+(col+dc+world.nx)%world.nx,a=P(world.x[i],world.y[i],sign*world.z[i]-HemiWave.LIMIT),b=P(world.x[i],world.y[i],sign*world.z[i]+HemiWave.LIMIT);line(ctx,a,b,'rgba(195,212,192,.43)',.75)}
-  circle(ctx,active[0],active[1],radius+5,null,'#f0cf8e');circle(ctx,base[0],base[1],2,'#c2c9bd');
-  const k=phase(),entry=P(0,0,HemiWave.Z0-HemiWave.R),shaftStart=P(0,0,-1.86),shaftEnd=P(0,0,-1.15),event=world.events[world.events.length-1];
-  line(ctx,shaftStart,entry,'#c5b17a',1.2,[4,4]);arrow(ctx,shaftStart[0],shaftStart[1],shaftEnd[1],'#d9be7b');
-  if(k===0&&event){const progress=Math.max(0,Math.min(1,(world.time-event.born)/.95)),z=-1.86+progress*((HemiWave.Z0-HemiWave.R)+1.86),q=P(0,0,z),rr=Math.max(4,Math.min(8,scale*.045)),gr=ctx.createRadialGradient(q[0]-rr*.3,q[1]-rr*.3,1,q[0],q[1],rr);gr.addColorStop(0,'#f4e8bc');gr.addColorStop(1,'#b59856');ctx.beginPath();ctx.moveTo(q[0],q[1]-rr*1.5);ctx.bezierCurveTo(q[0]-rr*.3,q[1]-rr*.4,q[0]-rr,q[1]-rr*.1,q[0]-rr,q[1]+rr*.3);ctx.bezierCurveTo(q[0]-rr,q[1]+rr*1.4,q[0]+rr,q[1]+rr*1.4,q[0]+rr,q[1]+rr*.3);ctx.bezierCurveTo(q[0]+rr,q[1]-rr*.1,q[0]+rr*.3,q[1]-rr*.4,q[0],q[1]-rr*1.5);ctx.fillStyle=gr;ctx.fill()}
-  if(k===1)arrow(ctx,entry[0]+17,entry[1]+27,entry[1]-27,C.gold);if(k===2)arrow(ctx,entry[0]+17,entry[1]-27,entry[1]+27,C.blue);
-  text(ctx,'柱身 → 柱头',shaftStart[0]+15,(shaftStart[1]+shaftEnd[1])/2,'#d9be7b',10);
-  text(ctx,'固定半球轮廓',14,22,'#b0c9c0',11);text(ctx,iso?'轴测仅作辅助':'所有颗粒仅上下移动',w-14,22,'#b0c9c0',11,'right');text(ctx,w<500?'蓝↓ 金↑ · 灰点为基准':'蓝 ↓ 下移   灰 · 基准   金 ↑ 上移',14,h-17,'#c5d5ca',11);text(ctx,w<500?'400 颗':'20×20＝400 颗（含背面）',w-14,h-17,'#b0c9c0',11,'right');
-  if(w>760){const x=cx+scale*1.30;text(ctx,'外壳 / 顶板固定',x,oy+40,'#9db7ac',11);text(ctx,'颗粒竖向行程',x,oy+62,'#9db7ac',11);line(ctx,[x,oy+76],[x,oy+124],'#9db7ac',1);arrow(ctx,x+12,oy+116,oy+82,C.gold);arrow(ctx,x-12,oy+82,oy+116,C.blue)}
- }
- function drawLocal(){const {ctx,w,h}=canvas('local-view'),src=world.source,sr=Math.min(world.ny-3,Math.floor(src/world.nx)),sc=src%world.nx,dx=(w-40)/5,dy=(h-48)/5;
-  for(let dr=-2;dr<=2;dr++)for(let dc=-2;dc<=2;dc++){const r=sr+dr;if(r<0||r>=world.ny)continue;const i=r*world.nx+(sc+dc+world.nx)%world.nx,x=20+(dc+2.5)*dx,y=19+(dr+2.5)*dy,z=world.q[i]/HemiWave.LIMIT*dy*.29;line(ctx,[x,y-dy*.34],[x,y+dy*.34],'#cbd6cb',1);line(ctx,[x-4,y],[x+4,y],'#adbba9',1);circle(ctx,x,y,1.7,'#929f91');line(ctx,[x,y],[x,y-z],world.q[i]>=0?C.gold:C.blue,1.6);circle(ctx,x,y-z,Math.min(5,dx*.12),color(world.q[i]),i===src?'#a07a38':null)}
-  text(ctx,'固定导轨，颗粒只沿竖向升降',13,h-8,C.muted,10);}
- function drawProfile(){const {ctx,w,h}=canvas('profile-view'),src=world.source,col=src%world.nx,left=43,right=w-17,mid=h*.48,scale=h*.28/HemiWave.LIMIT;
-  for(const v of [-HemiWave.LIMIT,0,HemiWave.LIMIT]){const y=mid-v*scale;line(ctx,[left,y],[right,y],v===0?'#b9c7b6':'#e0e6dc',1,v===0?[4,4]:[]);text(ctx,v.toFixed(2),left-6,y+4,C.muted,10,'right')}
-  ctx.beginPath();for(let k=0;k<world.ny;k++){const row=world.ny-1-k,i=row*world.nx+col,q=[left+k/(world.ny-1)*(right-left),mid-world.q[i]*scale];k?ctx.lineTo(...q):ctx.moveTo(...q)}ctx.strokeStyle='#529183';ctx.lineWidth=2;ctx.stroke();text(ctx,'柱身连接处',left,h-13,C.muted,10);text(ctx,'半球中部',(left+right)/2,h-13,C.muted,10,'center');text(ctx,'顶部边缘',right,h-13,C.muted,10,'right');text(ctx,'竖向位移 / 连接处向上展开',left,14,C.muted,10);}
- function render(){drawMain();drawLocal();drawProfile();const k=phase(),labels=['柱内上行 / 水滴式输入由下向上','连接处上冲 / 底端颗粒上移','反向回弹 / 连接处下移','向上传播 / 上方环带逐步响应','起伏衰减 / 返回基准附近'];$('phase-label').textContent=k<0?'静止':labels[k];if(k!==phaseLast){document.querySelectorAll('[data-time]').forEach((b,i)=>b.setAttribute('aria-pressed',String(k===i)));phaseLast=k}for(const id of ['play','play-top'])$(id).textContent=state.playing?'暂停':'播放';$('clock').textContent=world.time.toFixed(1)+' s';const s=HemiWave.stats(world);$('moving-count').textContent=s.moving.toLocaleString();$('up-value').textContent='+'+s.up.toFixed(3);$('down-value').textContent=s.down.toFixed(3);}
- function busy(on){state.seeking=on;for(const id of ['impact','play','play-top','reset'])$(id).disabled=on;document.querySelectorAll('[data-time]').forEach(b=>b.disabled=on)}
- async function seek(t){reset(false);busy(true);const token=state.token;$('status').textContent='从静止基准重新计算…';while(world.time<t-1e-8){for(let k=0;k<70&&world.time<t-1e-8;k++)HemiWave.step(world,Math.min(1/180,t-world.time),p);await new Promise(resolve=>setTimeout(resolve,0));if(token!==state.token)return}busy(false);$('status').textContent='已暂停在 '+t.toFixed(2)+' s，点击播放继续。';render()}
- function toggle(){state.playing=!state.playing;lastStamp=0;acc=0;$('status').textContent=state.playing?'运行中：固定半球立面内，颗粒持续上下运动。':'已暂停；点击播放继续。';render()}
- $('impact').addEventListener('click',()=>addImpact());$('play').addEventListener('click',toggle);$('play-top').addEventListener('click',toggle);$('reset').addEventListener('click',()=>reset(true));$('speed').addEventListener('change',e=>p.speed=+e.target.value);$('orientation').addEventListener('change',e=>{state.orientation=e.target.value;render()});$('strength').addEventListener('input',e=>{p.strength=+e.target.value/100;sensorText()});$('damping').addEventListener('input',e=>{p.damping=+e.target.value/100;$('damping-value').textContent=p.damping.toFixed(2)+'×'});$('coupled').addEventListener('change',e=>{p.coupled=e.target.checked;reset(true)});
- $('sensor').addEventListener('change',e=>{p.source=e.target.value;state.armed=true;sensorCheck()});$('reading').addEventListener('input',e=>{p.reading=+e.target.value/100;sensorCheck()});$('trigger').addEventListener('change',e=>{p.trigger=e.target.value;if(p.trigger==='threshold')reset(false,false);state.armed=true;state.lastTrigger=-Infinity;sensorCheck()});$('threshold').addEventListener('change',e=>{p.threshold=+e.target.value;sensorCheck()});
- document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>{state.view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(v=>v.setAttribute('aria-pressed',String(v===b)));render()}));document.querySelectorAll('[data-time]').forEach(b=>b.addEventListener('click',()=>seek(+b.dataset.time)));
- $('main-view').addEventListener('click',()=>{if(!state.seeking)addImpact(world.entrySource,'柱身连接处滴入')});window.addEventListener('resize',render);
- function stopClock(){if(clockID!==null){clearInterval(clockID);clockID=null}}function fail(error){state.playing=false;busy(false);$('play').textContent='播放';$('play-top').textContent='播放';$('status').textContent='动画中断：'+(error?.message||String(error));console.error(error)}
- function tick(stamp){if(lastStamp&&state.playing&&!state.seeking){acc+=Math.min(.12,(stamp-lastStamp)/1000)*p.speed;while(acc>=1/180){HemiWave.step(world,1/180,p);acc-=1/180}if(p.trigger==='threshold')sensorCheck();if(world.time>8&&$('loop').checked&&p.trigger==='manual'&&world.events.length===1)reset(true)}lastStamp=stamp;if(state.playing)render()}
- function startClock(){stopClock();clockID=setInterval(()=>{try{tick(typeof performance!=='undefined'?performance.now():Date.now())}catch(error){fail(error)}},33)}window.addEventListener('pagehide',stopClock);window.addEventListener('pageshow',()=>{lastStamp=0;startClock()});window.addEventListener('error',e=>fail(e.error||e.message));
- try{sensorText();HemiWave.drop(world,p.strength);render();startClock()}catch(error){fail(error)}
- window.__hemiDemo={state,parameters:p,getWorld:()=>world,getProjected:()=>projected,render,reset,addImpact,seek,step:dt=>HemiWave.step(world,dt,p),stopClock,startClock,fixedGeometry:()=>({radius:1.16,orientation:state.orientation,shaftWidth:.50,stroke:HemiWave.LIMIT})};
+
+window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短停0.9秒","timing":{"bigOn":0.5,"smallOn":3,"bigOff":4.2,"smallOff":5.1000000000000005,"period":8.600000000000001},"durations":{"lead":2.5,"overlap":1.2,"hold":0.9,"allOff":4},"meanVerticalRange":88.4829334177572,"meanRadialRange":44.86879184787186,"p10VerticalRange":71.21552641445325,"returnedFraction":1,"innerFraction":0.86,"endMeanHeight":19.778412184934623},"previous":{"id":"previous","label":"上一版","timing":{"bigOn":1,"smallOn":4,"bigOff":6,"smallOff":9,"period":12},"durations":{"lead":3,"overlap":2,"hold":3,"allOff":4},"meanVerticalRange":88.21018590922999,"meanRadialRange":35.05341588307282,"p10VerticalRange":73.91829643759556,"returnedFraction":1,"innerFraction":0.88,"endMeanHeight":19.201383899930455},"fast":{"timing":{"bigOn":0.2,"smallOn":2,"bigOff":2.6,"smallOff":3,"period":5.3}}};
+(() => {
+ const launch=()=>{
+  const root=document.getElementById('branch-relay-v4');if(!root)return;
+  try{
+  const el=id=>root.querySelector('#'+id),reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  const defaults=[{az:-.48,el:.29,zoom:1},{az:-.20,el:.10,zoom:1}];
+  const state={playing:!reduced,speed:1,open:true,explode:false,selected:6,view:'perspective',timingPreset:'fast',beadCount:100,cameras:defaults.map(c=>({...c}))};
+  let world=window.VerticalGranular.createWorld({timing:window.RelayTimingData.fast.timing,beadCount:state.beadCount});world.advance(.1);
+  const E=window.VerticalGranular,{W,H,BASE,RIN}=E;
+  const canvases=[el('vr-whole'),el('vr-detail')],contexts=canvases.map(c=>c.getContext('2d'));
+  if(contexts.some(c=>!c))throw new Error('当前浏览器不能创建绘图上下文');
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],sub=(a,b)=>a.map((v,i)=>v-b[i]);
+  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],norm=a=>{const n=Math.hypot(...a)||1;return a.map(v=>v/n);};
+  let palette={},fontSize=14,last=0,lastDraw=0,clockId=0,dirty=true,accumulator=0,lastPhase='';
+  const sizes=[{w:0,h:0},{w:0,h:0}],meshes=[[],[]],labelRegions=[[],[]];
+    function rgbToken(name) {
+    const styles=getComputedStyle(root);
+    const css=styles.getPropertyValue(name).trim() || styles.getPropertyValue('--foreground').trim() || styles.color;
+    const probe=document.createElement('span');probe.style.color=css;root.appendChild(probe);
+    const resolved=getComputedStyle(probe).color;probe.remove();
+    // Parse computed CSS colors directly. Do not read canvas pixels during startup.
+    function parse(s){
+      s=s.trim().toLowerCase();
+      let match=s.match(/^rgba?\((.*)\)$/);
+      if(match){const parts=match[1].split('/')[0].replace(/,/g,' ').trim().split(/\s+/);if(parts.length>=3)return parts.slice(0,3).map(x=>x.endsWith('%')?parseFloat(x)*2.55:parseFloat(x));}
+      match=s.match(/^color\(srgb\s+([^)]*)\)$/);
+      if(match)return match[1].split('/')[0].trim().split(/\s+/).slice(0,3).map(x=>x.endsWith('%')?parseFloat(x)*2.55:parseFloat(x)*255);
+      match=s.match(/^ok(lab|lch)\(([^)]*)\)$/);
+      if(match){
+        const v=match[2].split('/')[0].replace(/,/g,' ').trim().split(/\s+/);let L=parseFloat(v[0])/(v[0].endsWith('%')?100:1),a,b;
+        if(match[1]==='lch'){const C=parseFloat(v[1]),h=parseFloat(v[2])*Math.PI/180;a=C*Math.cos(h);b=C*Math.sin(h);}else{a=parseFloat(v[1]);b=parseFloat(v[2]);}
+        const l=(L+.3963377774*a+.2158037573*b)**3,m=(L-.1055613458*a-.0638541728*b)**3,t=(L-.0894841775*a-1.291485548*b)**3;
+        const linear=[4.0767416621*l-3.3077115913*m+.2309699292*t,-1.2684380046*l+2.6097574011*m-.3413193965*t,-.0041960863*l-.7034186147*m+1.707614701*t];
+        return linear.map(c=>255*clamp(c<=.0031308?12.92*c:1.055*c**(1/2.4)-.055,0,1));
+      }
+      return null;
+    }
+    const values=parse(resolved)||parse(styles.color);
+    if(!values||!values.every(Number.isFinite))throw new Error('无法解析主题颜色：'+name);
+    return values;
+  }
+
+  function updateTheme() {
+    palette={bg:rgbToken('--background'),fg:rgbToken('--foreground'),muted:rgbToken('--muted-foreground'),
+      surface:rgbToken('--muted'),edge:rgbToken('--border'),coil:rgbToken('--viz-series-1'),particle:rgbToken('--viz-series-2'),spacer:rgbToken('--viz-series-3'),small:rgbToken('--viz-series-4')};
+    fontSize=parseFloat(getComputedStyle(root).fontSize)||14;dirty=true;
+  }
+  function color(c,shade=1) {return 'rgb('+c.map(v=>Math.round(clamp(v*shade,0,255))).join(',')+')';}
+  function mix(a,b,t){return a.map((v,i)=>v*(1-t)+b[i]*t);}
+
+
+  function sync(){el('vr-count').value=String(state.beadCount);el('vr-count').setAttribute('aria-valuetext','每腔'+state.beadCount+'颗，整机'+(state.beadCount*8)+'颗');for(const scope of [root,document.getElementById('relay-notes')].filter(Boolean)){for(const n of scope.querySelectorAll('[data-bead-count]'))n.textContent=String(state.beadCount);for(const n of scope.querySelectorAll('[data-bead-total]'))n.textContent=String(state.beadCount*8);}el('vr-play').textContent=state.playing?'暂停':'播放';el('vr-mode').value=world.mode;el('vr-scenario').value=world.scenario;el('vr-preset').value=state.timingPreset;el('vr-speed').value=String(state.speed);el('vr-select').value=String(state.selected);el('vr-view').value=state.view;el('vr-open').checked=state.open;el('vr-explode').checked=state.explode;syncScheduleText();}
+  const durationLimits={lead:[.2,5],overlap:[.1,3],hold:[.1,3],allOff:[.5,6]};
+  function getDurations(){const t=world.timing;return{lead:t.smallOn-t.bigOn,overlap:t.bigOff-t.smallOn,hold:t.smallOff-t.bigOff,allOff:t.period-t.smallOff+t.bigOn};}
+  function validDurations(d){return d&&Object.entries(durationLimits).every(([k,[min,max]])=>Number.isFinite(d[k])&&d[k]>=min-1e-8&&d[k]<=max+1e-8);}
+  function timingFromDurations(d){const bigOn=.2,smallOn=bigOn+d.lead,bigOff=smallOn+d.overlap,smallOff=bigOff+d.hold;return{bigOn,smallOn,bigOff,smallOff,period:d.lead+d.overlap+d.hold+d.allOff};}
+  function setDurations(d){if(!validDurations(d))return false;world.timing=timingFromDurations(d);state.timingPreset='custom';seek(.1);save();return true;}
+  function syncScheduleText(){const t=world.timing,fmt=v=>String(Number(v.toFixed(1))),notes=document.getElementById('relay-notes');const fields={...t,...getDurations()};for(const scope of [root,notes].filter(Boolean))for(const n of scope.querySelectorAll('[data-time-key]'))n.textContent=fmt(fields[n.dataset.timeKey]);for(const key of Object.keys(durationLimits)){const slider=el('vr-duration-'+key);slider.value=fmt(fields[key]);slider.setAttribute('aria-valuetext',fmt(fields[key])+'秒');}const label=notes?.querySelector('#timing-preset-label');if(label)label.textContent={fast:'短周期：5.3秒（模型）',recommended:'对照：大行程时序（模型）',previous:'对照：更早的12秒时序（模型）',custom:'自定义时序（模型）'}[state.timingPreset];}
+  function save(){const p={kind:'branch-relay-v4',timingPreset:state.timingPreset,beadCount:state.beadCount,durations:getDurations(),scenario:world.scenario,selected:state.selected,open:state.open,explode:state.explode,view:state.view,speed:state.speed,cameras:state.cameras};window.openai?.setWidgetState?.({modelContent:{kind:'branch-relay-v4',chambers:8,beads:state.beadCount*8,beadsPerChamber:state.beadCount,coils:9,placement:'outer-end',coilAxis:'Z',smallCoilRadius:118,timingPreset:state.timingPreset,timing:world.timing,sequence:'big on > small on > big off > small off',scenario:world.scenario,selectedChamber:state.selected+1,qualitativeModel:true},privateContent:p}).catch(()=>{});}
+  function applySaved(saved){const p=saved?.privateContent;if(p?.kind!=='branch-relay-v4')return;if(Number.isInteger(p.beadCount)&&p.beadCount>=E.MIN_COUNT&&p.beadCount<=E.MAX_COUNT){state.beadCount=p.beadCount;world=E.createWorld({timing:world.timing,beadCount:state.beadCount});}if(['fast','recommended','previous'].includes(p.timingPreset)){state.timingPreset=p.timingPreset;world.timing={...window.RelayTimingData[state.timingPreset].timing};}else if(p.timingPreset==='custom'&&validDurations(p.durations)){state.timingPreset='custom';world.timing=timingFromDurations(p.durations);}if(['normal','weak','startweak'].includes(p.scenario))world.scenario=p.scenario;for(const k of ['open','explode'])if(typeof p[k]==='boolean')state[k]=p[k];if(Number.isInteger(p.selected))state.selected=clamp(p.selected,0,7);if(['perspective','top','front'].includes(p.view))state.view=p.view;if([.5,1,2].includes(p.speed))state.speed=p.speed;if(Array.isArray(p.cameras))p.cameras.slice(0,2).forEach((c,i)=>{if(c&&[c.az,c.el,c.zoom].every(Number.isFinite))state.cameras[i]={az:c.az,el:clamp(c.el,-.15,1.5),zoom:clamp(c.zoom,.65,1.6)};});seek(.1);dirty=true;}
+  function resize(){canvases.forEach((c,i)=>{const r=c.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);sizes[i]={w:Math.max(1,r.width),h:Math.max(1,r.height),dpr};c.width=Math.round(sizes[i].w*dpr);c.height=Math.round(sizes[i].h*dpr);contexts[i].setTransform(dpr,0,0,dpr,0,0);});dirty=true;}
+    function camera(index,bounds) {
+    const c=state.cameras[index],w=sizes[index].w,h=sizes[index].h;
+    const right=[Math.cos(c.az),Math.sin(c.az),0];
+    const up=[-Math.sin(c.az)*Math.sin(c.el),Math.cos(c.az)*Math.sin(c.el),Math.cos(c.el)];
+    const out=[Math.sin(c.az)*Math.cos(c.el),-Math.cos(c.az)*Math.cos(c.el),Math.sin(c.el)];
+    const mid=bounds.min.map((a,i)=>(a+bounds.max[i])/2);
+    const corners=[];
+    for(const x of [bounds.min[0],bounds.max[0]])for(const y of [bounds.min[1],bounds.max[1]])for(const z of [bounds.min[2],bounds.max[2]])corners.push([x,y,z]);
+    const xx=corners.map(p=>dot(sub(p,mid),right)),yy=corners.map(p=>dot(sub(p,mid),up));
+    const padX=Math.min(w*.12,46),padY=Math.min(h*.13,48);
+    const scale=Math.min((w-padX*2)/(Math.max(...xx)-Math.min(...xx)),(h-padY*2)/(Math.max(...yy)-Math.min(...yy)))*c.zoom;
+    const cx=w/2,cy=h/2-6;
+    function project(p){const a=sub(p,mid);return {x:cx+dot(a,right)*scale,y:cy-dot(a,up)*scale,d:dot(a,out),scale};}
+    return {project,out,right,up,scale,w,h};
+  }
+
+  function buildScene(index,projector){
+       const commands=[];
+    const addFace=(v,col,alpha=1,edge=false)=>{
+      const normal=norm(cross(sub(v[1],v[0]),sub(v[2],v[0])));
+      const light=norm([-0.45,-0.65,0.9]);
+      const shade=0.72+0.28*Math.abs(dot(normal,light));
+      const pts=v.map(projector.project);
+      commands.push({kind:'face',pts,depth:pts.reduce((s,p)=>s+p.d,0)/pts.length,col:color(col,shade),alpha,edge});
+    };
+    const addLine=(v,col,width=1,alpha=1,dashed=false)=>{
+      const pts=v.map(projector.project);
+      commands.push({kind:'line',pts,depth:pts.reduce((s,p)=>s+p.d,0)/pts.length+0.015,col:color(col),alpha,width,dashed});
+    };
+    function ring(r,ri,z0,z1,col,origin,opts={}) {
+      const cut=opts.cut??false,alpha=opts.alpha??1;
+      const start=cut?(-Math.PI/2+Math.PI*0.34):0;
+      const span=cut?Math.PI*1.32:Math.PI*2;
+      const n=opts.segments || (cut?28:36);
+      const p=(rr,a,z)=>[origin[0]+rr*Math.cos(a),origin[1]+rr*Math.sin(a),origin[2]+z];
+      for(let j=0;j<n;j++){
+        const a=start+span*j/n,b=start+span*(j+1)/n;
+        addFace([p(r,a,z0),p(r,b,z0),p(r,b,z1),p(r,a,z1)],col,alpha);
+        if(ri>0)addFace([p(ri,b,z0),p(ri,a,z0),p(ri,a,z1),p(ri,b,z1)],col,alpha);
+        addFace([p(ri,a,z1),p(r,a,z1),p(r,b,z1),p(ri,b,z1)],col,alpha);
+        addFace([p(ri,b,z0),p(r,b,z0),p(r,a,z0),p(ri,a,z0)],col,alpha);
+      }
+      if(cut)for(const a of [start,start+span])addFace([p(ri,a,z0),p(r,a,z0),p(r,a,z1),p(ri,a,z1)],mix(col,palette.fg,0.12),alpha);
+      for(const z of [z0,z1]){
+        const pts=[];for(let k=0;k<=n;k++)pts.push(p(r,start+span*k/n,z));
+        addLine(pts,palette.muted,0.7,0.6);
+      }
+    }
+    function box(x0,y0,z0,x1,y1,z1,col,alpha=1){
+      const v=[[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];
+      for(const f of [[0,1,2,3],[4,7,6,5],[0,4,5,1],[1,5,6,2],[2,6,7,3],[3,7,4,0]])addFace(f.map(i=>v[i]),col,alpha);
+    }
+
+   const drive=world.drive(),neutral=mix(palette.surface,palette.fg,.26),glass=mix(palette.surface,palette.bg,.5),steel=mix(palette.fg,palette.bg,.48);
+   function rotatedBox(x0,y0,z0,x1,y1,z1,col,alpha,transform){const v=[[x0,y0,z0],[x1,y0,z0],[x1,y1,z0],[x0,y1,z0],[x0,y0,z1],[x1,y0,z1],[x1,y1,z1],[x0,y1,z1]];for(const f of [[0,1,2,3],[4,7,6,5],[0,4,5,1],[1,5,6,2],[2,6,7,3],[3,7,4,0]])addFace(f.map(i=>transform(v[i])),col,alpha);}
+   function outline(x0,y,z0,x1,z1,col,alpha,width,transform){addLine([[x0,y,z0],[x1,y,z0],[x1,y,z1],[x0,y,z1],[x0,y,z0]].map(transform),col,width,alpha);}
+   const theta=l=>(l+.5)*Math.PI/4;
+   const radial=l=>v=>{const t=theta(l),r=v[0]+RIN;return[r*Math.cos(t)-v[1]*Math.sin(t),r*Math.sin(t)+v[1]*Math.cos(t),BASE+v[2]];};
+   function branchCoil(l,detail=false){
+    const a=theta(l),r=E.SMALL_RADIUS,origin=detail?[r-RIN-W/2,0,-BASE]:[r*Math.cos(a),r*Math.sin(a),0];
+    const start=commands.length,c=drive.small?palette.small:mix(palette.small,palette.muted,.72);
+    // All nine winding planes are horizontal; every winding axis is world +Z.
+    ring(3,0,227,242,steel,origin,{segments:20});
+    ring(9,4,232,240,c,origin,{segments:32,alpha:.95});
+    ring(10,4,231,232,neutral,origin,{segments:32,alpha:.8});ring(10,4,240,241,neutral,origin,{segments:32,alpha:.8});
+    for(let i=0;i<9;i++){const pts=[];for(let k=0;k<=40;k++){const t=k*Math.PI/20;pts.push([origin[0]+9.03*Math.cos(t),origin[1]+9.03*Math.sin(t),origin[2]+232.4+i*.83]);}addLine(pts,palette.small,.65,drive.small?.85:.25);}
+    const ax=[origin[0],origin[1],origin[2]+246];addLine([[origin[0],origin[1],origin[2]+227],ax],palette.muted,.8,.65,true);addLine([[ax[0]-1.2,ax[1],ax[2]-2],ax,[ax[0]+1.2,ax[1],ax[2]-2]],palette.muted,.8,.65);
+    for(let i=start;i<commands.length;i++){commands[i].coilID='S'+(l+1);commands[i].coilAxis=[0,0,1];commands[i].coilCenter=[r*Math.cos(a),r*Math.sin(a),236];}
+   }
+   // Each sheet stays planar. Its cut lower edge follows the hemisphere section.
+   function profile(y){const p=[[0,y,H],[W,y,H]];for(let j=40;j>=0;j--){const x=W*j/40;p.push([x,y,E.floor(x)]);}return p;}
+   function sheet(y0,y1,col,alpha,tr,frame,width){
+    for(let j=0;j<40;j++){const x0=W*j/40,x1=W*(j+1)/40,f0=E.floor(x0),f1=E.floor(x1);for(const y of [y0,y1])addFace([[x0,y,f0],[x1,y,f1],[x1,y,H],[x0,y,H]].map(tr),col,alpha);addFace([[x0,y0,f0],[x1,y0,f1],[x1,y1,f1],[x0,y1,f0]].map(tr),col,alpha);}
+    addLine([...profile(y0),profile(y0)[0]].map(tr),frame,width,.75);
+    addLine([...profile(y1),profile(y1)[0]].map(tr),frame,width,.45);
+   }
+   function curvedRail(tr,col){for(let j=0;j<48;j++){const x0=W*j/48,x1=W*(j+1)/48,f0=E.floor(x0),f1=E.floor(x1);for(const y of [-2.9,2.9])addFace([[x0,y,f0-1.2],[x1,y,f1-1.2],[x1,y,f1],[x0,y,f0]].map(tr),col,.65);addFace([[x0,-2.9,f0-1.2],[x1,-2.9,f1-1.2],[x1,2.9,f1-1.2],[x0,2.9,f0-1.2]].map(tr),col,.65);addFace([[x0,-2.9,f0],[x1,-2.9,f1],[x1,2.9,f1],[x0,2.9,f0]].map(tr),col,.55);}}
+   function chamber(l,detail=false){
+    const tr=detail?v=>[v[0]-W/2,v[1],v[2]]:radial(l),chosen=state.selected===l,frame=chosen?palette.spacer:palette.muted,front=detail&&state.explode?-15:-2.9;
+    sheet(1.4,2.9,glass,.035,tr,frame,chosen?1.3:.7);
+    sheet(front,front+1.5,glass,.025,tr,frame,chosen?1.3:.7);
+    // Thin side spacers close the 2.8 mm operating cavity; front panel opens only in the detail.
+    curvedRail(tr,neutral);
+    for(const b of [[-1,-2.9,H,W+1,2.9,H+1],[-1,-2.9,E.floor(0)-1,0,2.9,H],[W,-2.9,E.floor(W)-1,W+1,2.9,H]])rotatedBox(...b,neutral,.55,tr);
+    for(const p of world.layers[l]){
+     const xyz=tr([p.x,0,p.z]),v=projector.project(xyz);
+     commands.push({kind:'ball',id:p.id,world:xyz,pts:[v],depth:v.d,col:color(steel),radius:projector.scale,alpha:1});
+    }
+    // Pole underside and the transparent ceiling remain fixed during operation.
+    if(detail){rotatedBox(-1,-4.5,H+2,W+1,4.5,H+5,steel,.80,tr);branchCoil(l,true);}
+    if(detail){
+     if(drive.big>.05)for(const x of [15,36,58,80]){
+      const bottom=Math.max(E.floor(x)+8,H-34);addLine([[x,0,bottom],[x,0,H-7]].map(tr),palette.coil,1,.23);
+      addLine([[x-1.3,0,H-10],[x,0,H-7],[x+1.3,0,H-10]].map(tr),palette.coil,1,.35);
+     }
+     if(drive.small>.05)for(const x of [78,86,93]){const z0=Math.max(E.floor(x)+4,H-18);addLine([[x,0,z0],[x,0,H-6]].map(tr),palette.small,1,.32);addLine([[x-1,0,H-9],[x,0,H-6],[x+1,0,H-9]].map(tr),palette.small,1,.45);}
+     const shell=[];for(let j=0;j<=48;j++){const x=W*j/48;shell.push([x,0,130-Math.sqrt(130**2-(RIN+x)**2)]);}addLine(shell.map(tr),palette.muted,.9,.6,true);
+     if(state.explode)for(const x of [0,W])for(const z of [E.floor(x),H])addLine([[x,-1.4,z],[x,front+1.5,z]].map(tr),palette.muted,.7,.4,true);
+    }
+   }
+   if(index===0){
+    if(state.view!=='top'){
+     box(-150,-140,0,150,140,14,neutral);ring(16,0,14,120,neutral,[0,0,0],{segments:24});
+     for(const x of [-6,6])addLine([[x,0,20],[x,0,121],[x,0,239]],drive.big>.05?palette.coil:palette.muted,1,.7);
+     box(38,-90,14,78,-60,24,palette.surface);box(88,-86,14,112,-62,24,palette.surface);addLine([[78,-74,20],[88,-74,20]],palette.muted,1,.7);
+    }
+    box(-135,-135,250,135,135,258,neutral,state.open?.045:.42);
+    for(let j=0;j<16;j++){const a=j*Math.PI/8,pts=[];for(let k=0;k<=24;k++){const t=k*Math.PI/48;pts.push([130*Math.sin(t)*Math.cos(a),130*Math.sin(t)*Math.sin(a),250-130*Math.cos(t)]);}addLine(pts,palette.muted,.8,state.open?.12:.48);}
+    for(const z of [168,205,250]){const r=Math.sqrt(130**2-(250-z)**2),pts=[];for(let k=0;k<=64;k++){const t=k*Math.PI/32;pts.push([r*Math.cos(t),r*Math.sin(t),z]);}addLine(pts,palette.muted,.7,state.open?.14:.34);}
+    // A single central winding with shared upper pole arms: conceptual magnetic circuit.
+    ring(9,0,228,248,steel,[0,0,0],{segments:24});const bigStart=commands.length;ring(24,10,232,246,drive.big>.05?palette.coil:mix(palette.coil,palette.muted,.65),[0,0,0],{segments:36,alpha:.94});for(let i=bigStart;i<commands.length;i++){commands[i].coilID='M0';commands[i].coilAxis=[0,0,1];commands[i].coilCenter=[0,0,239];}
+    ring(26,9,230,232,neutral,[0,0,0],{segments:32});ring(26,9,246,248,neutral,[0,0,0],{segments:32});
+    for(let j=0;j<12;j++){const pts=[];for(let k=0;k<=48;k++){const a=k*Math.PI/24;pts.push([24.02*Math.cos(a),24.02*Math.sin(a),232.5+j*1.1]);}addLine(pts,palette.coil,.65,drive.big>.05?.85:.35);}
+    addLine([[0,0,228],[0,0,249]],palette.muted,.8,.65,true);addLine([[-1.2,0,247],[0,0,249],[1.2,0,247]],palette.muted,.8,.65);
+    ring(124,0,248,250,steel,[0,0,0],{segments:48,alpha:state.open?.045:.3});ring(124,121,223,226,steel,[0,0,0],{segments:48,alpha:.3});
+    ring(28,0,227,230,steel,[0,0,0],{segments:24,alpha:.82});
+    for(let l=0;l<8;l++){
+     const a=theta(l),tr=v=>[v[0]*Math.cos(a)-v[1]*Math.sin(a),v[0]*Math.sin(a)+v[1]*Math.cos(a),v[2]];
+     rotatedBox(18,-4.5,227,120,4.5,230,steel,.72,tr);
+     const pa=a+Math.PI/8;ring(1.5,0,226,248,steel,[122.5*Math.cos(pa),122.5*Math.sin(pa),0],{segments:6,alpha:.45});
+     chamber(l);
+     branchCoil(l);
+    }
+   }else chamber(state.selected,true);
+   commands.sort((a,b)=>a.depth-b.depth);meshes[index]=commands;return{commands,drive};
+  }
+    function text(ctx,s,x,y,small=false,align='left',muted=false){
+    ctx.globalAlpha=1;ctx.font='400 '+(small?Math.max(12,fontSize-1):fontSize)+'px "Microsoft YaHei",system-ui,sans-serif';
+    ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillStyle=color(muted?palette.muted:palette.fg);ctx.fillText(s,x,y);
+  }
+  function screenLine(ctx,points,col,width=1,dash=[]){
+    ctx.globalAlpha=1;ctx.strokeStyle=color(col);ctx.lineWidth=width;ctx.setLineDash(dash);
+    ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));ctx.stroke();ctx.setLineDash([]);
+  }
+  function screenArrow(ctx,a,b,col){
+    screenLine(ctx,[a,b],col,1.6);const t=Math.atan2(b.y-a.y,b.x-a.x),L=7;
+    screenLine(ctx,[{x:b.x-L*Math.cos(t-.45),y:b.y-L*Math.sin(t-.45)},b,{x:b.x-L*Math.cos(t+.45),y:b.y-L*Math.sin(t+.45)}],col,1.6);
+  }
+
+  function annotations(index,cam){
+   const ctx=contexts[index],{w,h}=sizes[index];labelRegions[index]=[];
+   const leader=(s,p,side,y)=>{const a=cam.project(p),x=side==='left'?8:w-8;ctx.font='400 '+Math.max(12,fontSize-1)+'px "Microsoft YaHei",system-ui,sans-serif';const tw=ctx.measureText(s).width,target={x:side==='left'?x+tw+5:x-tw-5,y};screenLine(ctx,[a,{x:target.x,y:a.y},target],palette.muted,.7);text(ctx,s,x,y,true,side==='left'?'left':'right');labelRegions[index].push({x:side==='left'?x:x-tw,y:y-9,w:tw,h:18,text:s});};
+   if(index===0){
+    const top=state.view==='top';
+    if(top){text(ctx,'俯视：8腔等分45°',8,18,true,'left');}
+    else{const sa=(state.selected+.5)*Math.PI/4;leader('大线圈 M0 ×1',[24,0,239],'left',38);leader(w<400?'端部小线圈 ×8':'8只端部小线圈（水平）',[E.SMALL_RADIUS*Math.cos(sa),E.SMALL_RADIUS*Math.sin(sa),236],'right',h*.17);}
+    for(let l=0;l<8;l++){
+     const a=(l+.5)*Math.PI/4,r=120,p=cam.project([r*Math.cos(a),r*Math.sin(a),top?216:211]);
+     text(ctx,String(l+1),p.x,p.y,true,'center',l!==state.selected);
+    }
+    if(!top)leader('固定柱身',[16,0,75],'left',h*.74);
+    text(ctx,top?'8只小线圈在外端R118 · 轴均竖直':'9只线圈均水平 · 轴向均为Z',w/2,h-15,true,'center',true);
+   }else{
+    text(ctx,'↑ Z 竖向',w-8,18,true,'right',true);
+    leader('端部小线圈 S'+(state.selected+1),[E.SMALL_RADIUS-RIN-W/2,0,117],'left',37);
+    const yf=state.explode?-15:-2.9;
+    leader(state.explode?'前板拆开观察':'透明前板',[28,yf,78],'right',h*.33);
+    leader('弧底随形 R126',[6,0,E.floor(54)],'right',h*.75);
+    const p=cam.project([41,-5,91]),phase=world.drive();
+    if(phase.big>.7)screenArrow(ctx,{x:p.x,y:p.y+16},{x:p.x,y:p.y-16},palette.coil);
+    else if(phase.small>.7&&world.scenario==='normal')screenArrow(ctx,{x:p.x,y:p.y+16},{x:p.x,y:p.y-16},palette.small);
+    else if(world.stats(state.selected).meanHeight>25)screenArrow(ctx,{x:p.x,y:p.y-16},{x:p.x,y:p.y+16},palette.particle);
+    text(ctx,'净宽96 · 净隙2.8 · 珠径2 mm',w/2,h-15,true,'center',true);
+   }
+  }
+  function draw(index){
+   const ctx=contexts[index],{w,h}=sizes[index];ctx.clearRect(0,0,w,h);if(w<32||h<32)return;
+   const bounds=index===0?(state.view==='top'?{min:[-135,-135,120],max:[135,135,258]}:{min:[-150,-140,0],max:[150,140,258]}):{min:[-50,state.explode?-16:-12,0],max:[62,12,128]};
+   const cam=camera(index,bounds),scene=buildScene(index,cam);ctx.lineCap='round';ctx.lineJoin='round';
+   for(const c of scene.commands){ctx.globalAlpha=c.alpha;
+    if(c.kind==='ball'){
+     const p=c.pts[0],r=Math.max(.8,c.radius),steel=mix(palette.fg,palette.bg,.32),grad=ctx.createRadialGradient(p.x-r*.3,p.y-r*.35,r*.05,p.x,p.y,r);
+     grad.addColorStop(0,color(mix(steel,palette.bg,.85)));grad.addColorStop(.48,color(steel));grad.addColorStop(1,color(mix(steel,palette.fg,.4)));ctx.fillStyle=grad;ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();continue;
+    }
+    ctx.beginPath();c.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+    if(c.kind==='face'){ctx.closePath();ctx.fillStyle=c.col;ctx.fill();}else{ctx.strokeStyle=c.col;ctx.lineWidth=c.width;ctx.setLineDash(c.dashed?[4,4]:[]);ctx.stroke();}
+   }
+   ctx.globalAlpha=1;ctx.setLineDash([]);annotations(index,cam);el(index===0?'vr-poster-whole':'vr-poster-detail').hidden=true;
+  }
+  let timingWidth=0,timingKey='';
+  function drawTiming(d){const svg=el('vr-timing'),w=Math.max(260,svg.getBoundingClientRect().width||sizes[0].w),left=76,right=w-12,t=world.timing,xx=v=>left+(right-left)*v/t.period,key=JSON.stringify(t),fmt=v=>Number(v.toFixed(1));
+   if(Math.abs(w-timingWidth)>1||!svg.children.length||key!==timingKey){timingWidth=w;timingKey=key;svg.replaceChildren();svg.setAttribute('viewBox','0 0 '+w+' 112');const ns='http://www.w3.org/2000/svg';const n=(tag,a,s)=>{const e=document.createElementNS(ns,tag);for(const [k,v]of Object.entries(a))e.setAttribute(k,String(v));if(s)e.textContent=s;svg.appendChild(e);return e;};
+    n('title',{},'自动时序：大线圈'+fmt(t.bigOn)+'至'+fmt(t.bigOff)+'秒开，小线圈'+fmt(t.smallOn)+'至'+fmt(t.smallOff)+'秒开');
+    for(const [label,y,a,b,fill]of [['M0大',24,t.bigOn,t.bigOff,'var(--viz-series-1)'],['小×8',60,t.smallOn,t.smallOff,'var(--viz-series-4)']]){n('text',{x:2,y:y+12,fill:'currentColor','font-size':14},label);n('rect',{x:left,y,width:right-left,height:16,fill:'var(--muted)'});n('rect',{x:xx(a),y,width:xx(b)-xx(a),height:16,fill});}
+    const ticks=[];for(const v of [0,t.bigOn,t.smallOn,t.bigOff,t.smallOff,t.period]){if(v===t.period){if(ticks.length&&xx(v)-xx(ticks.at(-1))<48)ticks.pop();ticks.push(v);}else if(!ticks.length||xx(v)-xx(ticks.at(-1))>=48)ticks.push(v);}for(const v of ticks)n('text',{x:xx(v),y:101,fill:'currentColor','font-size':14,'text-anchor':v===0?'start':v===t.period?'end':'middle'},fmt(v)+'s');
+    n('line',{'data-timing-marker':'1',x1:xx(0),x2:xx(0),y1:12,y2:82,stroke:'currentColor','stroke-width':1.4});
+   }
+   const marker=svg.querySelector('[data-timing-marker]');marker.setAttribute('x1',xx(d.progress*t.period));marker.setAttribute('x2',xx(d.progress*t.period));el('vr-timing-label').textContent=world.mode==='auto'?'自动通断时序（模型演示秒数）':'自动时序参考（当前手动输入）';
+  }
+  function render(){
+   draw(0);draw(1);const drive=world.drive(),st=world.stats(state.selected),level=Math.round(drive.level*100);
+   el('vr-phase').textContent=drive.phase;el('vr-big').textContent=drive.big?'M0大线圈：通电':'M0大线圈：断电';el('vr-small').textContent=drive.small?'S1至S8小线圈：通电':'S1至S8小线圈：断电';
+   el('vr-height').textContent='平均标高 '+(BASE+st.meanHeight).toFixed(1)+' mm · 上半区 '+st.up+'/'+state.beadCount+'颗';el('vr-detail-title').textContent='第'+(state.selected+1)+'腔 · '+state.beadCount+'颗铁珠';
+   el('vr-scrub').value=String(Math.round(drive.progress*1000));el('vr-time').textContent=(world.time%world.timing.period).toFixed(1)+' / '+world.timing.period.toFixed(1)+' s';drawTiming(drive);
+   if(lastPhase!==drive.phase){el('vr-live').textContent=drive.phase;lastPhase=drive.phase;}
+   const status='三维已启动 · '+(state.playing?'慢放示意中':'已暂停');if(el('vr-startup').textContent!==status)el('vr-startup').textContent=status;dirty=false;
+  }
+  const raf=window.requestAnimationFrame?.bind(window)||(cb=>window.setTimeout(()=>cb(performance.now()),33));
+  function tick(now){const dt=last?clamp((now-last)/1000,0,.08):0;last=now;if(state.playing){accumulator=Math.min(.16,accumulator+dt*state.speed);const budgetStart=performance.now();let steps=0;while(accumulator>=E.STEP&&steps<4){world.step();accumulator-=E.STEP;steps++;if(performance.now()-budgetStart>=8)break;}dirty=true;}if(dirty&&now-lastDraw>=50){render();lastDraw=now;}clockId=raf(tick);}
+  function setView(v){state.view=v;state.cameras[0]={...defaults[0],...(v==='top'?{az:0,el:1.49}:v==='front'?{az:0,el:0}:{})};dirty=true;}
+  function seek(t){world.time=0;world.pending=0;const fresh=window.VerticalGranular.createWorld({beadCount:state.beadCount});for(let l=0;l<8;l++)world.layers[l].forEach((p,i)=>Object.assign(p,fresh.layers[l][i]));world.mode='auto';world.advance(t);accumulator=0;last=0;sync();render();}
+  function setBeadCount(n){if(!Number.isInteger(n)||n<E.MIN_COUNT||n>E.MAX_COUNT)return false;state.beadCount=n;world=E.createWorld({timing:world.timing,beadCount:n});world.scenario=el('vr-scenario').value;seek(.1);save();return true;}
+  el('vr-count').addEventListener('input',e=>{setBeadCount(Number(e.target.value));});
+  el('vr-play').addEventListener('click',()=>{state.playing=!state.playing;last=0;sync();dirty=true;});
+  el('vr-mode').addEventListener('change',e=>{world.mode=e.target.value;state.playing=true;last=0;sync();dirty=true;});
+  el('vr-scenario').addEventListener('change',e=>{world.scenario=e.target.value;seek(.1);sync();save();});
+  el('vr-restart').addEventListener('click',()=>{seek(.1);state.playing=true;sync();});
+  for(const [id,key]of [['vr-stage1','smallOn'],['vr-stage2','bigOff'],['vr-stage3','smallOff'],['vr-stage4','period']])el(id).addEventListener('click',()=>{state.playing=false;seek(world.timing[key]-.05);});
+  el('vr-preset').addEventListener('change',e=>{const preset=e.target.value;if(!window.RelayTimingData[preset])return;state.timingPreset=preset;world.timing={...window.RelayTimingData[preset].timing};seek(.1);save();});
+  for(const key of Object.keys(durationLimits))el('vr-duration-'+key).addEventListener('input',e=>{const d=getDurations();d[key]=Number(e.target.value);setDurations(d);});
+  el('vr-speed').addEventListener('change',e=>{state.speed=Number(e.target.value);save();});
+  el('vr-select').addEventListener('change',e=>{state.selected=Number(e.target.value);dirty=true;save();});
+  el('vr-view').addEventListener('change',e=>{setView(e.target.value);save();});
+  for(const k of ['open','explode'])el('vr-'+k).addEventListener('change',e=>{state[k]=e.target.checked;dirty=true;save();});
+  el('vr-fit').addEventListener('click',()=>{state.cameras=defaults.map(c=>({...c}));setView(state.view);resize();render();save();});
+  el('vr-scrub').addEventListener('input',e=>{state.playing=false;seek(Number(e.target.value)/1000*(world.timing.period-.001));});
+  canvases.forEach((c,i)=>{let drag=null;c.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,...state.cameras[i]};c.setPointerCapture?.(e.pointerId);});c.addEventListener('pointermove',e=>{if(!drag)return;state.cameras[i].az=drag.az+(e.clientX-drag.x)*.008;state.cameras[i].el=clamp(drag.el+(e.clientY-drag.y)*.006,-.15,1.5);dirty=true;});const stop=()=>{if(drag){drag=null;save();}};c.addEventListener('pointerup',stop);c.addEventListener('pointercancel',stop);c.addEventListener('lostpointercapture',stop);window.addEventListener('blur',stop);c.addEventListener('wheel',e=>{e.preventDefault();state.cameras[i].zoom=clamp(state.cameras[i].zoom*Math.exp(-e.deltaY*.001),.65,1.6);dirty=true;save();},{passive:false});});
+  window.addEventListener('resize',resize);window.addEventListener('openai:set_globals',e=>{applySaved(e.detail?.globals?.widgetState);updateTheme();});if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(root);if(typeof MutationObserver!=='undefined')new MutationObserver(updateTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
+  applySaved(window.openai?.widgetState);sync();updateTheme();resize();render();clockId=raf(tick);
+  window.__radialIron3D={state,get world(){return world;},render,resize,seek,setView,setDurations,getDurations,setBeadCount,geometry:()=>meshes,labels:()=>labelRegions,advance:t=>{world.advance(t);render();},dimensions:{chambers:8,get beadsPerChamber(){return state.beadCount;},get totalBeads(){return state.beadCount*8;},beadDiameter:2,clearGap:2.8,clearWidth:W,maxClearHeight:H-E.floor(0),minClearHeight:H-E.floor(W),floorRadius:126,shellRadius:130,sheet:1.5,radialMin:RIN,radialMax:RIN+W,floorMinZ:BASE+E.floor(0),floorMaxZ:BASE+E.floor(W),ceilingZ:225,angularPitch:45,commonCoils:1,branchCoils:8,branchCoilRadius:E.SMALL_RADIUS,coilAxesParallel:true,coilAxis:[0,0,1],branchCoilWinding:{outerDiameter:18,innerDiameter:8,height:8,z0:232,z1:240},branchCore:{diameter:6,z0:227,z1:242}},stop:()=>{state.playing=false;window.cancelAnimationFrame?.(clockId);}};
+  }catch(error){const n=root.querySelector('#vr-startup');if(n){n.textContent='初始化失败：'+(error?.message||String(error));n.setAttribute('role','alert');}console.error(error);}
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',launch,{once:true});else launch();
 })();

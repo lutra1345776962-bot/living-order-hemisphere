@@ -1,19 +1,1654 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>半球柱头 · 柱身向上干扰 · 20×20 V6</title><meta name="description" content="固定半球柱头，20×20共400颗磁体颗粒。水滴式脉冲从柱身连接处向上输入，颗粒只沿竖向运动。"><style>
-:root{--bg:#f1eee5;--ink:#2b403d;--muted:#697b72;--line:#ced7cd;--green:#338879;--blue:#5688b7;--gold:#d9ad61;--paper:#fcfbf6}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.7 "Segoe UI","Microsoft YaHei",sans-serif}main{max-width:1460px;margin:auto;padding:28px 38px 40px}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button,input,select,a{touch-action:manipulation}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--green);outline-offset:3px}a{color:var(--green);text-underline-offset:4px}.top{display:flex;justify-content:space-between;gap:18px;border-bottom:1px solid var(--ink);padding-bottom:12px;font-size:10px;letter-spacing:.12em;color:var(--muted)}header{display:grid;grid-template-columns:1.2fr 1fr;align-items:end;gap:45px;padding:24px 0}.eyebrow{font-size:10px;letter-spacing:.14em;color:var(--muted)}h1{font:400 clamp(34px,4.2vw,56px)/1.25 Georgia,SimSun,serif;margin:7px 0 12px}header p{font-size:13px;color:var(--muted);margin:0}.intro{border-left:3px solid #aa8e55;padding-left:15px}.intro b{color:var(--ink)}.visual{background:#142f37;border:1px solid #36515a;min-width:0}.visual-top{padding:13px 17px 0;display:flex;justify-content:space-between;align-items:center;gap:12px;color:#d8e6df;font-size:12px}.visual-top small{font-size:10px;color:#9cb8b7}.view-buttons{display:flex;gap:4px;flex-wrap:wrap}.view-buttons button{border:1px solid #5c787c;color:#c8dbd4;background:transparent;padding:4px 9px;font-size:11px}.view-buttons button[aria-pressed=true]{background:#3b5d62;color:#fff}.main-canvas{height:570px}canvas{display:block;width:100%;height:100%}.visual-footer{border-top:1px solid #36515a;color:#adc4be;padding:8px 17px;font-size:11px;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:17px 0 12px}.btn{border:1px solid var(--line);background:var(--paper);padding:6px 12px;min-height:36px;font-size:12px}.btn.primary{background:var(--ink);border-color:var(--ink);color:white}.controls label{font-size:12px;display:flex;align-items:center;gap:5px}select{border:1px solid var(--line);background:var(--paper);padding:6px;font-size:12px;min-height:36px}input[type=checkbox],input[type=range]{accent-color:var(--green)}.clock{font-size:13px;font-variant-numeric:tabular-nums;margin-left:auto}.parameters{display:grid;grid-template-columns:repeat(3,1fr);gap:25px;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.range-label{font-size:12px;display:flex;justify-content:space-between;gap:12px}.range-label output{color:#ae7044;font-variant-numeric:tabular-nums}.parameters input[type=range]{display:block;width:100%;margin:8px 0}.parameters p{font-size:10px;color:var(--muted);margin:0}.phases{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--line);margin:19px 0 21px}.phase{background:transparent;border:0;border-top:2px solid transparent;text-align:left;padding:11px}.phase[aria-pressed=true]{border-top-color:var(--green);background:#e2e9dd}.phase small{display:block;font-size:10px;color:var(--muted)}.phase b{display:block;font-size:14px;font-weight:500}.phase span{font-size:11px;color:var(--muted)}.lower{display:grid;grid-template-columns:1.15fr 1fr;gap:20px}.panel{background:var(--paper);border:1px solid var(--line);min-width:0}.panel-head{padding:13px 16px 0;display:flex;justify-content:space-between;gap:15px;font-size:13px}.panel-head small{color:var(--muted);font-size:10px}.local-canvas,.profile-canvas{height:235px}.caption{padding:8px 15px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:23px 0}.stat{padding:12px 15px;border-right:1px solid var(--line)}.stat:last-child{border:0}.stat small{font-size:11px;color:var(--muted);display:block}.stat strong{font-size:25px;font-weight:450;display:block;line-height:1.5;font-variant-numeric:tabular-nums}.stat span{font-size:10px;color:var(--muted)}.section-head{font-size:16px;font-weight:600;margin:24px 0 12px}.sensor-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.sensor-controls label{font-size:12px;display:flex;gap:6px;align-items:center}.badge{font-size:11px;color:#a7734c}.status{min-height:20px;font-size:11px;color:var(--muted);margin:9px 0}.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0 23px}.chain div{border-bottom:2px solid var(--line);padding-bottom:11px}.chain small{font-size:10px;color:var(--muted)}.chain p{font-size:13px;margin:4px 0}.explain{display:grid;grid-template-columns:1fr 1fr;gap:35px}.explain h3{font-size:15px;font-weight:600;margin:0 0 10px}.explain p{font-size:12px;color:var(--muted);margin:0 0 12px}.spec{display:grid;grid-template-columns:90px 1fr;gap:15px;border-top:1px solid var(--line);padding:8px 0;font-size:12px}.spec span:first-child{color:var(--muted)}.note{border-left:3px solid #aa8e55;padding-left:12px;margin-top:12px}.note b{font-size:12px}.note p{margin-top:5px}.foot{border-top:1px solid var(--line);padding-top:16px;margin-top:25px;display:grid;grid-template-columns:1.3fr 1fr;gap:25px;font-size:11px;color:var(--muted)}.foot p{margin:0 0 8px}button:disabled,input:disabled{opacity:.45;cursor:default}@media(max-width:850px){main{padding:22px}.main-canvas{height:510px}.parameters{gap:15px}.visual-top{align-items:start}}@media(max-width:650px){main{padding:17px 13px}header,.lower,.explain,.foot{grid-template-columns:1fr;gap:19px}.main-canvas{height:440px}.visual-top{padding:12px 12px 0;display:block}.visual-top small{display:none}.view-buttons{margin-top:9px}.visual-footer{padding:8px 12px}.parameters{grid-template-columns:1fr;gap:12px}.phases{grid-template-columns:repeat(3,1fr)}.chain{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.stat{border-bottom:1px solid var(--line)}.clock{margin-left:0}.btn,select{min-height:44px}.view-buttons button{min-height:36px}.top{font-size:9px}}@media print{.controls,.parameters,.phases,.sensor-controls{display:none}.visual,.lower{break-inside:avoid}}
-</style></head><body><main>
-<div class="top"><span>LIVING ORDER / HEMISPHERICAL CAPITAL</span><span>柱身 → 柱头 · 20×20 · V6</span></div>
-<header><div><div class="eyebrow">FIXED HEMISPHERE / VERTICAL PARTICLE MOTION</div><h1>从柱身滴入，<br>让涟漪向柱头传播。</h1><p>半球轮廓保持固定，网格减少为 20×20，共 400 颗。干扰从柱身连接处向上输入，底端先上移、再回弹，传播至半球上部。</p></div><div class="intro"><p><b>默认正立面、20×20 网格、柱身向上输入。</b> 蓝色代表下移，金色代表上移；灰色点是固定基准。主视图不旋转颗粒，也不改变半球轮廓。</p><p style="margin-top:9px">水滴符号表示传感器触发的向上脉冲，不表示真实液滴逆重力上升。外壳固定，颗粒仅上下运动。</p></div></header>
-<section class="visual"><div class="visual-top"><div><b>柱头立面 / 颗粒只作竖向位移</b> <small>半球轮廓与竖向基准固定</small></div><div class="view-buttons"><button id="play-top">暂停</button><button data-view="front" aria-pressed="true">正立面</button><button data-view="side" aria-pressed="false">侧立面</button><button data-view="iso" aria-pressed="false">轴测辅助</button></div></div><div class="main-canvas"><canvas id="main-view" role="img" aria-label="固定半球形柱头的正立面，干扰从柱身向柱头输入，内部颗粒沿固定竖向导轨先上移、反向回弹并向上传播。"></canvas></div><div class="visual-footer"><span>固定轮廓＋灰色基准点；干扰入口固定在柱身连接处。点击画面可从同一入口再次滴入。</span><span id="phase-label">冲击前</span></div></section>
-<div class="controls"><button class="btn primary" id="impact">由柱身滴入</button><button class="btn" id="play">暂停</button><button class="btn" id="reset">静止并重播</button><span>形态：下垂半球</span><input id="orientation" type="hidden" value="down"><label>速度 <select id="speed"><option value="0.25">慢放 0.25×</option><option value="0.5" selected>0.5×</option><option value="1">1×</option></select></label><label><input id="coupled" type="checkbox" checked>邻域传播</label><label><input id="loop" type="checkbox" checked>循环柱身滴入</label><span id="clock" class="clock">0.0 s</span></div>
-<div class="parameters"><div><label class="range-label" for="strength"><span>冲击倍率</span><output id="strength-value">2.80×</output></label><input id="strength" type="range" min="100" max="550" step="10" value="280"><p>只从底端三圈直接输入向上脉冲；上方单元依靠邻域传播响应，整体不移动。</p></div><div><label class="range-label" for="damping"><span>衰减系数</span><output id="damping-value">1.00×</output></label><input id="damping" type="range" min="40" max="220" value="100"><p>控制起伏衰减。系数、位移与时间均为模型单位。</p></div><div><label class="range-label" for="reading"><span id="reading-label">模拟力学传感器读数</span><output id="reading-value">75.0 N</output></label><input id="reading" type="range" min="0" max="100" value="75"><p id="reading-range">0–100 N 为归一化示例范围，未连接硬件。</p></div></div>
-<div class="phases"><button class="phase" data-time="0.45" aria-pressed="true"><small>01 / COLUMN INPUT</small><b>柱内上行</b><span>水滴式脉冲由下向上</span></button><button class="phase" data-time="1.04" aria-pressed="false"><small>02 / UPWARD INPUT</small><b>连接处上冲</b><span>底端颗粒先向上移动</span></button><button class="phase" data-time="1.28" aria-pressed="false"><small>03 / REBOUND</small><b>反向回弹</b><span>连接处反向，邻居响应</span></button><button class="phase" data-time="2.8" aria-pressed="false"><small>04 / BOTTOM TO TOP</small><b>向上传播</b><span>波峰波谷由连接处向上展开</span></button><button class="phase" data-time="4.8" aria-pressed="false"><small>05 / DECAY</small><b>起伏衰减</b><span>颗粒回归固定基准附近</span></button></div>
-<div class="lower"><div class="panel"><div class="panel-head"><b>立面局部放大 / 固定导轨</b><small>位置不横移，只有高度改变</small></div><div class="local-canvas"><canvas id="local-view" role="img" aria-label="立面局部放大，灰点为静止基准，各颗粒只沿竖直导轨上下移动。"></canvas></div><div class="caption">蓝＝下移；金＝上移；灰点＝基准。此处选取连接处及上方的 5×5 单元。</div></div><div class="panel"><div class="panel-head"><b>从柱身连接处向上的位移</b><small>子午方向展开</small></div><div class="profile-canvas"><canvas id="profile-view" role="img" aria-label="从柱身连接处到半球顶部，各环带颗粒的竖向位移。"></canvas></div><div class="caption">横轴由柱身连接处指向半球顶部，纵轴为颗粒高度变化；曲线来自同一组计算。</div></div></div>
-<div class="stats"><div class="stat"><small>计算颗粒总数</small><strong>400</strong><span>20 周向 × 20 环带，含背面</span></div><div class="stat"><small>当前运动颗粒</small><strong id="moving-count">0</strong><span>位移绝对值大于 0.004</span></div><div class="stat"><small>最大上移</small><strong id="up-value">0.000</strong><span>模型单位，非实测 mm</span></div><div class="stat"><small>最大下移</small><strong id="down-value">0.000</strong><span>模型单位，非实测 mm</span></div></div>
-<h2 class="section-head">传感器只控制局部冲击，整体结构固定</h2><div class="sensor-controls"><label>来源 <select id="sensor"><option value="force">力学 · 反力</option><option value="light">光学 · 照度</option><option value="temperature">温湿度 · 温度</option><option value="humidity">温湿度 · 相对湿度</option></select></label><label>触发 <select id="trigger"><option value="manual">手动由柱身滴入</option><option value="threshold">读数越阈值</option></select></label><label>阈值 <select id="threshold"><option value="0.4">映射范围 40%</option><option value="0.6" selected>映射范围 60%</option><option value="0.8">映射范围 80%</option></select></label><span class="badge">模拟读数 · 未连接实物</span></div><p class="status" id="status" role="status" aria-live="polite">默认自动慢放。点击“由柱身滴入”或直接点击立面，可观察局部事件。</p>
-<div class="chain"><div><small>01 / SENSOR</small><p>反力或环境读数越阈值</p></div><div><small>02 / LOCAL FIELD</small><p>柱身连接处施加向上及回弹脉冲</p></div><div><small>03 / VERTICAL MOTION</small><p>内部颗粒仅沿导轨升降</p></div><div><small>04 / ELEVATION</small><p>立面波峰波谷从下向上传播</p></div></div>
-<div class="explain"><div><h3>半球柱头的构造提案</h3><p>默认采用下垂半球：上部平圆连接顶板，底部圆弧收束至柱身。透明外壳、承重核心、竖向导轨和线圈全部固定；400 颗磁性颗粒按 20×20 经纬网格分布在壳内半球基准面上。</p><div class="spec"><span>固定外形</span><span>半球轮廓、顶板与柱身不随输入缩放、摆动或变形</span></div><div class="spec"><span>唯一运动</span><span>每颗保持 x、y 不变，仅 z 随时间变化；没有转轴旋转</span></div><div class="spec"><span>立面表达</span><span>用竖向位移、基准点和颜色显示冲击，避免只在俯视中看到圆环</span></div></div><div><h3>形态演示与实体之间</h3><p>本页提高局部冲击倍率，并给颗粒设置 ±0.14 的模型行程限位。输入先使底端三圈颗粒上移，再给出反向回弹；上部颗粒不直接施加脉冲，通过邻域耦合响应。</p><p>传播使用固定半球邻接图上的线性耦合模型，不是完整磁力计算。限位为简化处理，未求解真实碰撞、颗粒避让、导轨摩擦、荷载或驱动功率。</p><div class="note"><b>实体尚需验证</b><p>大行程与密排单元可能相互干涉。需要先做局部小样，核对导轨布置、可用行程、磁极方向与回复力，再确定实际尺寸。</p></div></div></div>
-<footer class="foot"><div><p><b>计算边界：</b>半球形基准点固定，邻居之间的耦合参与传播。未预设逐颗运动相位。强冲击和回弹源项是设计假设，不能据此宣称磁体实物已复现水滴。</p><p>位移、时间、行程均未实体标定，页面不是结构或电磁工程验证。</p></div><div><p><a href="archive/hemisphere-v5.html">查看此前的半球立面 V5</a></p><p><a href="archive/ripple-v4.html">查看此前的平面水滴参考 V4</a></p><p><a href="archive/magnet-v3.html">查看其他固定外壳方案 V3</a></p><p>当前重点：20×20、柱身向上输入、半球立面、颗粒竖向位移。</p></div></footer>
-</main><script>
-/*__ENGINE__*/
-/*__APP__*/
-</script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>端部平行线圈 · 8分支顺序接力</title>
+<style>
+:root {
+  color-scheme: light dark;
+  background-color: var(
+    --background,
+    var(--color-background-primary, light-dark(rgb(255 255 255), rgb(24 24 24)))
+  ) !important;
+
+  /* Agent-facing contract; keep in sync with SKILL.md. */
+  --background: var(
+    --color-background-primary,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --card: color-mix(in oklab, var(--foreground) 5%, var(--background));
+  --card-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --popover: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255), rgb(45 45 45))
+  );
+  --popover-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --primary: var(
+    --color-text-info,
+    light-dark(rgb(27 104 171), rgb(131 195 255))
+  );
+  --primary-foreground: var(
+    --color-text-inverse,
+    light-dark(rgb(255 255 255), rgb(13 13 13))
+  );
+  --secondary: var(
+    --color-background-secondary,
+    light-dark(rgb(255 255 255 / 96%), rgb(54 54 54 / 96%))
+  );
+  --secondary-foreground: var(
+    --color-text-primary,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --muted: color-mix(in srgb, var(--foreground) 10%, transparent);
+  --muted-foreground: var(
+    --color-text-secondary,
+    light-dark(rgb(26 28 31 / 70%), rgb(255 255 255 / 70%))
+  );
+  --accent: var(
+    --color-background-info,
+    light-dark(rgb(229 242 255), rgb(13 39 63))
+  );
+  --accent-foreground: var(
+    --color-text-info,
+    light-dark(rgb(27 104 171), rgb(131 195 255))
+  );
+  --destructive: var(
+    --color-text-warning,
+    light-dark(rgb(226 85 7), rgb(255 133 73))
+  );
+  --border: var(
+    --color-border-secondary,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+  --input: var(
+    --color-border-primary,
+    light-dark(
+      rgb(26 28 31 / 11.8%),
+      color-mix(in oklab, rgb(0 0 0) 10%, transparent)
+    )
+  );
+  --ring: var(
+    --color-ring-primary,
+    light-dark(rgb(51 156 255), rgb(131 195 255 / 76%))
+  );
+  --font-size-base: var(--font-text-md-size, 16px);
+  --blue: light-dark(rgb(27 104 171), rgb(131 195 255));
+  --orange: light-dark(rgb(226 85 7), rgb(251 106 34));
+  --green: light-dark(rgb(0 162 64), rgb(64 201 119));
+  --red: light-dark(rgb(224 46 42), rgb(255 103 100));
+  --purple: light-dark(rgb(146 79 247), rgb(173 123 249));
+  --yellow: light-dark(rgb(255 195 0), rgb(255 210 64));
+  --viz-series-1: var(--primary);
+  --viz-series-2: light-dark(rgb(243 136 59), rgb(245 154 86));
+  --viz-series-3: light-dark(rgb(93 201 119), rgb(116 213 139));
+  --viz-series-4: light-dark(rgb(235 119 177), rgb(240 143 192));
+  --viz-series-5: light-dark(rgb(155 121 236), rgb(170 145 239));
+  --viz-series-6: light-dark(rgb(58 185 177), rgb(90 203 194));
+
+  /* Internal implementation variables; not part of the agent contract. */
+  --font-sans:
+    -apple-system-body, ui-sans-serif, -apple-system, system-ui, "Segoe UI",
+    Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+  --font-size-normal: max(11px, var(--font-size-base));
+  --font-size-tooltip: calc(var(--font-size-base) - 1px);
+  --font-size-small: max(11px, calc(var(--font-size-base) - 2px));
+  --font-size-h1: calc(var(--font-size-normal) * 1.7142857143);
+  --font-size-h2: calc(var(--font-size-normal) * 1.4285714286);
+  --font-size-h3: calc(var(--font-size-normal) * 1.2857142857);
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --icon-size: 16px;
+  --line-height-normal: calc(var(--font-size-normal) * 1.5);
+  --line-height-tooltip: calc(var(--font-size-tooltip) * 1.4285714286);
+  --line-height-small: calc(var(--font-size-small) + 4px);
+  --corner-shape: round;
+  --radius: var(--border-radius-lg, 8px);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 2px -1px rgb(0 0 0 / 8%);
+  --checkmark-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 17'%3E%3Cpath d='M12.8961 3.64101C13.1297 3.41418 13.4984 3.37523 13.7779 3.56581C14.0571 3.75635 14.1554 4.11331 14.0299 4.41347L13.9615 4.53847L7.71151 13.7045C7.59411 13.8767 7.4063 13.9877 7.19881 14.0072C6.99136 14.0267 6.78564 13.9533 6.63826 13.806L2.88826 10.056L2.79842 9.9457C2.6192 9.67407 2.64927 9.30496 2.88826 9.06581C3.12738 8.82669 3.49647 8.79676 3.76815 8.97597L3.8785 9.06581L7.03084 12.2182L12.8053 3.74941L12.8961 3.64101Z'/%3E%3C/svg%3E");
+
+  /* Legacy aliases; not part of the current agent contract. */
+  --viz-bg: transparent;
+  --viz-panel: var(--card);
+  --viz-border: var(--border);
+  --viz-text: var(--foreground);
+  --viz-muted: var(--muted-foreground);
+  --viz-accent: var(--primary);
+  --viz-accent-text: var(--primary-foreground);
+  --viz-accent-bg: var(--accent);
+  --viz-font-size: var(--font-size-base);
+  --viz-warning: var(--destructive);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html > body {
+  /* Preserve MCP aliases for older inline renderers without creating :root cycles. */
+  --color-background-primary: var(
+    --background,
+    light-dark(rgb(255 255 255), rgb(24 24 24))
+  );
+  --color-text-primary: var(
+    --foreground,
+    light-dark(rgb(26 28 31), rgb(255 255 255))
+  );
+  --color-border-secondary: var(
+    --border,
+    light-dark(rgb(26 28 31 / 8%), rgb(255 255 255 / 8.2%))
+  );
+
+  margin: 0;
+  padding: var(--visualize-paint-gutter, 0px);
+  color: var(--foreground);
+  background: transparent !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-weight: var(--font-weight-normal);
+}
+
+.cursor-interaction {
+  cursor: var(--cursor-interaction, pointer);
+}
+
+a {
+  color: color-mix(in srgb, var(--viz-accent) 80%, var(--viz-text) 20%);
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  font-weight: inherit;
+}
+
+a:is(:hover, :focus-visible) {
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 0.5px;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-block: 0;
+}
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+.table {
+  font-family: var(--font-sans);
+}
+
+h1 {
+  font-size: calc(var(--font-size-base) * 1.5);
+  line-height: 1.3333333333;
+}
+
+h2 {
+  font-size: calc(var(--font-size-base) * 1.25);
+  line-height: 1.4;
+}
+h3 {
+  font-size: calc(var(--font-size-base) * 1.125);
+  line-height: 1.5555555556;
+}
+h4 {
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+h5,
+h6 {
+  font-size: var(--font-size-base);
+  line-height: calc(var(--font-size-base) * 1.625);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+b,
+strong,
+th {
+  font-weight: 600;
+}
+
+code:not(pre code) {
+  display: inline;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  corner-shape: var(--corner-shape);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  overflow-wrap: anywhere;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  word-break: break-word;
+}
+pre,
+pre code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.table {
+  width: 100%;
+  color: var(--foreground);
+  font: inherit;
+  text-align: start;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: calc(var(--font-size-base) * 0.875);
+  line-height: calc(var(--font-size-base) * 1.625);
+  font-family: var(--font-sans);
+}
+
+.table :is(th, td) {
+  padding-block: 10px;
+  padding-inline: 0 24px;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+  border-bottom-color: color-mix(in srgb, var(--foreground) 5%, transparent);
+}
+.table :is(th, td):not(:last-child) {
+  padding-inline-end: calc(var(--font-size-base) * 1.5);
+}
+
+.table-responsive > .table :is(th, td) {
+  overflow-wrap: break-word;
+}
+
+.table :is(th, td):last-child {
+  padding-inline-end: 0;
+}
+
+.table :is(caption, thead th) {
+  font-weight: 600;
+}
+
+.table thead :is(th, td) {
+  border-bottom-color: var(--border-strong, var(--input));
+  padding-block: calc(var(--font-size-base) / 2);
+  line-height: var(--font-size-base);
+}
+
+.table tbody tr:last-child :is(th, td) {
+  border-bottom: 0;
+}
+.table tbody :is(th, td) {
+  padding-block: calc(var(--font-size-base) * 0.625);
+}
+
+.table.table-sm :is(th, td) {
+  padding-block: 8px;
+}
+
+.table.table-sm :is(th, td):not(:last-child) {
+  padding-inline-end: 16px;
+}
+
+.table :is(.text-end, [align="right"]) {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.table :is(.text-center, [align="center"]) {
+  text-align: center;
+}
+
+.table .text-nowrap {
+  white-space: nowrap;
+}
+
+#widget {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding: 0;
+  background: transparent !important;
+}
+
+.card {
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  border-radius: var(--radius-2xl);
+  corner-shape: var(--corner-shape);
+  color: var(--card-foreground);
+  background: var(--card);
+}
+
+.widget {
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-lg);
+  corner-shape: var(--corner-shape);
+  box-shadow: 0 0 0 0.5px var(--border-strong, var(--border));
+  color: var(--foreground);
+  background: var(--background);
+}
+
+#widget > :not(.card, .widget, .progress) {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.tooltip {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: max-content;
+  max-width: min(
+    20rem,
+    var(--tooltip-available-width, calc(100vw - 10px)),
+    calc(100vw - 10px)
+  );
+  max-height: min(
+    var(--tooltip-available-height, calc(100vh - 10px)),
+    calc(100vh - 10px)
+  );
+  border: 1px solid var(--border);
+  corner-shape: var(--corner-shape);
+  overflow-wrap: break-word;
+  white-space: normal;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-sans);
+  padding: 5px 12px;
+  border-color: color-mix(
+    in oklab,
+    light-dark(var(--primary-foreground), var(--foreground)) 5%,
+    transparent
+  );
+  border-radius: var(--radius-2xl);
+  color: light-dark(var(--primary-foreground), var(--foreground));
+  background: light-dark(var(--foreground), var(--popover));
+  box-shadow: 0 8px 18px rgb(15 23 42 / 20%);
+  letter-spacing: -0.15px;
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+
+.viz-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(max(180px, 24%), 1fr));
+  gap: 10px;
+}
+
+.viz-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.viz-stat-value {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.25;
+}
+
+.viz-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin-block: 6px;
+  border: 0;
+  background: var(--border);
+}
+
+.nav {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 4px;
+}
+
+.progress {
+  display: flex;
+  height: 8px;
+  margin-block: calc((var(--line-height-normal, 1.5em) - 8px) / 2);
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+}
+
+.progress-bar:only-child {
+  border-radius: var(--radius-full);
+}
+
+.progress-bar {
+  height: 100%;
+  flex-shrink: 0;
+  border: 0;
+  background: var(--viz-series-1);
+}
+
+.viz-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: color-mix(in srgb, var(--foreground) 40%, var(--muted-foreground));
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-family: var(--font-sans);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1;
+}
+
+small,
+.text-small {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.viz-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.viz-controls > .form-label {
+  display: grid;
+  min-width: min(100%, 260px);
+  flex: 1 1 280px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px 12px;
+  margin-bottom: 0;
+}
+
+.viz-controls > .form-label > :is(.form-control, .form-range, .form-select) {
+  grid-column: 1 / -1;
+}
+
+.btn,
+.nav-link,
+.form-check-input,
+.form-control,
+.form-range,
+.form-select {
+  font: inherit;
+}
+
+/* Match inline alignment without overriding a containing flex or grid layout. */
+.btn,
+.nav-link,
+.form-control,
+.form-select,
+.form-range,
+.form-check {
+  vertical-align: middle;
+}
+
+.btn,
+.nav-link {
+  --btn-size: calc(12px + 2 * var(--control-spacing, 12px));
+  appearance: button;
+  display: inline-flex;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0;
+  padding: 0 8px;
+  -webkit-app-region: no-drag;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  cursor: var(--cursor-interaction, pointer);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-font-smoothing: inherit;
+  font-family: var(--font-sans);
+  height: fit-content;
+  min-height: var(--btn-size);
+  padding-inline: var(--control-spacing, 12px);
+  border-color: transparent;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.btn {
+  border-color: var(--border);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+}
+
+/* Codex Button size="compact"; appearance stays with the button variant. */
+.btn-sm {
+  --btn-size: 24px;
+  padding-inline: 8px;
+  font-size: calc(var(--font-size-base) * 12 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 12 / 16), 1px);
+  line-height: 16px;
+}
+
+.btn:is(.btn-block, .viz-tile) {
+  inline-size: 100%;
+}
+
+.btn.viz-tile {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+a.btn {
+  cursor: var(--cursor-interaction, pointer);
+  text-decoration: none;
+}
+
+.btn:not(:disabled):hover {
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-link:not(:disabled):not([aria-disabled="true"]):hover {
+  background: color-mix(in srgb, var(--foreground) 10%, transparent);
+}
+
+.btn-primary {
+  border-color: var(--border);
+  color: var(--primary-foreground);
+  background: var(--foreground);
+  background-clip: border-box;
+}
+
+.btn-primary .text-muted {
+  color: color-mix(in srgb, var(--primary-foreground) 50%, transparent);
+}
+
+.btn-primary:not(:disabled):hover {
+  background: color-mix(in srgb, var(--foreground) 80%, transparent);
+  background-clip: border-box;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.btn-ghost:not(:disabled):hover {
+  color: var(--muted-foreground);
+  background: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.nav-pills .nav-link {
+  min-width: 0;
+  border-color: transparent;
+  color: var(--muted-foreground);
+  background: transparent;
+}
+
+.nav-justified .nav-link {
+  flex: 1 1 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.nav-pills .nav-link.active {
+  color: var(--foreground);
+  background: var(--muted);
+}
+
+/* Shared preview chrome; product styles stay inside each variant. */
+.viz-dotted-background {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--foreground) 14%, transparent) 0.8px,
+    transparent 0.8px
+  );
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+.viz-carousel {
+  position: relative;
+  min-width: 0;
+}
+
+.viz-carousel:has(> .viz-carousel-controls) {
+  min-height: calc(60px + var(--viz-carousel-picker-height, 0px));
+  padding-bottom: 60px;
+}
+
+.viz-carousel > [data-variant][hidden] {
+  display: none !important;
+}
+
+.viz-carousel > [data-variant] {
+  isolation: isolate;
+}
+
+.viz-carousel-controls {
+  --viz-carousel-hover: light-dark(
+    color-mix(in srgb, var(--foreground) 5.4%, transparent),
+    color-mix(in srgb, var(--foreground) 7.8%, transparent)
+  );
+  position: absolute;
+  z-index: 2;
+  bottom: 8px;
+  left: 50%;
+  display: flex;
+  width: max-content;
+  /* Leave room for the host's design-controls launcher at the trailing edge. */
+  max-width: calc(100% - 96px);
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-sans);
+  /* Match the settings dropdown chrome independently of the content font size. */
+  font-size: 13px;
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+  transform: translateX(-50%);
+  user-select: none;
+}
+
+/* Keep authored mockup button styles out of the shared carousel chrome. */
+.viz-carousel-controls button,
+.viz-carousel-picker > summary {
+  display: flex !important;
+  height: auto !important;
+  min-height: 30px;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px;
+  padding: 0 6px !important;
+  -webkit-app-region: no-drag;
+  border: 0 !important;
+  border-radius: 14px !important;
+  color: inherit !important;
+  background: transparent !important;
+  font: inherit !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.viz-carousel-controls > button,
+.viz-carousel-picker > summary {
+  position: relative;
+  isolation: isolate;
+}
+
+.viz-carousel-controls > button {
+  --icon-size: 16px;
+  width: 30px !important;
+  padding: 0 !important;
+}
+
+.viz-carousel-picker > summary {
+  padding-inline: 12px !important;
+}
+
+.viz-carousel-controls .viz-carousel-caret {
+  width: 14px;
+  height: 14px;
+  flex: none;
+  margin: 0;
+  color: inherit;
+  transform: rotate(180deg);
+}
+
+.viz-carousel-controls > button > svg,
+.viz-carousel-controls .viz-carousel-caret,
+.viz-carousel-count {
+  opacity: 0.5;
+}
+
+.viz-carousel-controls > button::before,
+.viz-carousel-picker > summary::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3px;
+  border-radius: 12px;
+  content: "";
+  pointer-events: none;
+}
+
+.viz-carousel-controls > button:hover::before,
+.viz-carousel-picker > summary:hover::before {
+  background: var(--viz-carousel-hover);
+}
+
+.viz-carousel-controls > button,
+.viz-carousel-controls [data-lucide],
+.viz-carousel-controls .lucide {
+  flex-shrink: 0;
+}
+
+.viz-carousel-picker {
+  min-width: 0;
+}
+
+.viz-carousel-picker > summary {
+  min-width: 0;
+  list-style: none;
+}
+
+.viz-carousel-picker > summary::-webkit-details-marker {
+  display: none;
+}
+
+.viz-carousel-count {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.viz-carousel-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.viz-carousel-options {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  left: 0;
+  display: flex;
+  max-height: 240px;
+  flex-direction: column;
+  gap: 2px;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--background);
+  box-shadow: 0 4px 12px light-dark(rgb(0 0 0 / 6%), rgb(0 0 0 / 25%));
+}
+
+.viz-carousel-options > button {
+  border-radius: max(0px, calc(var(--radius-lg) - 5px)) !important;
+  width: 100% !important;
+  min-height: 28px;
+  justify-content: flex-start !important;
+  padding: 4px 8px !important;
+  font-size: var(--font-size-small) !important;
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.viz-carousel-options > [aria-current="true"],
+.viz-carousel-options > button:hover {
+  background: var(--viz-carousel-hover) !important;
+}
+
+.btn:disabled,
+.nav-link:disabled,
+.nav-link[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+[data-lucide] {
+  stroke-width: 1.6;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--foreground);
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0 8px;
+  outline: none;
+  border: 1px solid var(--input);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding-inline: calc(4px + var(--control-spacing, 12px) / 2);
+  border-color: var(--input);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--popover) 96%, transparent);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 1.4285714286;
+}
+.form-control:is(
+  [type="file"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="week"],
+  [type="color"]
+) {
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  line-height: 18px;
+}
+.form-control:is(
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="week"]
+) {
+  padding-inline: var(--control-spacing, 12px);
+}
+
+.form-control::placeholder {
+  color: var(--muted-foreground);
+}
+
+.form-control[type="file"] {
+  overflow: hidden;
+  cursor: var(--cursor-interaction, pointer);
+  padding: 0;
+}
+
+.form-control[type="file"]::file-selector-button {
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid var(--input);
+  color: var(--secondary-foreground);
+  background: var(--secondary);
+  cursor: inherit;
+  font: inherit;
+  min-height: calc(10px + 2 * var(--control-spacing, 12px));
+  padding-inline: var(--control-spacing, 12px);
+  margin-inline-end: var(--control-spacing, 12px);
+}
+
+.form-control[type="file"]:not(:disabled):hover::file-selector-button {
+  background: color-mix(in srgb, var(--foreground) 6%, var(--secondary));
+}
+
+.form-control-color[type="color"] {
+  width: 40px;
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  padding: 3px;
+  cursor: var(--cursor-interaction, pointer);
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.form-control-color[type="color"]::-webkit-color-swatch {
+  border: 0;
+  border-radius: calc(var(--radius-lg) - 4px);
+  corner-shape: var(--corner-shape);
+}
+
+textarea.form-control {
+  height: auto;
+  resize: vertical;
+  min-height: 96px;
+  padding: 8px 10px;
+}
+
+.form-control:focus-visible {
+  border-color: var(--ring);
+  box-shadow: none;
+}
+.form-control:disabled {
+  color: var(--muted-foreground);
+  background: color-mix(in srgb, var(--foreground) 5%, transparent);
+  opacity: 1;
+}
+.form-control[aria-invalid="true"] {
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--red) 20%, transparent);
+}
+
+.form-control:disabled,
+.form-select:disabled {
+  cursor: not-allowed;
+}
+
+.form-select {
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: fit-content;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  margin: 0;
+  /* The secondary icon role is 14px at compact density and 16px at web density. */
+  --icon-size: calc(10px + var(--control-spacing, 12px) / 2);
+  /* Settings dropdowns retain a 12px inset and a 4px text-to-chevron gap. */
+  padding: 0 calc(16px + var(--icon-size)) 0 12px;
+  outline: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  corner-shape: var(--corner-shape);
+  color: var(--foreground);
+  background-color: var(--secondary);
+  background-image:
+    linear-gradient(
+      45deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    ),
+    linear-gradient(
+      135deg,
+      transparent calc(50% - 0.6px),
+      var(--muted-foreground) calc(50% - 0.6px) calc(50% + 0.6px),
+      transparent calc(50% + 0.6px)
+    );
+  background-position:
+    calc(100% - 12px - var(--icon-size) / 2) 50%,
+    calc(100% - 12px - var(--icon-size) * 0.18) 50%;
+  background-repeat: no-repeat;
+  background-size: calc(var(--icon-size) * 0.32) calc(var(--icon-size) * 0.32);
+  cursor: var(--cursor-interaction, default);
+  font-size: calc(var(--font-size-base) * 14 / 16);
+  font-size: round(nearest, calc(var(--font-size-base) * 14 / 16), 1px);
+  font-weight: var(--font-weight-normal);
+  line-height: 18px;
+}
+
+.form-select :is(option, optgroup) {
+  color: var(--popover-foreground);
+  background-color: var(--popover);
+}
+
+.form-select :is(option, optgroup):disabled {
+  color: var(--muted-foreground);
+}
+
+.form-select:not(:disabled):hover {
+  background-color: light-dark(
+    color-mix(in srgb, var(--foreground) 5.5%, transparent),
+    color-mix(in srgb, var(--foreground) 8%, transparent)
+  );
+}
+
+.form-select:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+.form-select:disabled {
+  opacity: 0.4;
+}
+
+.form-check {
+  display: flex;
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  align-items: center;
+  gap: 6px;
+}
+
+.form-check-input {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  margin: 0;
+  border: 1px solid var(--input);
+  color: var(--primary-foreground);
+  background-color: transparent;
+  cursor: var(--cursor-interaction, default);
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    box-shadow 150ms;
+}
+
+.form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+  corner-shape: round;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  width: calc(10px + var(--control-spacing, 12px) / 2);
+  height: calc(10px + var(--control-spacing, 12px) / 2);
+  border-color: var(--border-strong, var(--input));
+  border-radius: calc(var(--radius-sm) / 2);
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input:not(:disabled):not(:checked):hover {
+  background-color: var(--card);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:is(:checked, :indeterminate) {
+  border-color: var(--border-strong, var(--input));
+  background-color: color-mix(in srgb, var(--popover) 96%, transparent);
+}
+
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:checked::before {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-foreground);
+  content: "";
+  mask: var(--checkmark-image) center / 12px 12px no-repeat;
+  background-color: var(--foreground);
+}
+.form-check:not(.form-switch)
+  .form-check-input[type="checkbox"]:indeterminate::before {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 65%;
+  height: 6.65%;
+  margin: auto;
+  border-radius: var(--radius-full);
+  background: var(--foreground);
+  mask: none;
+  content: "";
+}
+
+.form-check-input[type="radio"] {
+  border-radius: var(--radius-full);
+  width: 16px;
+  height: 16px;
+  border: 0;
+  box-shadow: inset 0 0 0 1px var(--input);
+}
+
+.form-check-input[type="radio"]:checked {
+  border: 0;
+  background: radial-gradient(
+    circle,
+    var(--primary-foreground) 0 3px,
+    var(--foreground) 3px
+  );
+  box-shadow: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.form-check:not(.form-switch) .form-check-input[type="checkbox"]:focus-visible {
+  border-color: var(--ring);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.form-check:not(.form-switch) .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+}
+.form-check:not(.form-switch) .form-check-input[type="radio"]:disabled,
+.form-check:not(.form-switch)
+  .form-check-input[type="radio"]:disabled
+  + .form-check-label {
+  opacity: 0.5;
+}
+
+.form-switch .form-check-input:disabled,
+.form-switch .form-check-input:disabled + .form-check-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-check-label {
+  color: var(--foreground);
+  cursor: var(--cursor-interaction, default);
+}
+
+.form-switch .form-check-input {
+  position: relative;
+  width: 32px;
+  height: 20px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  box-shadow: none;
+  transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.form-switch .form-check-input::before {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  box-sizing: border-box;
+  border: 1px solid light-dark(var(--primary-foreground), var(--foreground));
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  content: "";
+  transform: translate(2px, -50%);
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  border-color: #fff;
+  background: #fff;
+}
+
+.form-switch .form-check-input:checked {
+  background: var(--blue);
+}
+
+.form-switch .form-check-input:checked::before {
+  transform: translate(14px, -50%);
+}
+
+.form-switch .form-check-input:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+  outline: none;
+}
+
+.form-range {
+  appearance: none;
+  display: block;
+  width: 100%;
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  accent-color: var(--primary);
+  height: calc(12px + 2 * var(--control-spacing, 12px));
+  min-height: calc(12px + 2 * var(--control-spacing, 12px));
+  outline: none;
+  border-radius: var(--radius-full);
+  color: var(--foreground);
+  background: transparent;
+}
+
+.form-range::-webkit-slider-runnable-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  margin-top: -9px;
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Outline the native track and thumb, preserving the larger input hit area. */
+.form-range:focus-visible::-webkit-slider-runnable-track {
+  outline: 2px auto Highlight;
+  outline-color: -webkit-focus-ring-color;
+}
+
+.form-range::-moz-range-track {
+  background: var(--form-range-track, var(--border));
+  height: 2px;
+  border-radius: var(--radius-full);
+}
+
+.form-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-full);
+  border-color: transparent;
+  background: currentColor;
+  box-shadow: var(--shadow-sm);
+}
+
+.form-range:focus-visible::-moz-range-thumb {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+.form-range:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.btn:not(.btn-primary, .viz-tile):is(
+  [aria-pressed="true"],
+  [aria-selected="true"],
+  .is-selected
+) {
+  border-color: transparent;
+  color: var(--primary-foreground);
+  background: var(--blue);
+}
+
+.btn.viz-tile:is([aria-pressed="true"], [aria-selected="true"], .is-selected) {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+.btn:focus-visible,
+.nav-link:focus-visible {
+  outline-offset: 2px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.viz-carousel-controls :is(button, summary):focus-visible {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Web recipes are the default, including on renderers without inline style queries. */
+@supports (border-radius: if(style(--corner-shape: round): 1px; else: 2px)) {
+  /* Match the host's proportional text-sm scale at every text preference. */
+  .tooltip,
+  .viz-badge,
+  .btn,
+  .nav-link,
+  .form-control,
+  .form-select {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 14 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 13 / 14), 1px)
+    );
+  }
+
+  .btn-sm {
+    font-size: if(
+      style(--corner-shape: round): round(
+          nearest,
+          calc(var(--font-size-base) * 12 / 16),
+          1px
+        );
+        else: round(nearest, calc(var(--font-size-base) * 12 / 14), 1px)
+    );
+  }
+
+  .btn,
+  .nav-link,
+  .form-select {
+    border-radius: if(
+      style(--corner-shape: round): var(--radius-full); else: var(--radius-lg)
+    );
+  }
+
+  .form-check:not(.form-switch) .form-check-input[type="checkbox"] {
+    border-radius: if(
+      style(--corner-shape: round): calc(var(--radius-sm) / 2);
+        else: calc(var(--radius-lg) * 0.4)
+    );
+  }
+
+  .tooltip {
+    font-weight: if(
+      style(--corner-shape: round): 600; else: var(--font-weight-normal)
+    );
+  }
+}
+
+@media (pointer: coarse) {
+  .viz-carousel:has(> .viz-carousel-controls) {
+    min-height: calc(76px + var(--viz-carousel-picker-height, 0px));
+    padding-bottom: 76px;
+  }
+
+  .btn,
+  .nav-link,
+  .viz-carousel-controls button,
+  .viz-carousel-picker > summary,
+  .form-control,
+  .form-select {
+    --btn-size: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Keep small-screen WebKit from zooming when a text field receives focus. */
+  .form-control,
+  .form-select {
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+  .form-control:is(
+    [type="file"],
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="week"],
+    [type="time"],
+    [type="color"]
+  ) {
+    height: 44px;
+    min-height: 44px;
+    font-size: max(16px, calc(var(--font-size-base) * 14 / 16));
+    font-size: max(
+      16px,
+      round(nearest, calc(var(--font-size-base) * 14 / 16), 1px)
+    );
+  }
+
+  .form-control[type="file"]::file-selector-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .form-control-color[type="color"] {
+    width: 44px;
+    height: 44px;
+  }
+
+  .form-control:is(
+    [type="date"],
+    [type="datetime-local"],
+    [type="month"],
+    [type="time"],
+    [type="week"]
+  ) {
+    min-width: 0;
+    max-width: 100%;
+    padding-block: 8px;
+  }
+
+  .form-check {
+    min-height: 44px;
+    padding-inline: 15px;
+  }
+
+  .form-check-input {
+    position: relative;
+  }
+
+  .form-check-input::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 44px;
+    height: 44px;
+    content: "";
+    transform: translate(-50%, -50%);
+  }
+
+  .form-check-label {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+  }
+
+  .form-range {
+    height: 44px;
+    touch-action: pan-y;
+  }
+}
+
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+#widget > svg {
+  width: 100%;
+}
+
+/* Model-authored chart rules can otherwise stretch icons after these styles load. */
+svg.lucide {
+  display: block;
+  width: var(--icon-size) !important;
+  height: var(--icon-size) !important;
+  flex: none;
+  margin: 0 !important;
+  stroke-width: 1.6;
+}
+
+.text-warning,
+.text-destructive {
+  color: var(--destructive);
+}
+
+html>body{padding:0}
+</style>
+<style>
+html{min-height:100%;overflow-y:auto;overflow-x:clip;}
+body{margin:0;min-height:100%;height:auto;overflow:visible;background:var(--background);color:var(--foreground);}
+:root{--font-size-base:16px;}
+main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20px;min-width:0;}
+@media(max-width:600px){main{padding:12px;}}
+</style>
+</head>
+<body><main>
+<div id="branch-relay-v4">
+ <h1>端部平行线圈 · 顺序接力</h1>
+ <div class="text-small" id="vr-startup" role="status">正在加载三维示意…</div>
+ <div class="viz-controls vr-controls">
+  <button type="button" class="btn btn-primary" id="vr-play">暂停</button>
+  <button type="button" class="btn" id="vr-fit">适配全图</button>
+  <button type="button" class="btn" id="vr-restart">重新播放</button>
+  <label class="form-label" for="vr-mode">线圈输入<select class="form-select" id="vr-mode"><option value="auto">自动接力时序</option><option value="big">仅大线圈</option><option value="both">大小同时</option><option value="small">仅小线圈</option><option value="off">全部断电</option></select></label>
+  <label class="form-label" for="vr-preset">时序<select class="form-select" id="vr-preset"><option value="fast">短周期 · 5.3秒</option><option value="recommended">大行程对照 · 8.6秒</option><option value="previous">早期对照 · 12秒</option><option value="custom" disabled>自定义滑块时序</option></select></label>
+  <label class="form-label" for="vr-scenario">观察条件<select class="form-select" id="vr-scenario"><option value="normal">端部局部保持（假设）</option><option value="weak">小线圈偏弱</option><option value="startweak">大线圈起动不足</option></select></label>
+  <label class="form-label" for="vr-speed">播放速度<select class="form-select" id="vr-speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+  <label class="form-label" for="vr-view">整机视角<select class="form-select" id="vr-view"><option value="perspective">斜视</option><option value="top">俯视 · 放射布置</option><option value="front">正立面</option></select></label>
+ </div>
+ <div class="viz-row vr-switches">
+  <label class="form-check"><input class="form-check-input" type="checkbox" id="vr-open" checked><span class="form-check-label">透视柱头内部</span></label>
+  <label class="form-check"><input class="form-check-input" type="checkbox" id="vr-explode"><span class="form-check-label">拆开放大腔前板</span></label>
+  <span id="vr-phase">断电 · 底部堆积</span>
+ </div>
+ <div class="vr-count-controls">
+  <label class="form-label" for="vr-count">铁珠数量：每腔 <output class="tabular-nums" for="vr-count" data-bead-count>100</output> 颗 · 整机 <span class="tabular-nums" data-bead-total>800</span> 颗</label>
+  <input class="form-range" type="range" id="vr-count" min="25" max="200" step="5" value="100" aria-describedby="vr-count-help">
+  <div class="vr-note" id="vr-count-help">每腔25至200颗，8腔同步调整；调节后重新起动，时序设置保留。高数量时优先保持操作响应，模型播放可能变慢。</div>
+ </div>
+ <div class="vr-scenes">
+  <section>
+   <div class="viz-row"><span>8腔／<span data-bead-total>800</span>珠 · 1大＋8小线圈</span><span class="text-small">8只小线圈在外端，轴均竖直</span></div>
+   <div class="vr-stage">
+    <canvas id="vr-whole" role="img" aria-label="八个竖向透明薄腔以四十五度等分放射布置，每个薄腔的下缘沿半球柱头圆弧随形，上缘水平；每腔铁珠数量可调，分支外端各加一只水平环形小线圈，与中央大线圈平行且轴线均竖直，按大开、小开、大关、小关的顺序演示接力保持及落回"></canvas>
+    <div id="vr-poster-whole" class="vr-poster"><svg viewBox="0 0 400 400" role="img" aria-label="固定半球柱头和随形弧底薄腔的静态加载预览"><g fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M65 62H335M65 62Q65 250 200 250Q335 250 335 62M188 250V360H212V250M55 365H345"/><ellipse cx="200" cy="98" rx="26" ry="10"/><path d="M200 110L85 130V155Q120 230 200 245ZM200 110L315 130V155Q280 230 200 245ZM200 110L145 150V210Q165 242 200 245ZM200 110L255 150V210Q235 242 200 245Z"/></g></svg></div>
+   </div>
+  </section>
+  <section>
+   <div class="viz-row"><span id="vr-detail-title">第7腔 · 100颗铁珠</span><label class="form-label" for="vr-select">放大<select class="form-select" id="vr-select"><option value="0">第1腔</option><option value="1">第2腔</option><option value="2">第3腔</option><option value="3">第4腔</option><option value="4">第5腔</option><option value="5">第6腔</option><option value="6" selected>第7腔</option><option value="7">第8腔</option></select></label></div>
+   <div class="vr-stage">
+    <canvas id="vr-detail" role="img" aria-label="单个弧底薄腔放大，展示铁珠在磁吸作用下向上移动和聚集，撤去磁作用后在重力下沿曲面下缘滑向低处；虚线表示原柱头外壳圆弧；与整机使用同一组位置"></canvas>
+    <div id="vr-poster-detail" class="vr-poster"><svg viewBox="0 0 400 400" role="img" aria-label="下缘随柱头圆弧上扬的透明薄腔"><g fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5"><path d="M65 55H325V125Q260 310 65 335ZM75 45H335V115Q270 300 75 325M65 55L75 45M325 55L335 45M65 335L75 325"/><path d="M55 40H345V49H55Z"/><circle cx="77" cy="322" r="5"/><circle cx="90" cy="320" r="5"/><circle cx="102" cy="317" r="5"/><circle cx="115" cy="314" r="5"/></g></svg></div>
+   </div>
+  </section>
+ </div>
+ <div class="viz-row vr-readout"><span id="vr-big">M0大线圈：断电</span><span id="vr-small">S1至S8小线圈：断电</span><span class="tabular-nums" id="vr-height">平均标高：加载中</span></div>
+ <div class="vr-duration-controls" role="group" aria-label="四段通断时长，单位秒">
+  <div><label class="form-label" for="vr-duration-lead">大线圈单独通电 <output class="tabular-nums" for="vr-duration-lead" data-time-key="lead">1.8</output> s</label><input class="form-range" type="range" id="vr-duration-lead" min="0.2" max="5" step="0.1" value="1.8" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-overlap">大小线圈重叠通电 <output class="tabular-nums" for="vr-duration-overlap" data-time-key="overlap">0.6</output> s</label><input class="form-range" type="range" id="vr-duration-overlap" min="0.1" max="3" step="0.1" value="0.6" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-hold">小线圈单独通电 <output class="tabular-nums" for="vr-duration-hold" data-time-key="hold">0.4</output> s</label><input class="form-range" type="range" id="vr-duration-hold" min="0.1" max="3" step="0.1" value="0.4" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-allOff">全部断电间隔 <output class="tabular-nums" for="vr-duration-allOff" data-time-key="allOff">2.5</output> s</label><input class="form-range" type="range" id="vr-duration-allOff" min="0.5" max="6" step="0.1" value="2.5" aria-describedby="vr-duration-help"></div>
+ </div>
+ <div class="vr-note" id="vr-duration-help">拖动即从周期起点重新计算，播放或暂停状态保持；总周期 <span data-time-key="period">5.3</span> s（模型）。短间隔可能升起不足或来不及落回。</div>
+ <div class="vr-timing-wrap"><span id="vr-timing-label">自动通断时序</span><svg id="vr-timing" role="img" aria-label="大小线圈按先后顺序接力通断，当前时刻及间隔由所选时序确定"></svg></div>
+ <div class="viz-row vr-stages" aria-label="查看接力阶段"><button class="btn" type="button" id="vr-stage1">大开</button><button class="btn" type="button" id="vr-stage2">大小都开</button><button class="btn" type="button" id="vr-stage3">大关／仅小开</button><button class="btn" type="button" id="vr-stage4">小关／落回</button></div>
+ <label class="form-label vr-timeline" for="vr-scrub">查看周期进程 <span class="tabular-nums" id="vr-time">加载中</span></label>
+ <input class="form-range" type="range" id="vr-scrub" min="0" max="1000" step="10" value="44" aria-label="拖动查看吸起和落下的周期进程">
+ <div class="viz-row text-small vr-legend"><span><i class="vr-dot vr-iron"></i>铁珠</span><span><i class="vr-dot vr-coil"></i>大线圈</span><span><i class="vr-dot vr-small-coil"></i>分支小线圈</span><span><i class="vr-dot vr-selected"></i>选中薄腔</span><span>拖动旋转 · 滚轮缩放 · 前板拆开仅为观察</span></div>
+ <div class="vr-note">小线圈放在分支外端，中心R118；9只线圈的平面都水平，轴线均沿Z。小线圈绕组占位外径18、内径8、高8 mm，8只同步通断；匝数、电流与散热待定。</div>
+ <div class="vr-note">条件示意：大线圈先吸起后，端部小线圈局部保持，远处铁珠可能先落回。可切换偏弱条件比较；保留数量与位移不是实体预测。磁路耦合、剩磁及温升尚未求解。</div>
+ <span class="sr-only" id="vr-live" aria-live="polite"></span>
+</div>
+<style>
+ #branch-relay-v4{width:100%;min-width:0;color:var(--foreground);overflow-wrap:anywhere;}
+ #branch-relay-v4 .vr-controls,#branch-relay-v4 .vr-switches{margin-top:calc(var(--font-size-base)*.75);}
+ #branch-relay-v4 .vr-count-controls{margin-top:16px;}
+ #branch-relay-v4 .vr-count-controls label{display:block;}
+ #branch-relay-v4 .vr-scenes{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;margin-top:16px;}
+ #branch-relay-v4 section,#branch-relay-v4 .vr-stage{min-width:0;}
+ #branch-relay-v4 .vr-stage{position:relative;}
+ #branch-relay-v4 canvas{display:block;width:100%;max-width:100%;height:490px;touch-action:none;}
+ #branch-relay-v4 canvas:active{cursor:grabbing;}
+ #branch-relay-v4 .vr-scenes .viz-row{justify-content:space-between;min-height:64px;align-items:center;}
+ #branch-relay-v4 .vr-poster{position:absolute;inset:0;pointer-events:none;color:var(--muted-foreground);}
+ #branch-relay-v4 .vr-poster svg{width:100%;height:100%;}
+ #branch-relay-v4 .vr-readout,#branch-relay-v4 .vr-legend{margin-top:12px;}
+ #branch-relay-v4 #vr-timing{display:block;width:100%;height:112px;color:var(--foreground);}
+ #branch-relay-v4 .vr-duration-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin-top:16px;}
+ #branch-relay-v4 .vr-duration-controls>div{min-width:0;}
+ #branch-relay-v4 .vr-duration-controls label{display:block;}
+ @media(max-width:600px){#branch-relay-v4 .vr-duration-controls{grid-template-columns:minmax(0,1fr);}}
+ #branch-relay-v4 .vr-timing-wrap{margin-top:18px;}
+ #branch-relay-v4 .vr-stages{margin-top:8px;}
+ #branch-relay-v4 .vr-timeline{display:block;margin-top:12px;}
+ #branch-relay-v4 .vr-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;}
+ #branch-relay-v4 .vr-iron{background:var(--foreground);}
+ #branch-relay-v4 .vr-coil{background:var(--viz-series-1);}
+ #branch-relay-v4 .vr-small-coil{background:var(--viz-series-4);}
+ #branch-relay-v4 .vr-selected{background:var(--viz-series-3);}
+ #branch-relay-v4 .vr-note{margin-top:10px;color:var(--muted-foreground);}
+ @media(max-width:780px){#branch-relay-v4 .vr-scenes{grid-template-columns:minmax(0,1fr);}#branch-relay-v4 #vr-whole{height:430px;}#branch-relay-v4 #vr-detail{height:410px;}}
+ @media(max-width:400px){#branch-relay-v4 #vr-whole{height:360px;}#branch-relay-v4 #vr-detail{height:360px;}}
+</style>
+<script>
+/*__ENGINE__*//*__APP__*/
+</script>
+
+<section id="relay-notes" style="margin-top:28px">
+ <p>数量可调：每腔<span data-bead-count>100</span>颗，整机<span data-bead-total>800</span>颗；默认比原400颗增加一倍。数量变化会改变堆积与响应，线圈作用代理没有随数量自动增强，不能据此推断实体能带动更多铁珠。</p>
+ <h2>可调时序：缩短周期，观察升起与落回</h2>
+ <p id="timing-preset-label">短周期：5.3秒（模型）</p>
+ <table class="table"><caption class="sr-only">大小线圈通断时序与条件响应</caption><thead><tr><th scope="col">演示阶段</th><th scope="col">大线圈M0</th><th scope="col">小线圈S1至S8</th><th scope="col">接力足够时的示意</th></tr></thead><tbody>
+  <tr><th scope="row"><span data-time-key="bigOn">0.5</span>至<span data-time-key="smallOn">3</span>秒</th><td>开</td><td>关</td><td>大线圈单独起动<span data-time-key="lead">2.5</span>秒，观察珠群升起程度</td></tr>
+  <tr><th scope="row"><span data-time-key="smallOn">3</span>至<span data-time-key="bigOff">4.2</span>秒</th><td>开</td><td>开</td><td>重叠<span data-time-key="overlap">1.2</span>秒，端部作用引导径向迁移</td></tr>
+  <tr><th scope="row"><span data-time-key="bigOff">4.2</span>至<span data-time-key="smallOff">5.1</span>秒</th><td>关</td><td>开</td><td>端部短停<span data-time-key="hold">0.9</span>秒，部分保持、其余先落；随后尽快释放</td></tr>
+  <tr><th scope="row"><span data-time-key="smallOff">5.1</span>秒至下一次大开</th><td>关</td><td>关</td><td>全断共<span data-time-key="allOff">4</span>秒，观察珠群落下及沿弧底回落；过短会在未落稳时进入下一周期</td></tr>
+ </tbody></table>
+ <p>默认短周期为1.8秒大单独、0.6秒重叠、0.4秒小单独、2.5秒全断，比8.6秒对照更紧凑，但不保证完整行程。四个滑块均以0.1秒为步长；拖动后从周期起点重新计算，暂停状态保持。当前周期<span data-time-key="period">5.3</span>秒，起始静置<span data-time-key="bigOn">0.2</span>秒计入跨周期的全断间隔。所有秒数都是模型画面时间，不是实测控制参数。8只小线圈同步通断，没有编排逐分支波浪或逐颗轨迹。</p>
+ <p><strong>实体按事件标定：</strong>大部分铁珠进入上方工作区后再开小线圈；端部开始稳定吸引后关大线圈；完成迁移后尽快关小线圈；珠群落回并恢复后再开大线圈。先用视频或目测逐段测时，有位置反馈时可按这些事件切换。无法吸起或断电挂珠，需要调整磁路、材料与气隙，单纯改等待时间不能保证解决。</p>
+ <details><summary>查看此前大行程对照的19组候选比较与400颗模型复核</summary>
+  <p>以下固定为400颗的历史比较，只适用于当时的8.6秒大行程对照和12秒早期对照，不代表当前短周期或自定义时序经过同样筛选。此前先在相同初始条件的独立单腔模型中比较19组时序，连续计算两周期，统计第二周期每颗铁珠的竖向及径向行程；随后用8腔400颗复核选定方案和上一版。这里只是在已试候选中选择，不是全局最优，也不是硬件验证。</p>
+  <table class="table"><caption>400颗模型的第二周期平均行程，单位为模型mm；周期为模型s</caption><thead><tr><th scope="col">方案</th><th scope="col">竖向行程</th><th scope="col">径向行程</th><th scope="col">周期</th></tr></thead><tbody><tr><th scope="row">上一版</th><td>87.5</td><td>34.6</td><td>12.0</td></tr>
+<tr><th scope="row">大行程优先</th><td>87.7</td><td>35.9</td><td>8.6</td></tr></tbody></table>
+  <p>竖向行程主要受腔体高度及吸力条件限制。8.6秒对照时序保留升降范围、略增径向活动，并减少端部长时间停留；不把单腔的较大提升直接当作400颗的提升。</p>
+ </details>
+ <p><strong>方向已按几何朝向修正：</strong>中央大线圈和8只小线圈的绕组平面都水平，轴线均沿竖直Z方向；小线圈在各分支外端，不再沿径向铁条横向绕制。图中的轴线箭头表示几何方向，不是实测磁场线。</p>
+ <p>小线圈采用竖向短极芯作安装占位，下部接近径向分支。实际磁通仍可能经过整套铁芯及气隙，不能把9只线圈当成互不影响的理想磁铁。磁饱和、剩磁、通电温升和断电瞬态需要验证。</p>
+ <details><summary>查看模型范围与安装尺寸</summary>
+  <p>沿用R130固定半球外壳、R126随形弧底、8腔×50颗Ø2铁珠。薄腔径向R22至R118、净隙2.8，上缘标高225 mm；上方径向铁芯高227至230 mm。</p>
+  <p>各小线圈中心在R118 mm，径向分支端部在R120 mm，即中心距外端约2 mm。绕组外径18、内径8、高8 mm，标高232至240；法兰外径20、标高231至232及240至241。短极芯Ø6、标高227至242。尺寸仅为占位，实际骨架、绝缘、线径、匝数、电流、接头及散热未确定。</p>
+  <p>外圈竖支杆移到相邻分支之间，给端部绕组让位。薄腔下缘和通断时序沿用原方案。</p>
+  <p>动画将全域与局部的归一化标量场代理先叠合，再按其平方的梯度形成示意作用；不是把两份独立吸力直接相加。局部作用中心同步移至R118，并以227 mm极面标高作参考。参数人为选择，只用于比较端部局部保持、小线圈偏弱、大线圈不起动三种条件，没有求解真实三维磁场、共享铁芯磁通或实际电流。</p>
+  <p>重力、弧底接触、颗粒碰撞及简化偶极相互作用通过积分计算。各腔独立，未计算跨腔耦合；不代表实体吸力、释放可靠性、速度或涌现已得到验证。</p>
+ </details>
+ <p>参考：<a href="https://www.bicronusa.com/resources/bicron-dc-solenoids-technical-guide/">Bicron：吸力与行程、安匝数及通电率</a>；<a href="https://www.coilcraft.com/en-us/resources/application-notes/selecting-the-best-inductor-for-your-dc-dc-convert/">Coilcraft：铁芯直流偏置与磁饱和</a>。</p>
+</section>
+<style>
+ #relay-notes{color:var(--foreground);overflow-wrap:anywhere;}
+ #relay-notes h2{margin-bottom:12px;}
+ #relay-notes p{max-width:75ch;margin-top:14px;}
+ #relay-notes .table{margin-top:14px;}
+ #relay-notes details{margin-top:18px;}
+ #relay-notes summary{padding-block:8px;}
+ #relay-notes a{text-decoration:underline;text-underline-offset:3px;}
+</style>
+
+</main></body>
+</html>

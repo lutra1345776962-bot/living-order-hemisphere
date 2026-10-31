@@ -1528,7 +1528,7 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
   <button type="button" class="btn" id="vr-fit">适配全图</button>
   <button type="button" class="btn" id="vr-restart">重新播放</button>
   <label class="form-label" for="vr-mode">线圈输入<select class="form-select" id="vr-mode"><option value="auto">自动接力时序</option><option value="big">仅大线圈</option><option value="both">大小同时</option><option value="small">仅小线圈</option><option value="off">全部断电</option></select></label>
-  <label class="form-label" for="vr-preset">时序<select class="form-select" id="vr-preset"><option value="fast">短周期 · 5.3秒</option><option value="recommended">大行程对照 · 8.6秒</option><option value="previous">早期对照 · 12秒</option><option value="custom" disabled>自定义滑块时序</option></select></label>
+  <label class="form-label" for="vr-preset">时序<select class="form-select" id="vr-preset"><option value="fast">快速 · 2.8秒</option><option value="gentle">上版短周期 · 5.3秒</option><option value="recommended">大行程对照 · 8.6秒</option><option value="previous">早期对照 · 12秒</option><option value="custom" disabled>自定义滑块时序</option></select></label>
   <label class="form-label" for="vr-scenario">观察条件<select class="form-select" id="vr-scenario"><option value="normal">端部局部保持（假设）</option><option value="weak">小线圈偏弱</option><option value="startweak">大线圈起动不足</option></select></label>
   <label class="form-label" for="vr-speed">播放速度<select class="form-select" id="vr-speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
   <label class="form-label" for="vr-view">整机视角<select class="form-select" id="vr-view"><option value="perspective">斜视</option><option value="top">俯视 · 放射布置</option><option value="front">正立面</option></select></label>
@@ -1543,6 +1543,11 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
   <input class="form-range" type="range" id="vr-count" min="50" max="400" step="10" value="200" aria-describedby="vr-count-help">
   <div class="vr-note" id="vr-count-help">每腔50至400颗，8腔同步调整；调节后重新起动，时序设置保留。高数量时优先保持操作响应，模型播放可能变慢。</div>
  </div>
+ <div class="vr-current-controls" role="group" aria-label="相对线圈电流">
+  <div><label class="form-label" for="vr-current-big">大线圈相对电流 <output class="tabular-nums" id="vr-current-value-big" for="vr-current-big">1.8</output> ×</label><input class="form-range" type="range" id="vr-current-big" min="0.5" max="2.5" step="0.1" value="1.8" aria-describedby="vr-current-help"></div>
+  <div><label class="form-label" for="vr-current-small">小线圈相对电流 <output class="tabular-nums" id="vr-current-value-small" for="vr-current-small">1.6</output> ×</label><input class="form-range" type="range" id="vr-current-small" min="0.5" max="2.5" step="0.1" value="1.6" aria-describedby="vr-current-help"></div>
+ </div>
+ <div class="vr-note" id="vr-current-help">1×为上一版磁吸代理强度；相对电流改变吸力计算，播放速度单独控制。不是安培值；铁芯饱和、温升与断电释放未标定。</div>
  <div class="vr-scenes">
   <section>
    <div class="viz-row"><span>8腔／<span data-bead-total>1600</span>珠 · 1大＋8小线圈</span><span class="text-small">8只小线圈在外端，轴均竖直</span></div>
@@ -1561,12 +1566,12 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
  </div>
  <div class="viz-row vr-readout"><span id="vr-big">M0大线圈：断电</span><span id="vr-small">S1至S8小线圈：断电</span><span class="tabular-nums" id="vr-height">平均标高：加载中</span></div>
  <div class="vr-duration-controls" role="group" aria-label="四段通断时长，单位秒">
-  <div><label class="form-label" for="vr-duration-lead">大线圈单独通电 <output class="tabular-nums" for="vr-duration-lead" data-time-key="lead">1.8</output> s</label><input class="form-range" type="range" id="vr-duration-lead" min="0.2" max="5" step="0.1" value="1.8" aria-describedby="vr-duration-help"></div>
-  <div><label class="form-label" for="vr-duration-overlap">大小线圈重叠通电 <output class="tabular-nums" for="vr-duration-overlap" data-time-key="overlap">0.6</output> s</label><input class="form-range" type="range" id="vr-duration-overlap" min="0.1" max="3" step="0.1" value="0.6" aria-describedby="vr-duration-help"></div>
-  <div><label class="form-label" for="vr-duration-hold">小线圈单独通电 <output class="tabular-nums" for="vr-duration-hold" data-time-key="hold">0.4</output> s</label><input class="form-range" type="range" id="vr-duration-hold" min="0.1" max="3" step="0.1" value="0.4" aria-describedby="vr-duration-help"></div>
-  <div><label class="form-label" for="vr-duration-allOff">全部断电间隔 <output class="tabular-nums" for="vr-duration-allOff" data-time-key="allOff">2.5</output> s</label><input class="form-range" type="range" id="vr-duration-allOff" min="0.5" max="6" step="0.1" value="2.5" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-lead">大线圈单独通电 <output class="tabular-nums" for="vr-duration-lead" data-time-key="lead">0.8</output> s</label><input class="form-range" type="range" id="vr-duration-lead" min="0.2" max="5" step="0.1" value="0.8" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-overlap">大小线圈重叠通电 <output class="tabular-nums" for="vr-duration-overlap" data-time-key="overlap">0.3</output> s</label><input class="form-range" type="range" id="vr-duration-overlap" min="0.1" max="3" step="0.1" value="0.3" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-hold">小线圈单独通电 <output class="tabular-nums" for="vr-duration-hold" data-time-key="hold">0.3</output> s</label><input class="form-range" type="range" id="vr-duration-hold" min="0.1" max="3" step="0.1" value="0.3" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-allOff">全部断电间隔 <output class="tabular-nums" for="vr-duration-allOff" data-time-key="allOff">1.4</output> s</label><input class="form-range" type="range" id="vr-duration-allOff" min="0.5" max="6" step="0.1" value="1.4" aria-describedby="vr-duration-help"></div>
  </div>
- <div class="vr-note" id="vr-duration-help">拖动即从周期起点重新计算，播放或暂停状态保持；总周期 <span data-time-key="period">5.3</span> s（模型）。短间隔可能升起不足或来不及落回。</div>
+ <div class="vr-note" id="vr-duration-help">拖动即从周期起点重新计算，播放或暂停状态保持；总周期 <span data-time-key="period">2.8</span> s（模型）。短间隔可能升起不足或来不及落回。</div>
  <div class="vr-timing-wrap"><span id="vr-timing-label">自动通断时序</span><svg id="vr-timing" role="img" aria-label="大小线圈按先后顺序接力通断，当前时刻及间隔由所选时序确定"></svg></div>
  <div class="viz-row vr-stages" aria-label="查看接力阶段"><button class="btn" type="button" id="vr-stage1">大开</button><button class="btn" type="button" id="vr-stage2">大小都开</button><button class="btn" type="button" id="vr-stage3">大关／仅小开</button><button class="btn" type="button" id="vr-stage4">小关／落回</button></div>
  <label class="form-label vr-timeline" for="vr-scrub">查看周期进程 <span class="tabular-nums" id="vr-time">加载中</span></label>
@@ -1591,6 +1596,9 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
  #branch-relay-v4 .vr-poster svg{width:100%;height:100%;}
  #branch-relay-v4 .vr-readout,#branch-relay-v4 .vr-legend{margin-top:12px;}
  #branch-relay-v4 #vr-timing{display:block;width:100%;height:112px;color:var(--foreground);}
+ #branch-relay-v4 .vr-current-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin-top:16px;}
+ #branch-relay-v4 .vr-current-controls label{display:block;}
+ @media(max-width:600px){#branch-relay-v4 .vr-current-controls{grid-template-columns:minmax(0,1fr);}}
  #branch-relay-v4 .vr-duration-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin-top:16px;}
  #branch-relay-v4 .vr-duration-controls>div{min-width:0;}
  #branch-relay-v4 .vr-duration-controls label{display:block;}
@@ -1614,14 +1622,14 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
 <section id="relay-notes" style="margin-top:28px">
  <p>数量可调：每腔<span data-bead-count>200</span>颗，整机<span data-bead-total>1600</span>颗；默认比上一版800颗增加一倍。数量变化会改变堆积与响应，线圈作用代理没有随数量自动增强，不能据此推断实体能带动更多铁珠。</p>
  <h2>可调时序：缩短周期，观察升起与落回</h2>
- <p id="timing-preset-label">短周期：5.3秒（模型）</p>
+ <p id="timing-preset-label">强驱动快速周期：2.8秒（模型）</p>
  <table class="table"><caption class="sr-only">大小线圈通断时序与条件响应</caption><thead><tr><th scope="col">演示阶段</th><th scope="col">大线圈M0</th><th scope="col">小线圈S1至S8</th><th scope="col">接力足够时的示意</th></tr></thead><tbody>
   <tr><th scope="row"><span data-time-key="bigOn">0.5</span>至<span data-time-key="smallOn">3</span>秒</th><td>开</td><td>关</td><td>大线圈单独起动<span data-time-key="lead">2.5</span>秒，观察珠群升起程度</td></tr>
   <tr><th scope="row"><span data-time-key="smallOn">3</span>至<span data-time-key="bigOff">4.2</span>秒</th><td>开</td><td>开</td><td>重叠<span data-time-key="overlap">1.2</span>秒，端部作用引导径向迁移</td></tr>
   <tr><th scope="row"><span data-time-key="bigOff">4.2</span>至<span data-time-key="smallOff">5.1</span>秒</th><td>关</td><td>开</td><td>端部短停<span data-time-key="hold">0.9</span>秒，部分保持、其余先落；随后尽快释放</td></tr>
   <tr><th scope="row"><span data-time-key="smallOff">5.1</span>秒至下一次大开</th><td>关</td><td>关</td><td>全断共<span data-time-key="allOff">4</span>秒，观察珠群落下及沿弧底回落；过短会在未落稳时进入下一周期</td></tr>
  </tbody></table>
- <p>默认短周期为1.8秒大单独、0.6秒重叠、0.4秒小单独、2.5秒全断，比8.6秒对照更紧凑，但不保证完整行程。四个滑块均以0.1秒为步长；拖动后从周期起点重新计算，暂停状态保持。当前周期<span data-time-key="period">5.3</span>秒，起始静置<span data-time-key="bigOn">0.2</span>秒计入跨周期的全断间隔。所有秒数都是模型画面时间，不是实测控制参数。8只小线圈同步通断，没有编排逐分支波浪或逐颗轨迹。</p>
+ <p>默认大线圈相对电流1.8×、小线圈1.6×；默认周期为0.8秒大单独、0.3秒重叠、0.3秒小单独、1.4秒全断，合计2.8秒。相对电流进入磁场代理及其梯度计算，受数值力上限约束，不是播放倍速，也不是已确定的安培值。短周期不保证全部铁珠完成行程。四个滑块均以0.1秒为步长；拖动后从周期起点重新计算，暂停状态保持。当前周期<span data-time-key="period">2.8</span>秒，起始静置<span data-time-key="bigOn">0.2</span>秒计入跨周期的全断间隔。升流模式首次使用快速预设，后续可分别调整电流与时长。实体不能直接照搬倍数加电：线圈额定电流、线径、供电驱动与散热需另行核定。所有秒数都是模型画面时间，不是实测控制参数。8只小线圈同步通断，没有编排逐分支波浪或逐颗轨迹。</p>
  <p><strong>实体按事件标定：</strong>大部分铁珠进入上方工作区后再开小线圈；端部开始稳定吸引后关大线圈；完成迁移后尽快关小线圈；珠群落回并恢复后再开大线圈。先用视频或目测逐段测时，有位置反馈时可按这些事件切换。无法吸起或断电挂珠，需要调整磁路、材料与气隙，单纯改等待时间不能保证解决。</p>
  <details><summary>查看此前大行程对照的19组候选比较与400颗模型复核</summary>
   <p>以下固定为400颗的历史比较，只适用于当时的8.6秒大行程对照和12秒早期对照，不代表当前短周期或自定义时序经过同样筛选。此前先在相同初始条件的独立单腔模型中比较19组时序，连续计算两周期，统计第二周期每颗铁珠的竖向及径向行程；随后用8腔400颗复核选定方案和上一版。这里只是在已试候选中选择，不是全局最优，也不是硬件验证。</p>

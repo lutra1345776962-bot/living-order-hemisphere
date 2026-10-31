@@ -3,6 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..'),Model=require('../src/engine.js');
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 assert(!html.includes('/*__')&&!html.includes('127.0.0.1')&&!html.includes('<iframe'));
+assert(html.includes('id="vr-current-big"')&&html.includes('id="vr-current-small"'));
 assert(html.includes('requestAnimationFrame')&&html.includes('id="vr-count"'));
 assert(html.includes('min="50" max="400" step="10" value="200"'));
 for(const file of [path.join(root,'index.html'),path.join(root,'v6-bottom-up.html'),...fs.readdirSync(path.join(root,'archive')).map(n=>path.join(root,'archive',n))]){

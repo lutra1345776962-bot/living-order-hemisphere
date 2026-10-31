@@ -13,13 +13,14 @@
   const names=['初始 · 全部断电','① 大开 · 全域起动条件','② 大＋小开 · 局部增强','③ 大关／小开 · 接力观察','④ 小关 · 重力落回'];
   return{big,small,level:Math.max(big,small),stage,phase:names[stage],progress:q/period};
  }
- function createWorld({layerCount=CHAMBERS,timing=BASE_TIMING,beadCount=COUNT}={}){
+ function createWorld({layerCount=CHAMBERS,timing=BASE_TIMING,beadCount=COUNT,currents={big:1,small:1}}={}){
   const count=Number.isInteger(beadCount)&&beadCount>=1&&beadCount<=MAX_COUNT?beadCount:COUNT;
   const layers=Array.from({length:layerCount},(_,l)=>Array.from({length:count},(_,i)=>{const x=4+(i%13)*2.04+((M.floor(i/13)%2)*1.02)+.025*M.sin(i*3+l);return{id:l*count+i,x,z:centerFloor(x)+M.floor(i/13)*2.3,vx:0,vz:0};}));
-  const world={layers,beadCount:count,time:0,mode:'auto',scenario:'normal',pending:0,timing:{...timing},
+  const currentValue=k=>Number.isFinite(currents?.[k])&&currents[k]>=0&&currents[k]<=2.5?currents[k]:1;
+  const world={layers,beadCount:count,time:0,mode:'auto',scenario:'normal',pending:0,timing:{...timing},currents:{big:currentValue('big'),small:currentValue('small')},
    drive(){const d=input(this.time,this.timing);if(this.mode==='auto')return d;const big=['big','both'].includes(this.mode)?1:0,small=['small','both'].includes(this.mode)?1:0;return{...d,big,small,level:Math.max(big,small),phase:{big:'手动 · 仅大线圈',both:'手动 · 大小同时',small:'手动 · 仅小线圈',off:'手动 · 全部断电'}[this.mode]||d.phase};},
    step(){
-    this.time+=STEP;const dt=STEP*SLOW,drive=this.drive(),big=drive.big*(this.scenario==='startweak'?.35:1),small=drive.small*(this.scenario==='weak'?.12:.8),mag=drive.level;
+    this.time+=STEP;const dt=STEP*SLOW,drive=this.drive(),big=drive.big*this.currents.big*(this.scenario==='startweak'?.35:1),small=drive.small*this.currents.small*(this.scenario==='weak'?.12:.8),mag=drive.level;
     for(let l=0;l<layers.length;l++){
      const a=layers[l],ax=new Vec(count),az=new Vec(count);
      for(let i=0;i<count;i++){

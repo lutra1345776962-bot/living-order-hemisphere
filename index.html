@@ -1528,7 +1528,7 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
   <button type="button" class="btn" id="vr-fit">适配全图</button>
   <button type="button" class="btn" id="vr-restart">重新播放</button>
   <label class="form-label" for="vr-mode">线圈输入<select class="form-select" id="vr-mode"><option value="auto">自动接力时序</option><option value="big">仅大线圈</option><option value="both">大小同时</option><option value="small">仅小线圈</option><option value="off">全部断电</option></select></label>
-  <label class="form-label" for="vr-preset">时序<select class="form-select" id="vr-preset"><option value="fast">短周期 · 5.3秒</option><option value="recommended">大行程对照 · 8.6秒</option><option value="previous">早期对照 · 12秒</option><option value="custom" disabled>自定义滑块时序</option></select></label>
+  <label class="form-label" for="vr-preset">时序<select class="form-select" id="vr-preset"><option value="fast">快速 · 2.8秒</option><option value="gentle">上版短周期 · 5.3秒</option><option value="recommended">大行程对照 · 8.6秒</option><option value="previous">早期对照 · 12秒</option><option value="custom" disabled>自定义滑块时序</option></select></label>
   <label class="form-label" for="vr-scenario">观察条件<select class="form-select" id="vr-scenario"><option value="normal">端部局部保持（假设）</option><option value="weak">小线圈偏弱</option><option value="startweak">大线圈起动不足</option></select></label>
   <label class="form-label" for="vr-speed">播放速度<select class="form-select" id="vr-speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
   <label class="form-label" for="vr-view">整机视角<select class="form-select" id="vr-view"><option value="perspective">斜视</option><option value="top">俯视 · 放射布置</option><option value="front">正立面</option></select></label>
@@ -1543,6 +1543,11 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
   <input class="form-range" type="range" id="vr-count" min="50" max="400" step="10" value="200" aria-describedby="vr-count-help">
   <div class="vr-note" id="vr-count-help">每腔50至400颗，8腔同步调整；调节后重新起动，时序设置保留。高数量时优先保持操作响应，模型播放可能变慢。</div>
  </div>
+ <div class="vr-current-controls" role="group" aria-label="相对线圈电流">
+  <div><label class="form-label" for="vr-current-big">大线圈相对电流 <output class="tabular-nums" id="vr-current-value-big" for="vr-current-big">1.8</output> ×</label><input class="form-range" type="range" id="vr-current-big" min="0.5" max="2.5" step="0.1" value="1.8" aria-describedby="vr-current-help"></div>
+  <div><label class="form-label" for="vr-current-small">小线圈相对电流 <output class="tabular-nums" id="vr-current-value-small" for="vr-current-small">1.6</output> ×</label><input class="form-range" type="range" id="vr-current-small" min="0.5" max="2.5" step="0.1" value="1.6" aria-describedby="vr-current-help"></div>
+ </div>
+ <div class="vr-note" id="vr-current-help">1×为上一版磁吸代理强度；相对电流改变吸力计算，播放速度单独控制。不是安培值；铁芯饱和、温升与断电释放未标定。</div>
  <div class="vr-scenes">
   <section>
    <div class="viz-row"><span>8腔／<span data-bead-total>1600</span>珠 · 1大＋8小线圈</span><span class="text-small">8只小线圈在外端，轴均竖直</span></div>
@@ -1561,12 +1566,12 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
  </div>
  <div class="viz-row vr-readout"><span id="vr-big">M0大线圈：断电</span><span id="vr-small">S1至S8小线圈：断电</span><span class="tabular-nums" id="vr-height">平均标高：加载中</span></div>
  <div class="vr-duration-controls" role="group" aria-label="四段通断时长，单位秒">
-  <div><label class="form-label" for="vr-duration-lead">大线圈单独通电 <output class="tabular-nums" for="vr-duration-lead" data-time-key="lead">1.8</output> s</label><input class="form-range" type="range" id="vr-duration-lead" min="0.2" max="5" step="0.1" value="1.8" aria-describedby="vr-duration-help"></div>
-  <div><label class="form-label" for="vr-duration-overlap">大小线圈重叠通电 <output class="tabular-nums" for="vr-duration-overlap" data-time-key="overlap">0.6</output> s</label><input class="form-range" type="range" id="vr-duration-overlap" min="0.1" max="3" step="0.1" value="0.6" aria-describedby="vr-duration-help"></div>
-  <div><label class="form-label" for="vr-duration-hold">小线圈单独通电 <output class="tabular-nums" for="vr-duration-hold" data-time-key="hold">0.4</output> s</label><input class="form-range" type="range" id="vr-duration-hold" min="0.1" max="3" step="0.1" value="0.4" aria-describedby="vr-duration-help"></div>
-  <div><label class="form-label" for="vr-duration-allOff">全部断电间隔 <output class="tabular-nums" for="vr-duration-allOff" data-time-key="allOff">2.5</output> s</label><input class="form-range" type="range" id="vr-duration-allOff" min="0.5" max="6" step="0.1" value="2.5" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-lead">大线圈单独通电 <output class="tabular-nums" for="vr-duration-lead" data-time-key="lead">0.8</output> s</label><input class="form-range" type="range" id="vr-duration-lead" min="0.2" max="5" step="0.1" value="0.8" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-overlap">大小线圈重叠通电 <output class="tabular-nums" for="vr-duration-overlap" data-time-key="overlap">0.3</output> s</label><input class="form-range" type="range" id="vr-duration-overlap" min="0.1" max="3" step="0.1" value="0.3" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-hold">小线圈单独通电 <output class="tabular-nums" for="vr-duration-hold" data-time-key="hold">0.3</output> s</label><input class="form-range" type="range" id="vr-duration-hold" min="0.1" max="3" step="0.1" value="0.3" aria-describedby="vr-duration-help"></div>
+  <div><label class="form-label" for="vr-duration-allOff">全部断电间隔 <output class="tabular-nums" for="vr-duration-allOff" data-time-key="allOff">1.4</output> s</label><input class="form-range" type="range" id="vr-duration-allOff" min="0.5" max="6" step="0.1" value="1.4" aria-describedby="vr-duration-help"></div>
  </div>
- <div class="vr-note" id="vr-duration-help">拖动即从周期起点重新计算，播放或暂停状态保持；总周期 <span data-time-key="period">5.3</span> s（模型）。短间隔可能升起不足或来不及落回。</div>
+ <div class="vr-note" id="vr-duration-help">拖动即从周期起点重新计算，播放或暂停状态保持；总周期 <span data-time-key="period">2.8</span> s（模型）。短间隔可能升起不足或来不及落回。</div>
  <div class="vr-timing-wrap"><span id="vr-timing-label">自动通断时序</span><svg id="vr-timing" role="img" aria-label="大小线圈按先后顺序接力通断，当前时刻及间隔由所选时序确定"></svg></div>
  <div class="viz-row vr-stages" aria-label="查看接力阶段"><button class="btn" type="button" id="vr-stage1">大开</button><button class="btn" type="button" id="vr-stage2">大小都开</button><button class="btn" type="button" id="vr-stage3">大关／仅小开</button><button class="btn" type="button" id="vr-stage4">小关／落回</button></div>
  <label class="form-label vr-timeline" for="vr-scrub">查看周期进程 <span class="tabular-nums" id="vr-time">加载中</span></label>
@@ -1591,6 +1596,9 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
  #branch-relay-v4 .vr-poster svg{width:100%;height:100%;}
  #branch-relay-v4 .vr-readout,#branch-relay-v4 .vr-legend{margin-top:12px;}
  #branch-relay-v4 #vr-timing{display:block;width:100%;height:112px;color:var(--foreground);}
+ #branch-relay-v4 .vr-current-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin-top:16px;}
+ #branch-relay-v4 .vr-current-controls label{display:block;}
+ @media(max-width:600px){#branch-relay-v4 .vr-current-controls{grid-template-columns:minmax(0,1fr);}}
  #branch-relay-v4 .vr-duration-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 24px;margin-top:16px;}
  #branch-relay-v4 .vr-duration-controls>div{min-width:0;}
  #branch-relay-v4 .vr-duration-controls label{display:block;}
@@ -1623,13 +1631,14 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
   const names=['初始 · 全部断电','① 大开 · 全域起动条件','② 大＋小开 · 局部增强','③ 大关／小开 · 接力观察','④ 小关 · 重力落回'];
   return{big,small,level:Math.max(big,small),stage,phase:names[stage],progress:q/period};
  }
- function createWorld({layerCount=CHAMBERS,timing=BASE_TIMING,beadCount=COUNT}={}){
+ function createWorld({layerCount=CHAMBERS,timing=BASE_TIMING,beadCount=COUNT,currents={big:1,small:1}}={}){
   const count=Number.isInteger(beadCount)&&beadCount>=1&&beadCount<=MAX_COUNT?beadCount:COUNT;
   const layers=Array.from({length:layerCount},(_,l)=>Array.from({length:count},(_,i)=>{const x=4+(i%13)*2.04+((M.floor(i/13)%2)*1.02)+.025*M.sin(i*3+l);return{id:l*count+i,x,z:centerFloor(x)+M.floor(i/13)*2.3,vx:0,vz:0};}));
-  const world={layers,beadCount:count,time:0,mode:'auto',scenario:'normal',pending:0,timing:{...timing},
+  const currentValue=k=>Number.isFinite(currents?.[k])&&currents[k]>=0&&currents[k]<=2.5?currents[k]:1;
+  const world={layers,beadCount:count,time:0,mode:'auto',scenario:'normal',pending:0,timing:{...timing},currents:{big:currentValue('big'),small:currentValue('small')},
    drive(){const d=input(this.time,this.timing);if(this.mode==='auto')return d;const big=['big','both'].includes(this.mode)?1:0,small=['small','both'].includes(this.mode)?1:0;return{...d,big,small,level:Math.max(big,small),phase:{big:'手动 · 仅大线圈',both:'手动 · 大小同时',small:'手动 · 仅小线圈',off:'手动 · 全部断电'}[this.mode]||d.phase};},
    step(){
-    this.time+=STEP;const dt=STEP*SLOW,drive=this.drive(),big=drive.big*(this.scenario==='startweak'?.35:1),small=drive.small*(this.scenario==='weak'?.12:.8),mag=drive.level;
+    this.time+=STEP;const dt=STEP*SLOW,drive=this.drive(),big=drive.big*this.currents.big*(this.scenario==='startweak'?.35:1),small=drive.small*this.currents.small*(this.scenario==='weak'?.12:.8),mag=drive.level;
     for(let l=0;l<layers.length;l++){
      const a=layers[l],ax=new Vec(count),az=new Vec(count);
      for(let i=0;i<count;i++){
@@ -1680,15 +1689,15 @@ main{box-sizing:border-box;width:100%;max-width:1300px;margin:0 auto;padding:20p
  return{createWorld,input,COUNT,MIN_COUNT,MAX_COUNT,DEFAULT_COUNT,CHAMBERS,W,H,R,STEP,SLOW,PERIOD,BASE,RIN,ARC,CZ,floor,centerFloor,SMALL_RADIUS,SMALL_POLE_Z,COIL_AXIS,BASE_TIMING};
 });
 
-window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短停0.9秒","timing":{"bigOn":0.5,"smallOn":3,"bigOff":4.2,"smallOff":5.1000000000000005,"period":8.600000000000001},"durations":{"lead":2.5,"overlap":1.2,"hold":0.9,"allOff":4},"meanVerticalRange":88.4829334177572,"meanRadialRange":44.86879184787186,"p10VerticalRange":71.21552641445325,"returnedFraction":1,"innerFraction":0.86,"endMeanHeight":19.778412184934623},"previous":{"id":"previous","label":"上一版","timing":{"bigOn":1,"smallOn":4,"bigOff":6,"smallOff":9,"period":12},"durations":{"lead":3,"overlap":2,"hold":3,"allOff":4},"meanVerticalRange":88.21018590922999,"meanRadialRange":35.05341588307282,"p10VerticalRange":73.91829643759556,"returnedFraction":1,"innerFraction":0.88,"endMeanHeight":19.201383899930455},"fast":{"timing":{"bigOn":0.2,"smallOn":2,"bigOff":2.6,"smallOff":3,"period":5.3}}};
+window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短停0.9秒","timing":{"bigOn":0.5,"smallOn":3,"bigOff":4.2,"smallOff":5.1000000000000005,"period":8.600000000000001},"durations":{"lead":2.5,"overlap":1.2,"hold":0.9,"allOff":4},"meanVerticalRange":88.4829334177572,"meanRadialRange":44.86879184787186,"p10VerticalRange":71.21552641445325,"returnedFraction":1,"innerFraction":0.86,"endMeanHeight":19.778412184934623},"previous":{"id":"previous","label":"上一版","timing":{"bigOn":1,"smallOn":4,"bigOff":6,"smallOff":9,"period":12},"durations":{"lead":3,"overlap":2,"hold":3,"allOff":4},"meanVerticalRange":88.21018590922999,"meanRadialRange":35.05341588307282,"p10VerticalRange":73.91829643759556,"returnedFraction":1,"innerFraction":0.88,"endMeanHeight":19.201383899930455},"gentle":{"timing":{"bigOn":0.2,"smallOn":2,"bigOff":2.6,"smallOff":3,"period":5.3}},"fast":{"timing":{"bigOn":0.2,"smallOn":1,"bigOff":1.3,"smallOff":1.6,"period":2.8}}};
 (() => {
  const launch=()=>{
   const root=document.getElementById('branch-relay-v4');if(!root)return;
   try{
   const el=id=>root.querySelector('#'+id),reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   const defaults=[{az:-.48,el:.29,zoom:1},{az:-.20,el:.10,zoom:1}];
-  const state={playing:!reduced,speed:1,open:true,explode:false,selected:6,view:'perspective',timingPreset:'fast',beadCount:window.VerticalGranular.DEFAULT_COUNT,cameras:defaults.map(c=>({...c}))};
-  let world=window.VerticalGranular.createWorld({timing:window.RelayTimingData.fast.timing,beadCount:state.beadCount});world.advance(.1);
+  const state={playing:!reduced,speed:1,open:true,explode:false,selected:6,view:'perspective',timingPreset:'fast',beadCount:window.VerticalGranular.DEFAULT_COUNT,currents:{big:1.8,small:1.6},cameras:defaults.map(c=>({...c}))};
+  let world=window.VerticalGranular.createWorld({timing:window.RelayTimingData.fast.timing,beadCount:state.beadCount,currents:state.currents});world.advance(.1);
   const E=window.VerticalGranular,{W,H,BASE,RIN}=E;
   const canvases=[el('vr-whole'),el('vr-detail')],contexts=canvases.map(c=>c.getContext('2d'));
   if(contexts.some(c=>!c))throw new Error('当前浏览器不能创建绘图上下文');
@@ -1732,15 +1741,15 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
   function mix(a,b,t){return a.map((v,i)=>v*(1-t)+b[i]*t);}
 
 
-  function sync(){el('vr-count').value=String(state.beadCount);el('vr-count').setAttribute('aria-valuetext','每腔'+state.beadCount+'颗，整机'+(state.beadCount*8)+'颗');for(const scope of [root,document.getElementById('relay-notes')].filter(Boolean)){for(const n of scope.querySelectorAll('[data-bead-count]'))n.textContent=String(state.beadCount);for(const n of scope.querySelectorAll('[data-bead-total]'))n.textContent=String(state.beadCount*8);}el('vr-play').textContent=state.playing?'暂停':'播放';el('vr-mode').value=world.mode;el('vr-scenario').value=world.scenario;el('vr-preset').value=state.timingPreset;el('vr-speed').value=String(state.speed);el('vr-select').value=String(state.selected);el('vr-view').value=state.view;el('vr-open').checked=state.open;el('vr-explode').checked=state.explode;syncScheduleText();}
+  function sync(){for(const k of ['big','small']){el('vr-current-'+k).value=String(state.currents[k]);el('vr-current-'+k).setAttribute('aria-valuetext',state.currents[k].toFixed(1)+'倍相对电流');el('vr-current-value-'+k).textContent=state.currents[k].toFixed(1);}el('vr-count').value=String(state.beadCount);el('vr-count').setAttribute('aria-valuetext','每腔'+state.beadCount+'颗，整机'+(state.beadCount*8)+'颗');for(const scope of [root,document.getElementById('relay-notes')].filter(Boolean)){for(const n of scope.querySelectorAll('[data-bead-count]'))n.textContent=String(state.beadCount);for(const n of scope.querySelectorAll('[data-bead-total]'))n.textContent=String(state.beadCount*8);}el('vr-play').textContent=state.playing?'暂停':'播放';el('vr-mode').value=world.mode;el('vr-scenario').value=world.scenario;el('vr-preset').value=state.timingPreset;el('vr-speed').value=String(state.speed);el('vr-select').value=String(state.selected);el('vr-view').value=state.view;el('vr-open').checked=state.open;el('vr-explode').checked=state.explode;syncScheduleText();}
   const durationLimits={lead:[.2,5],overlap:[.1,3],hold:[.1,3],allOff:[.5,6]};
   function getDurations(){const t=world.timing;return{lead:t.smallOn-t.bigOn,overlap:t.bigOff-t.smallOn,hold:t.smallOff-t.bigOff,allOff:t.period-t.smallOff+t.bigOn};}
   function validDurations(d){return d&&Object.entries(durationLimits).every(([k,[min,max]])=>Number.isFinite(d[k])&&d[k]>=min-1e-8&&d[k]<=max+1e-8);}
   function timingFromDurations(d){const bigOn=.2,smallOn=bigOn+d.lead,bigOff=smallOn+d.overlap,smallOff=bigOff+d.hold;return{bigOn,smallOn,bigOff,smallOff,period:d.lead+d.overlap+d.hold+d.allOff};}
   function setDurations(d){if(!validDurations(d))return false;world.timing=timingFromDurations(d);state.timingPreset='custom';seek(.1);save();return true;}
-  function syncScheduleText(){const t=world.timing,fmt=v=>String(Number(v.toFixed(1))),notes=document.getElementById('relay-notes');const fields={...t,...getDurations()};for(const scope of [root,notes].filter(Boolean))for(const n of scope.querySelectorAll('[data-time-key]'))n.textContent=fmt(fields[n.dataset.timeKey]);for(const key of Object.keys(durationLimits)){const slider=el('vr-duration-'+key);slider.value=fmt(fields[key]);slider.setAttribute('aria-valuetext',fmt(fields[key])+'秒');}const label=notes?.querySelector('#timing-preset-label');if(label)label.textContent={fast:'短周期：5.3秒（模型）',recommended:'对照：大行程时序（模型）',previous:'对照：更早的12秒时序（模型）',custom:'自定义时序（模型）'}[state.timingPreset];}
-  function save(){const p={kind:'branch-relay-v4',timingPreset:state.timingPreset,beadCount:state.beadCount,countRevision:2,durations:getDurations(),scenario:world.scenario,selected:state.selected,open:state.open,explode:state.explode,view:state.view,speed:state.speed,cameras:state.cameras};window.openai?.setWidgetState?.({modelContent:{kind:'branch-relay-v4',chambers:8,beads:state.beadCount*8,beadsPerChamber:state.beadCount,coils:9,placement:'outer-end',coilAxis:'Z',smallCoilRadius:118,timingPreset:state.timingPreset,timing:world.timing,sequence:'big on > small on > big off > small off',scenario:world.scenario,selectedChamber:state.selected+1,qualitativeModel:true},privateContent:p}).catch(()=>{});}
-  function applySaved(saved){const p=saved?.privateContent;if(p?.kind!=='branch-relay-v4')return;const restoredCount=p.countRevision===2?p.beadCount:p.beadCount*2;if(Number.isInteger(restoredCount)&&restoredCount>=E.MIN_COUNT&&restoredCount<=E.MAX_COUNT){state.beadCount=restoredCount;world=E.createWorld({timing:world.timing,beadCount:state.beadCount});}if(['fast','recommended','previous'].includes(p.timingPreset)){state.timingPreset=p.timingPreset;world.timing={...window.RelayTimingData[state.timingPreset].timing};}else if(p.timingPreset==='custom'&&validDurations(p.durations)){state.timingPreset='custom';world.timing=timingFromDurations(p.durations);}if(['normal','weak','startweak'].includes(p.scenario))world.scenario=p.scenario;for(const k of ['open','explode'])if(typeof p[k]==='boolean')state[k]=p[k];if(Number.isInteger(p.selected))state.selected=clamp(p.selected,0,7);if(['perspective','top','front'].includes(p.view))state.view=p.view;if([.5,1,2].includes(p.speed))state.speed=p.speed;if(Array.isArray(p.cameras))p.cameras.slice(0,2).forEach((c,i)=>{if(c&&[c.az,c.el,c.zoom].every(Number.isFinite))state.cameras[i]={az:c.az,el:clamp(c.el,-.15,1.5),zoom:clamp(c.zoom,.65,1.6)};});seek(.1);dirty=true;}
+  function syncScheduleText(){const t=world.timing,fmt=v=>String(Number(v.toFixed(1))),notes=document.getElementById('relay-notes');const fields={...t,...getDurations()};for(const scope of [root,notes].filter(Boolean))for(const n of scope.querySelectorAll('[data-time-key]'))n.textContent=fmt(fields[n.dataset.timeKey]);for(const key of Object.keys(durationLimits)){const slider=el('vr-duration-'+key);slider.value=fmt(fields[key]);slider.setAttribute('aria-valuetext',fmt(fields[key])+'秒');}const label=notes?.querySelector('#timing-preset-label');if(label)label.textContent={fast:'强驱动快速周期：2.8秒（模型）',gentle:'对照：5.3秒时序（模型）',recommended:'对照：大行程时序（模型）',previous:'对照：更早的12秒时序（模型）',custom:'自定义时序（模型）'}[state.timingPreset];}
+  function save(){const p={kind:'branch-relay-v4',timingPreset:state.timingPreset,beadCount:state.beadCount,countRevision:2,driveRevision:1,currents:{...state.currents},durations:getDurations(),scenario:world.scenario,selected:state.selected,open:state.open,explode:state.explode,view:state.view,speed:state.speed,cameras:state.cameras};window.openai?.setWidgetState?.({modelContent:{kind:'branch-relay-v4',chambers:8,beads:state.beadCount*8,beadsPerChamber:state.beadCount,coils:9,placement:'outer-end',coilAxis:'Z',smallCoilRadius:118,timingPreset:state.timingPreset,timing:world.timing,currents:state.currents,driveRevision:1,sequence:'big on > small on > big off > small off',scenario:world.scenario,selectedChamber:state.selected+1,qualitativeModel:true},privateContent:p}).catch(()=>{});}
+  function applySaved(saved){const p=saved?.privateContent;if(p?.kind!=='branch-relay-v4')return;if(p.driveRevision===1&&p.currents&&['big','small'].every(k=>Number.isFinite(p.currents[k])&&p.currents[k]>=.5&&p.currents[k]<=2.5)){state.currents={...p.currents};world.currents={...state.currents};}const restoredCount=p.countRevision===2?p.beadCount:p.beadCount*2;if(Number.isInteger(restoredCount)&&restoredCount>=E.MIN_COUNT&&restoredCount<=E.MAX_COUNT){state.beadCount=restoredCount;world=E.createWorld({timing:world.timing,beadCount:state.beadCount,currents:state.currents});}if(p.driveRevision===1&&['fast','gentle','recommended','previous'].includes(p.timingPreset)){state.timingPreset=p.timingPreset;world.timing={...window.RelayTimingData[state.timingPreset].timing};}else if(p.driveRevision===1&&p.timingPreset==='custom'&&validDurations(p.durations)){state.timingPreset='custom';world.timing=timingFromDurations(p.durations);}if(['normal','weak','startweak'].includes(p.scenario))world.scenario=p.scenario;for(const k of ['open','explode'])if(typeof p[k]==='boolean')state[k]=p[k];if(Number.isInteger(p.selected))state.selected=clamp(p.selected,0,7);if(['perspective','top','front'].includes(p.view))state.view=p.view;if([.5,1,2].includes(p.speed))state.speed=p.speed;if(Array.isArray(p.cameras))p.cameras.slice(0,2).forEach((c,i)=>{if(c&&[c.az,c.el,c.zoom].every(Number.isFinite))state.cameras[i]={az:c.az,el:clamp(c.el,-.15,1.5),zoom:clamp(c.zoom,.65,1.6)};});seek(.1);dirty=true;}
   function resize(){canvases.forEach((c,i)=>{const r=c.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,2);sizes[i]={w:Math.max(1,r.width),h:Math.max(1,r.height),dpr};c.width=Math.round(sizes[i].w*dpr);c.height=Math.round(sizes[i].h*dpr);contexts[i].setTransform(dpr,0,0,dpr,0,0);});dirty=true;}
     function camera(index,bounds) {
     const c=state.cameras[index],w=sizes[index].w,h=sizes[index].h;
@@ -1911,10 +1920,13 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
    const ctx=contexts[index],{w,h}=sizes[index];ctx.clearRect(0,0,w,h);if(w<32||h<32)return;
    const bounds=index===0?(state.view==='top'?{min:[-135,-135,120],max:[135,135,258]}:{min:[-150,-140,0],max:[150,140,258]}):{min:[-50,state.explode?-16:-12,0],max:[62,12,128]};
    const cam=camera(index,bounds),scene=buildScene(index,cam);ctx.lineCap='round';ctx.lineJoin='round';
+   const ballSteel=mix(palette.fg,palette.bg,.32),ballFill=color(ballSteel),ballHighlight=color(mix(ballSteel,palette.bg,.85)),ballEdge=color(mix(ballSteel,palette.fg,.4));
    for(const c of scene.commands){ctx.globalAlpha=c.alpha;
     if(c.kind==='ball'){
-     const p=c.pts[0],r=Math.max(.8,c.radius),steel=mix(palette.fg,palette.bg,.32),grad=ctx.createRadialGradient(p.x-r*.3,p.y-r*.35,r*.05,p.x,p.y,r);
-     grad.addColorStop(0,color(mix(steel,palette.bg,.85)));grad.addColorStop(.48,color(steel));grad.addColorStop(1,color(mix(steel,palette.fg,.4)));ctx.fillStyle=grad;ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();continue;
+     const p=c.pts[0],r=Math.max(.8,c.radius);
+     if(r<1.6)ctx.fillStyle=ballFill;
+     else{const grad=ctx.createRadialGradient(p.x-r*.3,p.y-r*.35,r*.05,p.x,p.y,r);grad.addColorStop(0,ballHighlight);grad.addColorStop(.48,ballFill);grad.addColorStop(1,ballEdge);ctx.fillStyle=grad;}
+     ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();continue;
     }
     ctx.beginPath();c.pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
     if(c.kind==='face'){ctx.closePath();ctx.fillStyle=c.col;ctx.fill();}else{ctx.strokeStyle=c.col;ctx.lineWidth=c.width;ctx.setLineDash(c.dashed?[4,4]:[]);ctx.stroke();}
@@ -1943,7 +1955,9 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
   function tick(now){const dt=last?clamp((now-last)/1000,0,.08):0;last=now;if(state.playing){accumulator=Math.min(.16,accumulator+dt*state.speed);const budgetStart=performance.now();let steps=0;while(accumulator>=E.STEP&&steps<4){world.step();accumulator-=E.STEP;steps++;if(performance.now()-budgetStart>=8)break;}dirty=true;}if(dirty&&now-lastDraw>=50){render();lastDraw=now;}clockId=raf(tick);}
   function setView(v){state.view=v;state.cameras[0]={...defaults[0],...(v==='top'?{az:0,el:1.49}:v==='front'?{az:0,el:0}:{})};dirty=true;}
   function seek(t){world.time=0;world.pending=0;const fresh=window.VerticalGranular.createWorld({beadCount:state.beadCount});for(let l=0;l<8;l++)world.layers[l].forEach((p,i)=>Object.assign(p,fresh.layers[l][i]));world.mode='auto';world.advance(t);accumulator=0;last=0;sync();render();}
-  function setBeadCount(n){if(!Number.isInteger(n)||n<E.MIN_COUNT||n>E.MAX_COUNT)return false;state.beadCount=n;world=E.createWorld({timing:world.timing,beadCount:n});world.scenario=el('vr-scenario').value;seek(.1);save();return true;}
+  function setBeadCount(n){if(!Number.isInteger(n)||n<E.MIN_COUNT||n>E.MAX_COUNT)return false;state.beadCount=n;world=E.createWorld({timing:world.timing,beadCount:n,currents:state.currents});world.scenario=el('vr-scenario').value;seek(.1);save();return true;}
+  function setCurrent(k,value){if(!['big','small'].includes(k)||!Number.isFinite(value)||value<.5||value>2.5)return false;state.currents[k]=value;world.currents={...state.currents};seek(.1);save();return true;}
+  for(const k of ['big','small'])el('vr-current-'+k).addEventListener('input',e=>setCurrent(k,Number(e.target.value)));
   el('vr-count').addEventListener('input',e=>{setBeadCount(Number(e.target.value));});
   el('vr-play').addEventListener('click',()=>{state.playing=!state.playing;last=0;sync();dirty=true;});
   el('vr-mode').addEventListener('change',e=>{world.mode=e.target.value;state.playing=true;last=0;sync();dirty=true;});
@@ -1961,7 +1975,7 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
   canvases.forEach((c,i)=>{let drag=null;c.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,...state.cameras[i]};c.setPointerCapture?.(e.pointerId);});c.addEventListener('pointermove',e=>{if(!drag)return;state.cameras[i].az=drag.az+(e.clientX-drag.x)*.008;state.cameras[i].el=clamp(drag.el+(e.clientY-drag.y)*.006,-.15,1.5);dirty=true;});const stop=()=>{if(drag){drag=null;save();}};c.addEventListener('pointerup',stop);c.addEventListener('pointercancel',stop);c.addEventListener('lostpointercapture',stop);window.addEventListener('blur',stop);c.addEventListener('wheel',e=>{e.preventDefault();state.cameras[i].zoom=clamp(state.cameras[i].zoom*Math.exp(-e.deltaY*.001),.65,1.6);dirty=true;save();},{passive:false});});
   window.addEventListener('resize',resize);window.addEventListener('openai:set_globals',e=>{applySaved(e.detail?.globals?.widgetState);updateTheme();});if(typeof ResizeObserver!=='undefined')new ResizeObserver(resize).observe(root);if(typeof MutationObserver!=='undefined')new MutationObserver(updateTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
   applySaved(window.openai?.widgetState);sync();updateTheme();resize();render();clockId=raf(tick);
-  window.__radialIron3D={state,get world(){return world;},render,resize,seek,setView,setDurations,getDurations,setBeadCount,geometry:()=>meshes,labels:()=>labelRegions,advance:t=>{world.advance(t);render();},dimensions:{chambers:8,get beadsPerChamber(){return state.beadCount;},get totalBeads(){return state.beadCount*8;},beadDiameter:2,clearGap:2.8,clearWidth:W,maxClearHeight:H-E.floor(0),minClearHeight:H-E.floor(W),floorRadius:126,shellRadius:130,sheet:1.5,radialMin:RIN,radialMax:RIN+W,floorMinZ:BASE+E.floor(0),floorMaxZ:BASE+E.floor(W),ceilingZ:225,angularPitch:45,commonCoils:1,branchCoils:8,branchCoilRadius:E.SMALL_RADIUS,coilAxesParallel:true,coilAxis:[0,0,1],branchCoilWinding:{outerDiameter:18,innerDiameter:8,height:8,z0:232,z1:240},branchCore:{diameter:6,z0:227,z1:242}},stop:()=>{state.playing=false;window.cancelAnimationFrame?.(clockId);}};
+  window.__radialIron3D={state,get world(){return world;},render,resize,seek,setView,setDurations,getDurations,setBeadCount,setCurrent,geometry:()=>meshes,labels:()=>labelRegions,advance:t=>{world.advance(t);render();},dimensions:{chambers:8,get beadsPerChamber(){return state.beadCount;},get totalBeads(){return state.beadCount*8;},beadDiameter:2,clearGap:2.8,clearWidth:W,maxClearHeight:H-E.floor(0),minClearHeight:H-E.floor(W),floorRadius:126,shellRadius:130,sheet:1.5,radialMin:RIN,radialMax:RIN+W,floorMinZ:BASE+E.floor(0),floorMaxZ:BASE+E.floor(W),ceilingZ:225,angularPitch:45,commonCoils:1,branchCoils:8,branchCoilRadius:E.SMALL_RADIUS,coilAxesParallel:true,coilAxis:[0,0,1],branchCoilWinding:{outerDiameter:18,innerDiameter:8,height:8,z0:232,z1:240},branchCore:{diameter:6,z0:227,z1:242}},stop:()=>{state.playing=false;window.cancelAnimationFrame?.(clockId);}};
   }catch(error){const n=root.querySelector('#vr-startup');if(n){n.textContent='初始化失败：'+(error?.message||String(error));n.setAttribute('role','alert');}console.error(error);}
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',launch,{once:true});else launch();
@@ -1972,14 +1986,14 @@ window.RelayTimingData={"recommended":{"id":"refine_hold09","label":"端部短�
 <section id="relay-notes" style="margin-top:28px">
  <p>数量可调：每腔<span data-bead-count>200</span>颗，整机<span data-bead-total>1600</span>颗；默认比上一版800颗增加一倍。数量变化会改变堆积与响应，线圈作用代理没有随数量自动增强，不能据此推断实体能带动更多铁珠。</p>
  <h2>可调时序：缩短周期，观察升起与落回</h2>
- <p id="timing-preset-label">短周期：5.3秒（模型）</p>
+ <p id="timing-preset-label">强驱动快速周期：2.8秒（模型）</p>
  <table class="table"><caption class="sr-only">大小线圈通断时序与条件响应</caption><thead><tr><th scope="col">演示阶段</th><th scope="col">大线圈M0</th><th scope="col">小线圈S1至S8</th><th scope="col">接力足够时的示意</th></tr></thead><tbody>
   <tr><th scope="row"><span data-time-key="bigOn">0.5</span>至<span data-time-key="smallOn">3</span>秒</th><td>开</td><td>关</td><td>大线圈单独起动<span data-time-key="lead">2.5</span>秒，观察珠群升起程度</td></tr>
   <tr><th scope="row"><span data-time-key="smallOn">3</span>至<span data-time-key="bigOff">4.2</span>秒</th><td>开</td><td>开</td><td>重叠<span data-time-key="overlap">1.2</span>秒，端部作用引导径向迁移</td></tr>
   <tr><th scope="row"><span data-time-key="bigOff">4.2</span>至<span data-time-key="smallOff">5.1</span>秒</th><td>关</td><td>开</td><td>端部短停<span data-time-key="hold">0.9</span>秒，部分保持、其余先落；随后尽快释放</td></tr>
   <tr><th scope="row"><span data-time-key="smallOff">5.1</span>秒至下一次大开</th><td>关</td><td>关</td><td>全断共<span data-time-key="allOff">4</span>秒，观察珠群落下及沿弧底回落；过短会在未落稳时进入下一周期</td></tr>
  </tbody></table>
- <p>默认短周期为1.8秒大单独、0.6秒重叠、0.4秒小单独、2.5秒全断，比8.6秒对照更紧凑，但不保证完整行程。四个滑块均以0.1秒为步长；拖动后从周期起点重新计算，暂停状态保持。当前周期<span data-time-key="period">5.3</span>秒，起始静置<span data-time-key="bigOn">0.2</span>秒计入跨周期的全断间隔。所有秒数都是模型画面时间，不是实测控制参数。8只小线圈同步通断，没有编排逐分支波浪或逐颗轨迹。</p>
+ <p>默认大线圈相对电流1.8×、小线圈1.6×；默认周期为0.8秒大单独、0.3秒重叠、0.3秒小单独、1.4秒全断，合计2.8秒。相对电流进入磁场代理及其梯度计算，受数值力上限约束，不是播放倍速，也不是已确定的安培值。短周期不保证全部铁珠完成行程。四个滑块均以0.1秒为步长；拖动后从周期起点重新计算，暂停状态保持。当前周期<span data-time-key="period">2.8</span>秒，起始静置<span data-time-key="bigOn">0.2</span>秒计入跨周期的全断间隔。升流模式首次使用快速预设，后续可分别调整电流与时长。实体不能直接照搬倍数加电：线圈额定电流、线径、供电驱动与散热需另行核定。所有秒数都是模型画面时间，不是实测控制参数。8只小线圈同步通断，没有编排逐分支波浪或逐颗轨迹。</p>
  <p><strong>实体按事件标定：</strong>大部分铁珠进入上方工作区后再开小线圈；端部开始稳定吸引后关大线圈；完成迁移后尽快关小线圈；珠群落回并恢复后再开大线圈。先用视频或目测逐段测时，有位置反馈时可按这些事件切换。无法吸起或断电挂珠，需要调整磁路、材料与气隙，单纯改等待时间不能保证解决。</p>
  <details><summary>查看此前大行程对照的19组候选比较与400颗模型复核</summary>
   <p>以下固定为400颗的历史比较，只适用于当时的8.6秒大行程对照和12秒早期对照，不代表当前短周期或自定义时序经过同样筛选。此前先在相同初始条件的独立单腔模型中比较19组时序，连续计算两周期，统计第二周期每颗铁珠的竖向及径向行程；随后用8腔400颗复核选定方案和上一版。这里只是在已试候选中选择，不是全局最优，也不是硬件验证。</p>

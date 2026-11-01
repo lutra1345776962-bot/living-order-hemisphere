@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="description" content="律动柱头项目总览：从水波纹与颗粒涌现概念，到弧底薄腔、中央与端部线圈、平顶压力交互，以及Arduino Nano与HX711的接线和实体小样。">
+<title>律动柱头 · 从水波纹到压力交互</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#content">跳到正文</a>
+<header class="site-header">
+<a class="brand" href="./" aria-label="律动柱头首页">律动柱头</a>
+<nav aria-label="本页目录"><a href="#evolution">概念演变</a><a href="#structure">当前构造</a><a href="#control">控制逻辑</a><a href="#wiring">Arduino接线</a><a href="#prototype">实体小样</a><a href="#downloads">演示与下载</a></nav>
+</header>
+<main id="content">
+<section class="intro" aria-labelledby="page-title">
+<div><h1 id="page-title">从一滴水，<br>到会回应压力的柱头</h1>
+<p class="lead">把一次局部扰动，转译为许多颗粒共同的变化。概念来自水波纹；目前的实现候选是<strong>平顶受压、磁场接力、铁珠升降</strong>。</p>
+<p>这页串起从概念到构造、电控与小样的完整过程。当前采用8条放射状弧底透明薄腔、1只中央大线圈和8只端部小线圈，由Arduino统一触发。</p>
+<div class="actions"><a class="button primary" href="#control">先看整体控制</a><a class="button" href="press-interaction.html">打开最新三维交互</a></div>
+<p class="meta">整理于2026年11月1日 · 已有数字演示与电控方案，实体运动待验证</p></div>
+<figure class="concept-figure"><img src="assets/overview/concept.svg" width="720" height="360" alt="水滴扰动产生同心波纹，转译为颗粒高度起伏，再转译为中央与8个端部线圈的控制。"><figcaption>水波纹提供运动语言，磁场与薄腔提供候选实现方式。</figcaption></figure>
+</section>
+
+<section id="evolution" class="chapter" aria-labelledby="evolution-title">
+<div class="section-heading"><h2 id="evolution-title">方案是怎样一步步形成的</h2><a href="archive/ripple-v4.html">查看最初的水波纹演示</a></div>
+<p class="section-intro">一路保留的是“整体固定、内部运动、对外界输入作出回应”；变化的是颗粒材料、运动约束，以及磁场怎样接近颗粒。</p>
+<ol class="evolution-list">
+<li><h3>水滴与涟漪</h3><div><p>一次局部冲击，引出回弹、向外传播与衰减。先用水面理解“一个输入如何影响整体”。</p><p class="quiet">这是形态与动力概念。早期演示采用简化阻尼波模型，并非真实水面或磁场求解。</p></div><a href="archive/ripple-v4.html">水波纹 V4</a></li>
+<li><h3>把波纹转译为颗粒起伏</h3><div><p>固定柱头外壳，颗粒只上下移动。V6曾用20×20共400个受约束单元，观察由柱身连接处向上的扰动。</p><p class="quiet">这条路线关注邻域传播；模型中的传播系数与反向脉冲不能直接当作真实磁力。</p></div><a href="v6-bottom-up.html">早期半球 V6</a></li>
+<li><h3>改为铁珠，尝试一只中央线圈</h3><div><p>希望用统一变化的磁场驱动很多小铁珠，减少逐颗执行器与接线。</p><p class="quiet">中央线圈远处的吸引不足、珠群结团和剩磁释放成为关键问题，单纯增加电流不能保证整机大行程。</p></div><span class="stage-note">简化驱动的探索</span></li>
+<li><h3>透明浅腔，再转向竖向薄腔</h3><div><p>先探索浅腔里的周期展开、收拢，再把运动平面竖起来，使通电吸引与重力落回形成明显升降。</p><p class="quiet">薄腔限制前后乱动，让运动可观察；它本身不会自动解决磁力和摩擦问题。</p></div><span class="stage-note">确定运动约束</span></li>
+<li><h3>薄腔随柱头的圆弧收底</h3><div><p>8片竖向透明薄腔以45°间隔放射布置，下缘随弧底收向柱身，保留半球柱头的轮廓。</p><p class="quiet">R130外壳、R126弧底是外形约束，长距离整腔吸起尚未得到实体证明。</p></div><a href="relay.html">弧底与整机演示</a></li>
+<li><h3>增加8只端部小线圈</h3><div><p>中央大线圈先开，端部小线圈随后开；再依次关大、关小，尝试让珠群在中央与端部之间迁移并落回。</p><p class="quiet">大小线圈轴线都沿竖直Z方向，小线圈放在分支外端；8路同步，不逐颗指定运动。</p></div><a href="relay.html">接力与时序滑块</a></li>
+<li><h3>平整顶面，内藏压力输入</h3><div><p>把传感器藏到顶板下方，通过HX711把压力信号交给Arduino，再由驱动模块控制1大8小。</p><p class="quiet">上面保持连续平面；HX711与控制器放到底座，传感器承压路径与磁骨架分开。</p></div><a href="press-interaction.html">当前压力交互方案</a></li>
+</ol>
+<div class="emergence"><h3>“涌现”在这里指什么</h3><p>目标是让大量铁珠在简单的磁场规则、重力和相互接触作用下形成整体变化。现在的电控规则已经很简单，但<strong>8个分支同步启动，以及画面里出现波纹，都不足以证明实体涌现</strong>。是否存在由颗粒相互作用产生的传播，需要用小样和对照实验区分。</p></div>
+</section>
+
+<section id="structure" class="chapter" aria-labelledby="structure-title">
+<div class="section-heading"><h2 id="structure-title">当前构造：平顶、弧底、8个分支</h2><a href="press-interaction.html">旋转查看三维布置</a></div>
+<figure class="wide-figure"><img src="assets/overview/assembly.png" width="1140" height="496" loading="lazy" alt="现有三维数字模型：平顶下藏LLB130，中央M0与8只端部小线圈分布在柱头内；HX711、Nano、缓冲器和驱动模块放在底座。"><figcaption>现有三维模型的布置图。传感器、线圈与底座模块已标注；模型轮廓不等于加工图。</figcaption></figure>
+<div class="two-column">
+<div><h3>从顶面到柱身</h3><p>平整PC顶板下方依次设置承压弹簧、非磁压头和LLB130。力经独立支座进入柱身，线圈和磁骨架固定在另一条路径上，减少磁吸反力对测力的影响。</p><p>中央区域预留约24mm夹层；传感器不夹在铜绕组中。周边导向让整块顶板轻微下沉，保持顶面为一个平面，下面设限位。</p><a href="assets/overview/flat-top-section.svg">放大平顶传力剖面</a></div>
+<div><h3>从磁场到铁珠</h3><p>8条竖向薄腔围绕柱心展开，底部随圆弧收拢。中央M0和外端S1—S8的轴线均竖直，通过通断改变工作区域。</p><p>低功耗的方向是让有效磁极接近珠群、缩小气隙，并试验回磁路径。现有径向软铁件作为可拆试件，最终磁路还未定型，不能预设9只线圈互不影响。</p></div>
+</div>
+<div class="table-wrap" role="region" aria-label="外形与小样参数表，可横向滚动" tabindex="0"><table>
+<caption>已讨论的尺度及其用途，均须按实际部件复核</caption><thead><tr><th scope="col">项目</th><th scope="col">当前记录</th><th scope="col">怎样理解</th></tr></thead><tbody>
+<tr><th scope="row">整体外形</th><td>外径260mm；外壳R130；弧底R126</td><td>保留的外形约束，不保证远处铁珠能被吸起</td></tr>
+<tr><th scope="row">平整顶板</th><td>PC，Ø260×6mm；下方留夹层</td><td>从下方装配，不增加顶面按钮凸起</td></tr>
+<tr><th scope="row">数字演示珠数</th><td>默认200颗/腔，共1600颗；可调400—3200颗</td><td>模型的数量范围，不是已验证承载能力</td></tr>
+<tr><th scope="row">实体第一步</th><td>1条薄腔；Ø2铁珠先1、再5、再20颗</td><td>先用M0+S1验证，不直接复制八腔</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="control" class="chapter" aria-labelledby="control-title">
+<div class="section-heading"><h2 id="control-title">最简单的控制逻辑</h2><a href="press-interaction.html">看完整压力与信号动画</a></div>
+<p class="section-intro"><strong>上部受压 → 传感器 → HX711 → Arduino → 驱动模块 → 线圈通断 → 铁珠运动。</strong>Arduino发指令，外置电源给线圈提供能量。</p>
+<div class="sequence-layout">
+<figure class="sequence-figure">
+<svg id="sequence-diagram" viewBox="0 0 680 360" role="img" aria-labelledby="sequence-title sequence-desc">
+<title id="sequence-title">一条薄腔的接力动作示意</title><desc id="sequence-desc">中央M0与端部S先后通断，铁珠以概念轨迹展示中央吸引、端部保持和重力落回。8只S同步，这里只展示其中一腔。</desc>
+<rect x="30" y="30" width="620" height="18" class="flat-top"/><text x="340" y="20" text-anchor="middle">连续平整顶面</text>
+<path d="M140 142 H572 V267 Q365 350 140 267Z" class="chamber"/>
+<path d="M140 267 Q365 350 572 267" class="arc-floor"/>
+<path d="M175 90 V166 M536 90 V166" class="axes"/>
+<rect id="m0-coil" x="125" y="86" width="100" height="44" rx="3" class="coil"/>
+<rect id="s-coil" x="509" y="91" width="54" height="34" rx="3" class="coil"/>
+<text x="175" y="75" text-anchor="middle">中央 M0</text><text x="536" y="75" text-anchor="middle">端部 S</text>
+<g id="bead-group">/*__BEADS__*/</g>
+<text x="45" y="350">弧底薄腔剖面 · 只显示一腔，S1—S8同步</text>
+</svg>
+<figcaption>目标动作示意，轨迹为说明控制顺序而绘制，未计算真实磁力、碰撞或行程。</figcaption>
+</figure>
+<div><div class="phase-buttons" role="group" aria-label="逐步查看线圈状态">
+<button type="button" data-phase="0" aria-pressed="false"><span>1</span><strong>大线圈先开</strong><small>M0开 · S关</small></button>
+<button type="button" data-phase="1" aria-pressed="false"><span>2</span><strong>小线圈也开</strong><small>M0开 · S开</small></button>
+<button type="button" data-phase="2" aria-pressed="false"><span>3</span><strong>大线圈关闭</strong><small>M0关 · S开</small></button>
+<button type="button" data-phase="3" aria-pressed="true"><span>4</span><strong>小线圈关闭</strong><small>M0关 · S关</small></button>
+</div>
+<p id="phase-explanation" role="status">全部断电，铁珠依靠重力落回弧底，准备下一轮。</p>
+<button type="button" id="play-sequence" class="primary">放慢演示一轮</button><p class="quiet">可点击任一阶段查看。这里的播放时间用于讲解，不是实体通断时间。</p></div>
+</div>
+<div class="two-column control-notes"><div><h3>轻按、长按、松手</h3><ul><li>轻按达到阈值，启动一轮。</li><li>持续受压，整机按同一顺序循环。</li><li>持续按压后松手，保留两轮间隔更长的收尾，再停止；短按只一轮。</li></ul></div><div><h3>动画2.8秒，实体先从4秒起步</h3><p>当前实体程序默认四段为0.8秒大单独、0.3秒重叠、0.3秒小单独、2.6秒全断，最快周期4秒；较轻的压力还会增加间歇。</p><p>2.8秒保留为模型演示与后续试验选项。必须先确认珠群能起吸、释放和落稳，再缩短间隔。</p></div></div>
+</section>
+
+<section id="wiring" class="chapter" aria-labelledby="wiring-title">
+<div class="section-heading"><h2 id="wiring-title">Arduino怎样把它们连起来</h2><a href="circuit-diagram.html">打开可放大电路图</a></div>
+<p class="section-intro">一条是<strong>信号链</strong>，一条是<strong>供电链</strong>。两者共用0V参考；线圈电流不经过Arduino，也不经过无焊面包板。</p>
+<ol class="signal-chain" aria-label="信号经过的模块"><li><strong>LLB130</strong><span>感受压力</span></li><li><strong>HX711</strong><span>放大并转换</span></li><li><strong>Nano</strong><span>判断与计时</span></li><li><strong>DRV8874</strong><span>通断与调流</span></li><li><strong>M0与S</strong><span>形成磁场变化</span></li></ol>
+<figure class="circuit-figure"><a href="circuit-diagram.html" aria-label="打开可放大的完整模块端子电路图"><img src="assets/circuit-diagram/system.svg" width="3500" height="2340" loading="lazy" alt="Nano居中，左侧LLB130与HX711，右侧74HC244和8路DRV8874，下方中央驱动、12V电源、5V降压及温控保护。详细针脚见接线表。"></a><figcaption>白底模块端子总图。实心点表示连接，跨线桥表示不连接；点击可放大并切换驱动详图。</figcaption></figure>
+<div class="actions"><a class="button primary" href="breadboard-wiring.html?view=board&amp;step=adc&amp;wire=dat">查看面包板孔位与逐线接法</a><a class="button" href="circuit-diagram.html?sheet=driver">查看DRV8874完整设置</a></div>
+<div class="table-wrap" role="region" aria-label="Arduino主要接线表，可横向滚动" tabindex="0"><table>
+<caption>采用经典5V Arduino Nano A000005；HX711使用SparkFun SEN-13879</caption><thead><tr><th scope="col">连接对象</th><th scope="col">具体接法</th><th scope="col">作用</th></tr></thead><tbody>
+<tr><th scope="row">传感器 → HX711</th><td>红E+→E+；黑E−→E−；绿S+→A+；白S−→A−</td><td>四线全桥；线色须核对随货证书</td></tr>
+<tr><th scope="row">HX711 → Nano</th><td>DAT/DT → D3；CLK/SCK ← D2；VCC和VDD接5V，GND共地</td><td>读压力数据并提供采样时钟；不是I²C</td></tr>
+<tr><th scope="row">中央驱动</th><td>D9 → 220Ω → M0的IN1；IN1另接10kΩ至GND</td><td>只控制中央M0</td></tr>
+<tr><th scope="row">8路端部驱动</th><td>D10 → SN74HC244N的8个A输入；各Y分别经220Ω至各S的IN1，各IN1用10kΩ下拉</td><td>8只S同步，缓冲输出不互相并联</td></tr>
+<tr><th scope="row">驱动故障</th><td>9路开漏FAULT并到D4，4.7kΩ上拉5V</td><td>任一路报告故障就停机</td></tr>
+<tr><th scope="row">绕组温控</th><td>常闭50℃温控串联链接D5与GND；D5用4.7kΩ上拉</td><td>过热或断线后停机</td></tr>
+<tr><th scope="row">线圈供电</th><td>12V → 总保险 → 急停 → 分路保险 → 各驱动VIN；OUT1/2接对应线圈两端</td><td>动力线经端子，独立回到公共0V</td></tr>
+<tr><th scope="row">逻辑供电</th><td>12V逻辑支路 → D24V10F5 → JP1 → 5V逻辑总线</td><td>USB调试前拔下JP1；Nano VIN悬空</td></tr>
+</tbody></table></div>
+<details><summary>展开74HC244针号与驱动模式</summary><p>244的20脚接5V，10脚GND，1和19脚OE接GND；20与10脚就近接100nF。D10同时接2、4、6、8、11、13、15、17脚；18、16、14、12、9、7、5、3脚分别输出到S1—S8。D10总线另加10kΩ下拉。</p><p>每块DRV8874 #4035：PMODE和SLEEP接5V；PH/IN2、IMODE直接接GND。保留CS原板2.49kΩ；VREF另接Rd至GND，首次统一560Ω。VM侧就近配置470µF/35V、100nF和SMCJ18A。完整接法与后续限流档见驱动详图，不能只接IN1、VIN就通电。</p></details>
+</section>
+
+<section id="prototype" class="chapter" aria-labelledby="prototype-title">
+<div class="section-heading"><h2 id="prototype-title">落到实体，先完成一条薄腔</h2><a href="downloads/capital-prototype.zip" download>下载实体小样实施包</a></div>
+<p class="section-intro">先证明“能吸起、能释放、能重复”，再扩展数量和分支。首样只需M0+S1两块驱动，其余7路等首腔通过后再接。</p>
+<div class="two-column"><div><h3>最简试验夹具</h3><p>透明板两片约50×35×1mm，隔框留35×20mm窗口，前后净隙2.6mm，局部弧底随R126。Ø2铁珠按1→5→20颗递增。</p><p>极面先从5mm距离测起，再测10、15、20mm；初步观察是否能重复上移10mm并落回。近距离成功后，还须回到最终磁极位置复验。</p><p>这是小窗口试验夹具，不能直接当整条弧底薄腔的加工图。</p></div><div><h3>线圈与功耗先保守</h3><p>M0试绕600匝、铜裸线Ø0.50mm，S试绕300匝、Ø0.30mm；轴线保持竖直。匝数和线径是试制起点。</p><p>先用560Ω的VREF下拉低流档，再按测得的吸力和温升逐级调整。此前按试绕与占空比估算的平均输入预算约10—15W，尚非实测功耗。</p><p>远处吸不起时，先调整极面、气隙与回磁试件，不用不断升流替代磁路验证。</p></div></div>
+<div class="table-wrap" role="region" aria-label="核心材料表，可横向滚动" tabindex="0"><table>
+<caption>核心部件：首腔起步 / 后续8分支</caption><thead><tr><th scope="col">部件</th><th scope="col">型号或规格</th><th scope="col">数量</th></tr></thead><tbody>
+<tr><th scope="row">控制器</th><td>Arduino Nano A000005，经典5V ATmega328P</td><td>1 / 1</td></tr>
+<tr><th scope="row">压力输入</th><td>FUTEK LLB130 FSH04855，10lb；HX711 SEN-13879</td><td>各1 / 各1</td></tr>
+<tr><th scope="row">线圈驱动</th><td>Pololu #4035 DRV8874，逐路独立限流</td><td>2 / 9</td></tr>
+<tr><th scope="row">逻辑缓冲</th><td>TI SN74HC244N，PDIP20</td><td>1 / 1</td></tr>
+<tr><th scope="row">电源与降压</th><td>GST60A12-P1J，12V/5A；D24V10F5，5V/1A</td><td>各1 / 各1</td></tr>
+<tr><th scope="row">磁与运动部件</th><td>M0与S定制绕组、低剩磁软铁极芯、Ø2铁珠、透明板与隔框</td><td>按首腔 / 再复制</td></tr>
+<tr><th scope="row">保护与装配</th><td>保险、急停、温控、电容、TVS、限流电阻、动力端子及逻辑面包板</td><td>按已安装驱动配置</td></tr>
+</tbody></table></div>
+<h3 class="spaced-heading">从空载到整机的验收顺序</h3>
+<ol class="validation-list"><li><strong>逻辑：</strong>先不接线圈，确认D9/D10四阶段及故障关断。</li><li><strong>单路：</strong>低流测试每只线圈，记录电流、释放与温升。</li><li><strong>单腔：</strong>少量铁珠，带标尺录视频，确认重复位移与落回。</li><li><strong>压力：</strong>安装后去皮、加已知砝码标定，再测空压时开关线圈是否造成误触发。</li><li><strong>扩展：</strong>最终磁极位置验收后，再逐级增加到8腔；模型中的1600颗暂不作为验收目标。</li></ol>
+<details><summary>Arduino程序怎样启用</summary><p>程序下载包内含<code>CapitalPrototype.ino</code>与两个头文件，无第三方HX711库依赖。串口115200，先完成基准和砝码标定，再手动启用；没有连接或烧录到实体Arduino。</p><pre><code>t                 // 在正常顶板静载下记录基准
+k 4.903325        // 已增加0.5kg砝码，求标定比例
+p 1.2 0.5         // 增压启动/释放阈值，单位N
+r 4000            // 最快周期4秒，首轮默认
+a                 // 移去砝码、回到基准后启用
+x                 // 立即停止</code></pre><p>首次低流、传感器标定和保护检测步骤见实施包。Arduino只给HIGH/LOW指令；真实安培值由驱动硬件设置。压力、数据超时或硬件故障异常时，程序关闭输出并锁存。</p></details>
+</section>
+
+<section id="downloads" class="chapter" aria-labelledby="downloads-title">
+<h2 id="downloads-title">全部演示和制作资料</h2>
+<div class="resource-list">
+<a href="archive/ripple-v4.html"><strong>水波纹与颗粒转译</strong><span>最初的水滴、回弹、传播与衰减概念</span></a>
+<a href="v6-bottom-up.html"><strong>早期400单元半球</strong><span>固定导向、从柱身向上输入的历史路线</span></a>
+<a href="relay.html"><strong>大小线圈接力演示</strong><span>原首页完整保留，含数量、电流代理和时序滑块</span></a>
+<a href="press-interaction.html"><strong>当前三维压力交互</strong><span>平顶受压、内藏传感器、1大8小与信号链</span></a>
+<a href="breadboard-wiring.html?view=board&amp;step=adc&amp;wire=dat"><strong>面包板逐线接法</strong><span>Nano、HX711、244与驱动模块的孔位及逻辑</span></a>
+<a href="circuit-diagram.html"><strong>模块端子电路图</strong><span>总图、单路驱动详图、PNG / SVG / A3 PDF</span></a>
+<a href="downloads/capital-prototype.zip" download><strong>实体小样实施包</strong><span>材料清单、结构参数、接线、上电标定与Arduino源程序</span></a>
+<a href="downloads/materials.csv" download><strong>完整材料清单 CSV</strong><span>首腔与整机数量、采购型号、备注及原厂资料链接</span></a>
+</div>
+<p class="closing-note">已整理的是设计过程、可运行数字演示、端子接线与小样程序。真实吸力、升降幅度、短周期、功耗、传感器抗干扰，以及颗粒间的涌现行为，都需要用实体试验逐项确认。</p>
+</section>
+</main>
+<footer><p>律动柱头 · 从概念、构造到控制的项目记录</p><p>保留各阶段版本，便于比较设计选择。<a href="#page-title">回到顶部</a></p></footer>
+<script>/*__APP__*/</script>
+</body></html>

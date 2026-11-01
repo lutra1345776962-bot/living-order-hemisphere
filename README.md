@@ -1,6 +1,12 @@
-# 半球柱头：大小线圈顺序接力
+# 律动柱头：从水波纹到压力交互
 
-首页更新为8个弧底透明薄腔、1只中央大线圈和8只端部小线圈的三维动态示意。9只线圈绕组平面均水平，轴向均为竖直Z；小线圈中心位于R118。
+首页现为项目总览：串起水波纹、颗粒起伏、中央线圈、透明浅腔、竖向弧底薄腔、端部接力和平顶压力交互；包含四阶段控制示意、Arduino接线表、材料/程序下载及所有历史演示入口。当前实体候选与早期V6路线分开记录，模型与未验证实体指标明确区分。
+
+维护源为`src/overview/`。`python scripts/build.py`同时生成总览`index.html`和原完整线圈演示`relay.html`，以后重建不会把总览覆盖回旧演示。公开小样包由`python scripts/prepare-overview-assets.py`从本地现有实施包准备，不包含工具日志或凭据。
+
+## 保留的大小线圈顺序接力
+
+[完整动态演示](relay.html)保留8个弧底透明薄腔、1只中央大线圈和8只端部小线圈。9只线圈绕组平面均水平，轴向均为竖直Z；小线圈中心位于R118。
 
 - 默认每腔200颗铁珠，整机1600颗；数量滑块可设每腔50至400颗，整机400至3200颗。
 - 四个时长滑块分别调整大线圈单独、大小重叠、小线圈单独、全部断电间隔；步长0.1秒。
@@ -12,15 +18,16 @@
 
 ## 本地运行与更新
 
-维护源为`src/engine.js`、`src/app.js`和`src/page.template.html`。在本目录执行：
+总览维护源为`src/overview/`；线圈演示维护源为`src/engine.js`、`src/app.js`和`src/page.template.html`。在本目录执行：
 
 ```sh
 python scripts/build.py
+node scripts/check-overview.cjs
 node scripts/check.cjs
 python -m http.server 8000
 ```
 
-构建生成纯静态、脚本内嵌的`index.html`。检查通过后提交并推送到`main`；GitHub Pages从分支根目录发布，`.nojekyll`保持纯静态提供。
+构建生成纯静态、样式/脚本内嵌的`index.html`和`relay.html`。总览还使用`assets/overview/`与`downloads/`，须随站点保留。检查通过后提交并推送到`main`；GitHub Pages从分支根目录发布，`.nojekyll`保持纯静态提供。
 
 在线地址：https://lutra1345776962-bot.github.io/living-order-hemisphere/
 

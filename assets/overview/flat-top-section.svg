@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1550" viewBox="0 0 2200 1550"><rect width="100%" height="100%" fill="white"/>
+<text x="65" y="90.75999999999999" font-family="Microsoft YaHei,sans-serif" font-size="52" fill="#172A38">03  平顶夹层的传力与限位</text>
+<text x="65" y="141.76" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#52636D">装置级剖面示意，纵向夸张，不是传感器制造图  /  所有自定尺寸均为试制值，单位mm</text>
+<rect x="120" y="255" width="910" height="70" fill="#DFEEF4" stroke="#1263A0" stroke-width="2"/>
+<text x="180" y="302.92" font-family="Microsoft YaHei,sans-serif" font-size="34" fill="#172A38">完整平顶PC板 Ø260 × 6（上方无凸起）</text>
+<polyline points="575,180 575,255" fill="none" stroke="#1263A0" stroke-width="8"/>
+<polygon points="575,255 568.3798881807529,239.34196310195097 581.6201118192471,239.34196310195097" fill="#1263A0"/>
+<text x="620" y="219.28" font-family="Microsoft YaHei,sans-serif" font-size="31" fill="#1263A0">轻按增力约1.2—10N</text>
+<rect x="505" y="325" width="140" height="45" fill="#DFEAE2" stroke="#246E50" stroke-width="2"/>
+<polyline points="575,370 575,395 605,415 545,436 605,457 545,478 605,499 545,520 605,541 545,562 605,583 575,605 575,635" fill="none" stroke="#246E50" stroke-width="6"/>
+<rect x="530" y="635" width="90" height="65" fill="#DFEAE2" stroke="#246E50" stroke-width="2"/>
+<rect x="520" y="730" width="110" height="40" fill="#F3D2AC" stroke="#AD4B09" stroke-width="2"/>
+<rect x="561" y="710" width="28" height="20" fill="#F3D2AC" stroke="#AD4B09" stroke-width="2"/>
+<rect x="485" y="785" width="180" height="45" fill="#E7EDF2" stroke="#172A38" stroke-width="2"/>
+<polyline points="575,700 575,710" fill="none" stroke="#246E50" stroke-width="5"/>
+<polygon points="575,710 568.3798881807529,694.3419631019509 581.6201118192471,694.3419631019509" fill="#246E50"/>
+<polyline points="575,770 575,785" fill="none" stroke="#246E50" stroke-width="5"/>
+<polygon points="575,785 568.3798881807529,769.3419631019509 581.6201118192471,769.3419631019509" fill="#246E50"/>
+<rect x="150" y="830" width="850" height="55" fill="#E7EDF2" stroke="#172A38" stroke-width="2"/>
+<rect x="155" y="885" width="45" height="305" fill="#E7EDF2" stroke="#172A38" stroke-width="2"/>
+<rect x="955" y="885" width="45" height="305" fill="#E7EDF2" stroke="#172A38" stroke-width="2"/>
+<text x="220" y="870.52" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#172A38">独立承压固定架 → 柱身</text>
+<rect x="183" y="330" width="24" height="310" fill="#E4E9ED" stroke="#52636D" stroke-width="2"/>
+<rect x="165" y="415" width="60" height="90" fill="#DDECE8" stroke="#246E50" stroke-width="2"/>
+<polyline points="195,640 195,830" fill="none" stroke="#52636D" stroke-width="3"/>
+<rect x="943" y="330" width="24" height="310" fill="#E4E9ED" stroke="#52636D" stroke-width="2"/>
+<rect x="925" y="415" width="60" height="90" fill="#DDECE8" stroke="#246E50" stroke-width="2"/>
+<polyline points="955,640 955,830" fill="none" stroke="#52636D" stroke-width="3"/>
+<rect x="255" y="390" width="90" height="25" fill="#DBE2E6" stroke="#52636D" stroke-width="2"/>
+<polyline points="300,415 300,830" fill="none" stroke="#52636D" stroke-width="3"/>
+<rect x="805" y="390" width="90" height="25" fill="#DBE2E6" stroke="#52636D" stroke-width="2"/>
+<polyline points="850,415 850,830" fill="none" stroke="#52636D" stroke-width="3"/>
+<polyline points="1140,325 1140,390" fill="none" stroke="#246E50" stroke-width="3"/>
+<polyline points="1120,325 1160,325" fill="none" stroke="#246E50" stroke-width="3"/>
+<polyline points="1120,390 1160,390" fill="none" stroke="#246E50" stroke-width="3"/>
+<text x="1090" y="450.52" font-family="Microsoft YaHei,sans-serif" font-size="29" fill="#246E50">2.0</text>
+<polyline points="630,750 1110,750" fill="none" stroke="#AD4B09" stroke-width="3"/>
+<polygon points="1110,750 1094.341963101951,756.6201118192471 1094.341963101951,743.3798881807529" fill="#AD4B09"/>
+<text x="210" y="726.12" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#AD4B09">LLB130 Ø9.5×3.3</text>
+<polyline points="645,350 1100,350" fill="none" stroke="#246E50" stroke-width="3"/>
+<polygon points="1100,350 1084.341963101951,356.6201118192471 1084.341963101951,343.3798881807529" fill="#246E50"/>
+<polyline points="620,650 1100,650" fill="none" stroke="#246E50" stroke-width="3"/>
+<polygon points="1100,650 1084.341963101951,656.6201118192471 1084.341963101951,643.3798881807529" fill="#246E50"/>
+<text x="680" y="631.12" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#246E50">导向压头</text>
+<text x="680" y="541.12" font-family="Microsoft YaHei,sans-serif" font-size="24" fill="#246E50">k≈5N/mm</text>
+<rect x="545" y="1000" width="65" height="270" fill="#A8B1B8" stroke="#172A38" stroke-width="2"/>
+<rect x="365" y="1030" width="180" height="135" fill="#E8B88F" stroke="#AD4B09" stroke-width="2"/>
+<rect x="610" y="1030" width="180" height="135" fill="#E8B88F" stroke="#AD4B09" stroke-width="2"/>
+<text x="680" y="1263.76" font-family="Microsoft YaHei,sans-serif" font-size="27" fill="#AD4B09">M0与磁芯独立固定</text>
+<polyline points="575,1270 575,1330" fill="none" stroke="#AD4B09" stroke-width="4"/>
+<polygon points="575,1330 568.3798881807529,1314.341963101951 581.6201118192471,1314.341963101951" fill="#AD4B09"/>
+<text x="125" y="1406.4" font-family="Microsoft YaHei,sans-serif" font-size="30" fill="#172A38">传感器与绕组分开：留约24mm夹层，必要时中央组件下移。</text>
+<rect x="1240" y="240" width="875" height="1080" fill="#F3F7FA" stroke="#8AA0AE" stroke-width="2"/>
+<text x="1260" y="285.92" font-family="Microsoft YaHei,sans-serif" font-size="34" fill="#172A38">实体装配要点</text>
+<text x="1260" y="334.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">1  三点周边导向，防止偏载使板倾斜。</text>
+<text x="1260" y="376.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">   导向滑动，不锁死，也不旁路承重。</text>
+<text x="1260" y="418.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38"></text>
+<text x="1260" y="460.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">2  板重约3.75N使弹簧预压约0.75mm。</text>
+<text x="1260" y="502.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">   轻按时整板再下沉0—2mm。</text>
+<text x="1260" y="544.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38"></text>
+<text x="1260" y="586.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">3  三只下限位留2.0mm静态间隙。</text>
+<text x="1260" y="628.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">   理想总力约14N；实测上限须&lt;25N。</text>
+<text x="1260" y="670.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">   限位接触后，多余力经固定架旁路。</text>
+<text x="1260" y="712.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38"></text>
+<text x="1260" y="754.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">4  传感器有效受力点仅受轴向压缩。</text>
+<text x="1260" y="796.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">   下座按原厂固定环面支撑，中心退让。</text>
+<text x="1260" y="838.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38"></text>
+<text x="1260" y="880.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">5  传感器钢体可能受磁场/温度干扰。</text>
+<text x="1260" y="922.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">   必须做无人按压、开关线圈的零点测试。</text>
+<text x="1260" y="964.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38"></text>
+<text x="1260" y="1006.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">6  HX711放底座，尽量离绕组≥150mm。</text>
+<text x="1260" y="1048.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">   原配屏蔽桥线与动力线分路。</text>
+<text x="1260" y="1090.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38"></text>
+<text x="1260" y="1132.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#172A38">这是轻按功能样机，不能承受人坐/踩。</text>
+<text x="65" y="1504.64" font-family="Microsoft YaHei,sans-serif" font-size="28" fill="#52636D">顶板自身保持平面；下沉时相对边框略低。剖面不代表已通过强度、磁路或温升验证。</text>
+</svg>
